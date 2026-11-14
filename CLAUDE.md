@@ -1,7 +1,7 @@
 # Nawala (working name) — wedding invitation concept site
 
-- `build.mjs` generates `index.html`. Artwork: `scene.mjs` writes the stippled scene SVGs, `render_art.py` rasterises them to `art/day.webp` and `art/night.webp` (the page uses these as one fixed background).
-- Layout: one locked scene; on tall desktop screens each scroll step swaps the glass panel (deck mode), elsewhere panels scroll normally over the fixed scene. Nav is fixed. Template frames are intentionally empty. Logo: three flat options shown on the page, not yet chosen.
+- `build6.mjs` generates `index.html` (`--inline` writes a standalone copy). Artwork: `scene2.mjs` writes layered SVGs (sky, far clouds, land, near clouds; day and night), `render2.py` rasterises them to `art/*.webp`. Motion (clouds drifting, sun pulse and rays, birds, volcano smoke, swaying palm crowns, walking guests, petals, night fireflies) is CSS over the layers.
+- Layout: one locked scene; on tall desktop screens each scroll step swaps the glass panel (deck mode), elsewhere panels scroll normally over the fixed scene. Nav is fixed. Template frames are intentionally empty. Logo: option B chosen (orange gate with rising sun, knocked out, beside the bold lowercase wordmark). Deck scroll: one wheel gesture or key press moves exactly one step.
 - Standing rule from the owner: every design update is committed and pushed to `main` automatically, without asking. This repo is a private progress viewer for the owner.
-- Product truth lives in `PRODUCT.md`. Copy is Bahasa Indonesia. Fonts: Instrument Serif headlines with one italic phrase, Plus Jakarta Sans for body and logo. No purple/violet anywhere; dark mode is deep navy. No emojis, no eyebrow labels, no middle-dot taglines.
+- Product truth lives in `PRODUCT.md`. Copy is Bahasa Indonesia. Fonts: Plus Jakarta Sans 800 headlines with one phrase in Playfair Display 600 italic; Plus Jakarta Sans for body and logo. No purple/violet anywhere; dark mode is deep navy. No emojis, no eyebrow labels, no middle-dot taglines.
 - View: enable GitHub Pages (Settings > Pages > Deploy from branch `main`, folder `/`), then open https://adjisena-design.github.io/nawala/
