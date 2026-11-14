@@ -42,6 +42,7 @@ Invitations are sent by WhatsApp with a per-guest name link. Guests open them on
 - Logo direction: 3D marble wordmark in soft colours (reference: LAVA AI logo), flattened so it does not look like a balloon; one uniform logo pack.
 - Light theme: soft orange, white, light blue accent. Dark theme: deep navy / blue. No purple or violet anywhere (user rejected it as looking generated).
 - Visual references the user made binding: ieef.or.id (textured vector scenes, arch frames, glass cards over full-bleed art) but lighter, with deeper shadows and more translucency; elevenlabs.io for overall cleanliness.
+- Headlines: Instrument Serif with one italic phrase (user chose this from Dribbble references on 14 Nov); body and logo stay Plus Jakarta Sans. Hero: full-screen vector valley scene with centred text.
 - No emojis. No dotted "status" chips or middle-dot taglines.
 
 ## Evidence on Hand

@@ -243,7 +243,7 @@ function heroBack() {
 }
 
 
-function backdrop(kind, seed) {
+function backdropOld(kind, seed) {
   const BW = 1600, BH = 1000, rr = rng(Math.round(seed * 100));
   const sky = `<defs><linearGradient id="bk${kind}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hb-sky1)"/><stop offset=".75" style="stop-color:var(--hb-sky2)"/></linearGradient></defs><rect width="${BW}" height="${BH}" style="fill:url(#bk${kind})"/>`;
   const r1 = ridge({ w: BW, h: BH, y: 740, amp: 46, seed, f: 2.3, fill: [v('hb-r1'), v('hb-r1d')], line: v('hb-line'), lines: 3, sh: 'paint-s' });
@@ -257,6 +257,88 @@ function backdrop(kind, seed) {
   const clouds = `<g class="drift">${cloud(60 + rr() * 40, 620 + rr() * 30, .8, v('hb-cloud'), v('hb-cline'))}${cloud(1540 + rr() * 40, 640 + rr() * 30, .8, v('hb-cloud'), v('hb-cline'))}</g>`;
   return svg(sky + far + clouds + r1.svg + mid + r2.svg + r3.svg, 'art-back', 'xMidYMax slice', `0 0 ${BW} ${BH}`);
 }
+
+
+/* ---------- vista: rich layered valley scene (no filters) ---------- */
+const VW = 1600, VH = 1000;
+function noise1(seed) { const r = rng(Math.round(seed)), a = Array.from({ length: 256 }, () => r()); return t => { const i = Math.floor(t), fr = t - i, sm = fr * fr * (3 - 2 * fr); return a[i & 255] * (1 - sm) + a[(i + 1) & 255] * sm; }; }
+function ridgeLine(o) {
+  const n1 = noise1(o.seed * 13 + 1), n = o.n || 110, pts = [], ro = o.rough || 0;
+  for (let i = 0; i <= n; i++) { const t = i / n, x = -60 + (VW + 120) * t;
+    let h = n1(t * o.f) + .5 * n1(t * o.f * 2.3 + 40) + .25 * n1(t * o.f * 5.1 + 90) + ro * n1(t * o.f * 13 + 140);
+    h /= (1.75 + ro); pts.push([x, o.y - o.amp * h * (o.env ? o.env(t) : 1)]); }
+  const yAt = x => { const u = (x + 60) / (VW + 120) * n, i = Math.max(0, Math.min(n - 1, Math.floor(u))), fr = u - i; return pts[i][1] * (1 - fr) + pts[i + 1][1] * fr; };
+  return { d: 'M' + pts.map(q => f(q[0]) + ',' + f(q[1])).join(' L') + ` L${VW + 60},${VH + 20} L-60,${VH + 20}Z`, yAt };
+}
+const cub = (P, t) => { const u = 1 - t; return [u * u * u * P[0][0] + 3 * u * u * t * P[1][0] + 3 * u * t * t * P[2][0] + t * t * t * P[3][0], u * u * u * P[0][1] + 3 * u * u * t * P[1][1] + 3 * u * t * t * P[2][1] + t * t * t * P[3][1]]; };
+function pineD(x, y, h, r) {
+  const m = Math.max(5, Math.round(h / 40)), w0 = h * .25; let base = '', light = '';
+  for (let k = 0; k < m; k++) { const u = (k + 1) / m, top = y - h + (k / m) * h * .86, th = h * .86 / m * 1.95, w = w0 * Math.pow(u, .85) * (.88 + r() * .24), by = top + th, z = 6;
+    let d = `M${f(x)},${f(top)} L${f(x + w)},${f(by)}`;
+    for (let j = 1; j <= z; j++) { const px = x + w - 2 * w * j / z, py = by - (j % 2 ? th * .3 : 0) + (r() - .5) * th * .1; d += ` L${f(px)},${f(j === z ? by : py)}`; }
+    base += d + 'Z';
+    light += `M${f(x)},${f(top + th * .12)} L${f(x - w * .84)},${f(by - th * .08)} L${f(x - w * .5)},${f(by - th * .36)} L${f(x - w * .22)},${f(by - th * .12)} L${f(x)},${f(by - th * .32)}Z`; }
+  return { base, light, trunk: `M${f(x - h * .013)},${f(y - h * .1)}h${f(h * .026)}v${f(h * .1)}h${f(-h * .026)}z` };
+}
+function vistaSym(o) {
+  const id = o.id, r = rng(o.seed * 31 + 7), V = k => `var(--v-${k})`, sx = o.sunX || 800;
+  const lg = (k, y1, y2, c1, c2) => `<linearGradient id="${id}${k}" gradientUnits="userSpaceOnUse" x1="0" y1="${y1}" x2="0" y2="${y2}"><stop offset="0" style="stop-color:${c1}"/><stop offset="1" style="stop-color:${c2}"/></linearGradient>`;
+  const u = k => `style="fill:url(#${id}${k})"`;
+  const env = t => .22 + .78 * Math.pow(Math.abs(2 * t - 1), 1.25);
+  const m1 = ridgeLine({ seed: o.seed + 1, y: 605, amp: 310, f: 6, rough: .5 }), m2 = ridgeLine({ seed: o.seed + 2, y: 618, amp: 235, f: 8, rough: .6 }), m3 = ridgeLine({ seed: o.seed + 3, y: 632, amp: 175, f: 10, rough: .5 });
+  const v1 = ridgeLine({ seed: o.seed + 4, y: 644, amp: 165, f: 5, env });
+  let defs = `<linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${V('sky1')}"/><stop offset=".42" style="stop-color:${V('sky2')}"/><stop offset=".62" style="stop-color:${V('sky3')}"/></linearGradient>`
+    + `<radialGradient id="${id}glow"><stop offset="0" style="stop-color:${V('glow')};stop-opacity:.95"/><stop offset="1" style="stop-color:${V('glow')};stop-opacity:0"/></radialGradient>`
+    + `<radialGradient id="${id}ag"><stop offset="0" style="stop-color:${V('archglow')};stop-opacity:.9"/><stop offset="1" style="stop-color:${V('archglow')};stop-opacity:0"/></radialGradient>`
+    + `<linearGradient id="${id}mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${V('haze')};stop-opacity:0"/><stop offset=".55" style="stop-color:${V('haze')};stop-opacity:.85"/><stop offset="1" style="stop-color:${V('haze')};stop-opacity:0"/></linearGradient>`
+    + lg('m1', 300, 630, V('m1'), V('haze')) + lg('m2', 390, 650, V('m2'), V('haze')) + lg('m3', 460, 670, V('m3'), V('haze'))
+    + lg('v1', 500, 700, V('b1'), V('b1b')) + lg('w', 626, 1000, V('w1'), V('w2'))
+    + lg('b1', 610, 730, V('b1'), V('b1b')) + lg('b2', 690, 910, V('b2'), V('b2b')) + lg('fg', 830, 1010, V('g1'), V('g2'));
+  let far = '';
+  for (let i = 0; i < 130; i++) { const x = r() * VW; if (Math.abs(x - 800) < 150) continue; const y = v1.yAt(x) + 2 + r() * 26, h = 24 + r() * 30, w = h * .2; far += `M${f(x)},${f(y - h)}l${f(w)},${f(h)}h${f(-2 * w)}z`; }
+  const banks = [
+    { P: [[-40, 640], [200, 610], [480, 620], [640, 652]], back: 'C560,694 300,702 -40,722Z', g: 'b1', n: 15, hs: [64, 60], tone: 'p2' },
+    { P: [[1640, 640], [1400, 614], [1150, 620], [980, 656]], back: 'C1080,700 1350,706 1640,726Z', g: 'b1', n: 15, hs: [64, 60], tone: 'p2' },
+    { P: [[-40, 722], [250, 690], [560, 730], [720, 802]], back: 'C600,862 300,884 -40,902Z', g: 'b2', n: 11, hs: [120, 100], tone: 'p3' },
+    { P: [[1640, 742], [1380, 700], [1180, 740], [1060, 822]], back: 'C1180,882 1400,902 1640,912Z', g: 'b2', n: 11, hs: [120, 100], tone: 'p3' },
+  ];
+  let bankSvg = '';
+  banks.forEach((b, bi) => { const P = b.P; let ba = '', li = '', tr = '';
+    const ts = Array.from({ length: b.n }, () => .04 + r() * .8).sort((a, c) => a - c);
+    for (const t of ts) { const q = cub(P, t), t3 = pineD(q[0], q[1] + 6 + r() * 10, b.hs[0] + r() * b.hs[1], r); ba += t3.base; li += t3.light; tr += t3.trunk; }
+    const shape = `<path d="M${P[0]} C${P[1]} ${P[2]} ${P[3]} ${b.back}" ${u(b.g)}/>`;
+    bankSvg += shape + `<path d="${tr}" style="fill:${V('tr')}"/><path d="${ba}" style="fill:${V(b.tone)}"/><path d="${li}" style="fill:${V('pl')};opacity:${bi < 2 ? .35 : .5}"/>`;
+    if (bi === 1) bankSvg += `<rect x="-60" y="650" width="${VW + 120}" height="120" style="fill:url(#${id}mist);opacity:.45"/>`; });
+  const FL = [[-40, 850], [300, 830], [520, 920], [640, 1010]], FR = [[1640, 860], [1350, 840], [1150, 930], [1000, 1010]];
+  let gb = '', gl = '', gt = '';
+  for (const [x, y, h] of [[70, 965, 580], [200, 935, 440], [320, 915, 330], [1535, 965, 560], [1410, 940, 450], [1295, 918, 320]]) { const t3 = pineD(x + (r() - .5) * 30, y, h * (.92 + r() * .16), r); gb += t3.base; gl += t3.light; gt += t3.trunk; }
+  const blades = ['', '', '']; let flowers = '', flowers2 = '';
+  [FL, FR].forEach(P => { for (let i = 0; i < 330; i++) { const t = r(), q = cub(P, t), inside = i >= 170, x = q[0] + (r() - .5) * 8, y = inside ? q[1] + r() * (VH - q[1]) : q[1] + 5, h = 14 + r() * 24, dx = (r() - .5) * 16;
+      blades[i % 3] += `M${f(x)},${f(y)}q${f(dx * .3)},${f(-h * .6)} ${f(dx)},${f(-h)}`;
+      if (inside && i % 6 === 0) { const c = `M${f(x)},${f(y - h)}m-3.2,0a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0`; if (i % 12 === 0) flowers += c; else flowers2 += c; } } });
+  let streaks = ''; for (let i = 0; i < 16; i++) { const y = 640 + r() * 330, x = 620 + r() * 420, w = 30 + r() * 90; streaks += `M${f(x)},${f(y)}h${f(w)}`; }
+  const island = !o.island ? '' : `<circle cx="800" cy="668" r="120" style="fill:url(#${id}ag)"/>`
+    + `<g opacity=".28" transform="translate(0,1436) scale(1,-1)"><path d="M768,716V664a32,32 0 0 1 64,0V716Z M781,716V666a19,19 0 0 1 38,0V716Z" fill-rule="evenodd" style="fill:${V('arch')}"/></g>`
+    + `<path d="M690,722 C720,702 880,702 910,722 C880,734 720,734 690,722Z" style="fill:${V('isle')}"/>`
+    + `<path d="M758,718h84v6h-84z" style="fill:${V('archsh')}"/><path d="M768,718V664a32,32 0 0 1 64,0V718Z M781,718V666a19,19 0 0 1 38,0V718Z" fill-rule="evenodd" style="fill:${V('arch')}"/>`
+    + `<path d="M705,720q4,-14 8,0 M722,716q5,-18 9,0 M868,716q5,-18 9,0 M886,720q4,-13 8,0" style="fill:none;stroke:${V('p2')};stroke-width:3;stroke-linecap:round"/>`;
+  const body = `<rect width="${VW}" height="${VH}" style="fill:url(#${id}sky)"/>`
+    + `<circle cx="${sx}" cy="590" r="430" style="fill:url(#${id}glow)"/><circle cx="${sx}" cy="560" r="44" style="fill:${V('sun')}"/>`
+    + `<path d="${m1.d}" ${u('m1')}/><path d="${m2.d}" ${u('m2')}/><rect x="-60" y="500" width="${VW + 120}" height="150" style="fill:url(#${id}mist);opacity:.7"/><path d="${m3.d}" ${u('m3')}/>`
+    + `<rect x="-60" y="560" width="${VW + 120}" height="130" style="fill:url(#${id}mist)"/>`
+    + `<path d="${v1.d}" ${u('v1')}/><path d="${far}" style="fill:${V('p1')}"/>`
+    + `<rect x="-60" y="626" width="${VW + 120}" height="400" ${u('w')}/><ellipse cx="${sx}" cy="650" rx="300" ry="70" style="fill:url(#${id}glow);opacity:.6"/>`
+    + `<path d="${streaks}" style="fill:none;stroke:${V('whi')};stroke-width:2;stroke-linecap:round;opacity:.55"/>`
+    + island + bankSvg
+    + `<path d="M${FL[0]} C${FL[1]} ${FL[2]} ${FL[3]} L-40,1010Z" ${u('fg')}/><path d="M${FR[0]} C${FR[1]} ${FR[2]} ${FR[3]} L1640,1010Z" ${u('fg')}/>`
+    + `<path d="${gt}" style="fill:${V('tr')}"/><path d="${gb}" style="fill:${V('p3')}"/><path d="${gl}" style="fill:${V('pl')};opacity:.38"/>`
+    + blades.map((d, i) => `<path d="${d}" style="fill:none;stroke:${V('gr' + (i + 1))};stroke-width:2.4;stroke-linecap:round"/>`).join('')
+    + `<path d="${flowers}" style="fill:${V('fl1')}"/><path d="${flowers2}" style="fill:${V('fl2')}"/>`;
+  return `<symbol id="${id}" viewBox="0 0 ${VW} ${VH}"><defs>${defs}</defs>${body}</symbol>`;
+}
+const VSYM = vistaSym({ id: 'vsA', seed: 3, island: true }) + vistaSym({ id: 'vsB', seed: 11, sunX: 520 });
+function vista(o) { return svg(`<use href="#${o.sym || 'vsB'}" width="${VW}" height="${VH}"${o.flip ? ` transform="translate(${VW},0) scale(-1,1)"` : ''}/>`, o.cls || '', o.par || 'xMidYMax slice', `0 0 ${VW} ${VH}`); }
+function backdrop(kind, seed) { return vista({ sym: 'vsB', cls: 'art-back quiet', flip: Math.round(seed) % 2 === 0, par: ({ meadow: 'xMinYMax slice', lake: 'xMaxYMax slice' })[kind] }); }
 
 /* ---------- logo pack (flattened marble) ---------- */
 let lg = 0;
@@ -313,7 +395,7 @@ const gallery = TPL.map(t => `
   </li>`).join('');
 
 const css = `/* Hallmark · shape: arch-window gallery · genre: editorial · theme: custom · job: browse templates (try) · idea: "every invitation is a painted landscape seen through an arched pendopo window" · vibe: "light, deep painted vector, glass over art"
- * paper: oklch(98.6% 0.006 250) · accent: oklch(74% 0.13 55) · display: Plus Jakarta Sans 800 · body: Plus Jakarta Sans · wordmark: Plus Jakarta Sans 800 · hero: one wide arch holding the live template scene, five scene tabs on a glass rail inside it · nav: glass bar, lockup left, four links, theme switch, one action · footer: lockup, links, legal line on a pale band · imagery: authored vector scenes (the product's templates) · signature: the arch window that repaints as you pick a template
+ * paper: oklch(98.6% 0.006 250) · accent: oklch(74% 0.13 55) · display: Instrument Serif · body: Plus Jakarta Sans · wordmark: Plus Jakarta Sans 800 · hero: one wide arch holding the live template scene, five scene tabs on a glass rail inside it · nav: glass bar, lockup left, four links, theme switch, one action · footer: lockup, links, legal line on a pale band · imagery: authored vector scenes (the product's templates) · signature: the arch window that repaints as you pick a template
  * axes: light/grotesk-heavy/warm · posture: restrained, accent lives in the paintings · contrast: pass · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V5 · weakest: S, a garden scene could suit any venue, so every template carries a named place and a real couple-name layout */
 /* Hallmark · dismissed 3 · five template screens are the products themselves, equal by design, not icon tiles */
@@ -322,17 +404,18 @@ const css = `/* Hallmark · shape: arch-window gallery · genre: editorial · th
 /* Hallmark · waive 79 · the arch painting fills the fold under the head, the scene is the hero visual · the template switcher sits inside it */
 /* Hallmark · project design wins · typeface pinned by the user: same as ieef.or.id (Plus Jakarta Sans), overriding the fonts.md ban */
 /* Hallmark · waive 38iii · two-tone heads, the continuation in a softer ink, on every h1 and h2 · this is the house heading pattern of the user's own RTD site, asked for by name */
+/* Hallmark · project design wins · serif heads with one italic phrase, pinned by the user from their references (overrides 38i) */
 /* Hallmark · waive 29 · sun bloom sits inside the painted arch scenes only · the bloom is part of the authored landscape artwork, not a wash behind text */
 :root {
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
   --text-xs: 0.8125rem; --text-sm: 0.9375rem; --text-md: 1.0625rem; --text-lg: 1.25rem; --text-xl: 1.5rem;
-  --text-display: clamp(2.5rem, 3.4vw + 1rem, 4.25rem); --text-section: clamp(2rem, 2.4vw + 1rem, 3.25rem); --text-title: clamp(1.2rem, .6vw + .95rem, 1.45rem); --text-lead: clamp(1.0625rem, .3vw + 1rem, 1.25rem);
+  --text-display: clamp(2.7rem, 3.6vw + 1rem, 4.8rem); --text-section: clamp(2.3rem, 2.8vw + 1rem, 3.9rem); --text-title: clamp(1.2rem, .6vw + .95rem, 1.45rem); --text-lead: clamp(1.0625rem, .3vw + 1rem, 1.25rem);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 620ms;
   --container: 1240px; --gutter: 48px; --gap-columns: 24px; --section-gap: 136px;
   --z-raised: 10; --z-sticky-nav: 300;
   --radius-card: 22px; --radius-arch: 999px; --radius-pill: 999px;
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, sans-serif; --font-body: "Plus Jakarta Sans", ui-sans-serif, sans-serif; --font-outlier: "Plus Jakarta Sans", ui-sans-serif, sans-serif;
-  --tracking-display: -0.035em;
+  --font-display: "Instrument Serif", ui-serif, serif; --font-body: "Plus Jakarta Sans", ui-sans-serif, sans-serif; --font-outlier: "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+  --tracking-display: -0.015em;
   --grain: url(data:image/png;base64,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); --scene-shadow: oklch(28% 0.06 35 / .42); --scene-shadow-l: oklch(26% 0.06 35 / .5);
   --logo-1: #FFC39C; --logo-2: #FF8A4C; --logo-3: #FFB07A; --logo-4: #9CC2EE; --logo-5: #FFE9DA; --logo-6: #F59C8E;
   --logo-light: #FFFFFF; --logo-edge: #B8653C; --logo-mask: #FFFFFF; --logo-cut: #000000;
@@ -359,7 +442,8 @@ const css = `/* Hallmark · shape: arch-window gallery · genre: editorial · th
   --b-glass: oklch(28% 0.05 252 / .42); --b-glass-strong: oklch(28% 0.05 252 / .62); --b-glass-edge: oklch(88% 0.03 245 / .2); --b-glass-hi: oklch(100% 0 0 / .14); --b-glass-ink: oklch(96% 0.01 250); --b-shadow: oklch(6% 0.03 255 / .6); --b-demo: oklch(18% 0.04 255 / .45);
 }
 html[data-theme="light"] {
-  --foot-ink: #3A1E12; --hb-sky1:#D9E9F9; --hb-sky2:#FFF1E6; --hb-r1:#F8DDCB; --hb-r1d:#F1C9B0; --hb-r2:#D3E4F5; --hb-r2d:#B7D1EC; --hb-r3:#F7FAFD; --hb-line:#FFFFFF; --hb-cloud:#FFFFFF; --hb-cline:#F0D9CB; --color-head-soft: oklch(56% 0.03 45);
+  --v-sky1:#CDE5F7; --v-sky2:#E9F4FB; --v-sky3:#FFF0E2; --v-sun:#FFE6CF; --v-glow:#FFD2AE; --v-haze:#F4F8FA; --v-m1:#C6DCF0; --v-m2:#A5C6E3; --v-m3:#84AED0; --v-b1:#8DBBAA; --v-b1b:#B4D6BE; --v-b2:#6FAE90; --v-b2b:#A5D39F; --v-g1:#CFE9A6; --v-g2:#8CC47E; --v-p1:#7FAFA4; --v-p2:#4C8F7C; --v-p3:#2C6C5C; --v-pl:#8FD0A4; --v-tr:#5B4636; --v-w1:#CDE9F7; --v-w2:#7CBFE8; --v-whi:#FFFFFF; --v-gr1:#6DB06C; --v-gr2:#B4DB8E; --v-gr3:#4E9566; --v-fl1:#FFB085; --v-fl2:#FFFFFF; --v-arch:#FFFDF8; --v-archsh:#F1D8C4; --v-archglow:#FFFFFF; --v-isle:#86BC84;
+  --foot-ink: #1C3526; --hb-sky1:#D9E9F9; --hb-sky2:#FFF1E6; --hb-r1:#F8DDCB; --hb-r1d:#F1C9B0; --hb-r2:#D3E4F5; --hb-r2d:#B7D1EC; --hb-r3:#F7FAFD; --hb-line:#FFFFFF; --hb-cloud:#FFFFFF; --hb-cline:#F0D9CB; --color-head-soft: oklch(56% 0.03 45);
   --color-paper: oklch(98.6% 0.006 250); --color-paper-2: oklch(96.2% 0.013 245); --color-paper-3: oklch(95% 0.025 60);
   --color-ink: oklch(23% 0.02 40); --color-ink-2: oklch(36% 0.02 40); --color-muted: oklch(50% 0.02 40);
   --color-rule: oklch(90.5% 0.01 250); --color-accent: oklch(74% 0.13 55); --color-accent-ink: oklch(22% 0.03 45); --color-accent-deep: oklch(48% 0.12 50); --color-focus: oklch(52% 0.15 250);
@@ -370,6 +454,9 @@ html[data-theme="light"] {
   --s-sky1:#D8E9FA; --s-sky2:#FFE9DA; --s-sun:#FFA466; --s-ring:#FFD6BE; --s-glow:#FFC3A0; --s-cloud:#FFFFFF; --s-cline:#F0D5C4;
   --s-h1:#FCE4D3; --s-h1d:#F2C8AE; --s-h2:#C9DEF3; --s-h2d:#9CBFE6; --s-h3:#F4B593; --s-h3d:#DC8D69; --s-line:#FFF4EC;
   --s-wall:#FFF6EE; --s-roof:#FF9A5C; --s-river:#D6EAFB; --s-riverd:#A6CDF2; --s-rline:#FFFFFF; --s-tree:#C9745A; --s-treel:#EFAA8C;
+}
+html[data-theme="dark"], .night {
+  --v-sky1:#040A18; --v-sky2:#0A1B30; --v-sky3:#234A5A; --v-sun:#FFE4C4; --v-glow:#F2A877; --v-haze:#1D4253; --v-m1:#1B3852; --v-m2:#142C45; --v-m3:#0F2337; --v-b1:#0F2E33; --v-b1b:#123A3B; --v-b2:#0B2529; --v-b2b:#0F3331; --v-g1:#123D37; --v-g2:#071C1C; --v-p1:#12363B; --v-p2:#0C2A2E; --v-p3:#06181C; --v-pl:#1F5A52; --v-tr:#081212; --v-w1:#17465A; --v-w2:#081B2B; --v-whi:#8FD6CC; --v-gr1:#1F5E50; --v-gr2:#174A41; --v-gr3:#0E322D; --v-fl1:#FFB98A; --v-fl2:#A8DDD4; --v-arch:#FFE9D2; --v-archsh:#E9B890; --v-archglow:#FFB87E; --v-isle:#134038;
 }
 html[data-theme="dark"] {
   --foot-ink: oklch(92% 0.02 250); --hb-sky1:#0A1430; --hb-sky2:#1A3158; --hb-r1:#1F3A63; --hb-r1d:#172E52; --hb-r2:#162C50; --hb-r2d:#10223F; --hb-r3:#0D1628; --hb-line:#4C6C9E; --hb-cloud:#24406C; --hb-cline:#3F5F92; --color-head-soft: oklch(72% 0.04 245);
@@ -394,7 +481,7 @@ body { margin: 0; background: var(--color-paper); color: var(--color-ink); font-
 ::selection { background: color-mix(in oklab, var(--color-accent) 30%, transparent); color: var(--color-ink); }
 :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 a { color: inherit; text-underline-offset: .2em; text-decoration-thickness: 1px; }
-h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 800; font-synthesis: none; overflow-wrap: break-word; min-width: 0; text-wrap: balance; letter-spacing: var(--tracking-display); }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-synthesis: none; overflow-wrap: break-word; min-width: 0; text-wrap: balance; letter-spacing: var(--tracking-display); }
 p { margin: 0; text-wrap: pretty; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 svg { display: block; }
@@ -431,12 +518,17 @@ html[data-theme="dark"] .theme .i-moon { display: block; }
 @media (max-width: 480px) { .nav { padding-left: 14px; gap: 8px; } .nav .btn { padding: 0 14px; } .nav-right { gap: 2px; } }
 
 /* hero */
-.hero-wrap { position: relative; isolation: isolate; margin-top: -86px; padding-top: 100px; padding-bottom: 120px; overflow: hidden; }
+.hero-wrap { position: relative; isolation: isolate; margin-top: -86px; min-height: max(100svh, 760px); overflow: hidden; }
 .hero-back { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
-.hero { padding-top: 36px; }
-.soft { color: var(--color-head-soft); }
+.hero { padding-top: clamp(140px, 17vh, 190px); text-align: center; display: grid; justify-items: center; gap: 22px; }
+.hero h1 { max-width: 20ch; }
+.hero .lead { max-width: 36ch; color: var(--color-ink); }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn-glass { background: var(--glass-strong); color: var(--glass-ink); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px var(--glass-edge), 0 10px 24px -14px var(--shadow-deep); }
+.art-back.quiet { opacity: .5; }
+.soft { font-style: italic; }
 .hero-head { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: var(--gap-columns); align-items: end; }
-h1 { font-size: var(--text-display); line-height: 1.02; max-width: 15ch; }
+h1 { font-size: var(--text-display); line-height: 1; }
 .hero-sub { display: grid; gap: 20px; justify-items: start; padding-bottom: 8px; }
 .lead { font-size: var(--text-lead); color: var(--color-ink-2); max-width: 34ch; }
 .arch { position: relative; margin-top: 32px; height: clamp(420px, calc(100svh - 390px), 640px); border-radius: 50% 50% 28px 28px / 46% 46% 28px 28px; overflow: hidden; box-shadow: 0 40px 80px -40px var(--shadow-deep), 0 0 0 1px var(--color-rule); isolation: isolate; }
@@ -473,14 +565,14 @@ h2 { font-size: var(--text-section); line-height: 1.05; max-width: 16ch; }
 
 /* gallery */
 .gallery { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; }
-.card h3 { font-size: var(--text-title); margin-top: 18px; }
+.card h3 { font-size: 1.6rem; margin-top: 18px; }
 .card-line { font-size: var(--text-sm); color: var(--color-muted); margin: 4px 0 10px; }
 .screen { position: relative; aspect-ratio: 9 / 17; border-radius: 999px 999px 26px 26px / 36% 36% 26px 26px; overflow: hidden; box-shadow: 0 30px 50px -30px var(--shadow-deep), 0 0 0 1px var(--color-rule); transition: transform var(--dur-long) var(--ease-out), box-shadow var(--dur-long) var(--ease-out); }
 .card:hover .screen { transform: translateY(-8px); box-shadow: 0 44px 60px -32px var(--shadow-deep), 0 0 0 1px var(--color-rule); }
 .screen svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .inv { position: absolute; inset: 15% 8% auto; text-align: center; color: var(--tc); }
 .inv-k { font-size: .72rem; opacity: .85; }
-.inv-n { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.15rem, 1.4vw, 1.5rem); line-height: 1.1; margin: 6px 0 4px; }
+.inv-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.15rem, 1.4vw, 1.5rem); line-height: 1.1; margin: 6px 0 4px; }
 .inv-n span { display: block; font-size: .8em; opacity: .8; }
 .inv-d { font-size: .72rem; opacity: .9; }
 .inv-guest { position: absolute; left: 10%; right: 10%; bottom: 6%; padding: 8px; border-radius: 16px; text-align: center; font-size: .72rem; background: var(--tcard); -webkit-backdrop-filter: blur(12px) saturate(150%); backdrop-filter: blur(12px) saturate(150%); border: 1px solid color-mix(in oklab, var(--tc) 22%, transparent); color: var(--tc); }
@@ -493,21 +585,21 @@ h2 { font-size: var(--text-section); line-height: 1.05; max-width: 16ch; }
 .band { position: relative; padding: 120px 0 140px; overflow: hidden; isolation: isolate; }
 .band-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .band-head { max-width: 560px; padding: 32px 34px; border-radius: 28px; }
-.band-head h2 { color: var(--b-glass-ink); }
-.band-head .soft { color: var(--b-cline); }
+.band-head h2 { color: var(--glass-ink); }
+
 .band-head p { margin-top: 14px; color: var(--glass-ink); opacity: .85; }
-.band .glass { --glass: var(--b-glass); --glass-strong: var(--b-glass-strong); --glass-edge: var(--b-glass-edge); --glass-hi: var(--b-glass-hi); --glass-ink: var(--b-glass-ink); --shadow-deep: var(--b-shadow); }
+.band .glass { background: var(--glass-strong); }
 .svc { margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .svc li { padding: 22px; border-radius: var(--radius-card); display: flex; flex-direction: column; gap: 14px; min-height: 280px; }
 .svc h3 { font-family: var(--font-body); font-weight: 800; font-size: var(--text-md); letter-spacing: -0.01em; }
 .svc .what { font-size: var(--text-sm); opacity: .85; }
-.svc .demo { margin-top: auto; border-radius: 14px; padding: 12px; background: var(--b-demo); font-size: var(--text-xs); display: grid; gap: 8px; }
+.svc .demo { margin-top: auto; border-radius: 14px; padding: 12px; background: var(--glass); font-size: var(--text-xs); display: grid; gap: 8px; }
 .row { display: flex; justify-content: space-between; gap: 8px; }
 .row b { font-weight: 500; }
-.ok { color: var(--b-roof); }
-.no-open { color: var(--b-glass-ink); }
-.qr { width: 64px; height: 64px; fill: var(--b-roof); }
-.qr .qr-o { fill: none; stroke: var(--b-roof); stroke-width: 3; }
+.ok { color: var(--color-accent-deep); font-weight: 500; }
+.no-open { color: var(--color-muted); }
+.qr { width: 64px; height: 64px; fill: var(--color-ink); }
+.qr .qr-o { fill: none; stroke: var(--color-ink); stroke-width: 3; }
 .mini { position: relative; height: 70px; border-radius: 10px; overflow: hidden; }
 .mini svg { width: 100%; height: 100%; }
 .live { position: absolute; left: 8px; top: 8px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--b-roof); color: var(--b-sky1); font-weight: 500; font-size: .7rem; }
@@ -522,8 +614,8 @@ th, td { padding: 16px 22px; text-align: left; border-bottom: 1px solid var(--co
 th { font-weight: 500; } b { font-weight: 500; }
 thead th { vertical-align: bottom; padding-top: 28px; padding-bottom: 24px; font-weight: 400; }
 thead th:first-child { width: 34%; }
-.pk { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; font-size: var(--text-xl); display: block; }
-.pp { display: block; font-size: 2rem; font-family: var(--font-display); font-weight: 800; letter-spacing: -0.03em; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.pk { font-family: var(--font-body); font-weight: 800; letter-spacing: -0.02em; font-size: var(--text-xl); display: block; }
+.pp { display: block; font-size: 2rem; font-family: var(--font-body); font-weight: 800; letter-spacing: -0.03em; margin-top: 6px; font-variant-numeric: tabular-nums; }
 .pd { display: block; color: var(--color-muted); font-size: var(--text-xs); margin-top: 4px; }
 .pop { background: color-mix(in oklab, var(--color-paper-3) 70%, transparent); }
 td .ico { color: var(--color-accent-deep); }
@@ -587,11 +679,10 @@ details p { padding: 0 0 22px; color: var(--color-ink-2); max-width: 60ch; }
 .hero-wrap::after, .art-sec::after, .band::after, .closing::after { z-index: -1; }
 .arch::after, .screen::after { z-index: 1; }
 .inv, .inv-guest, .hero-card, .tabs { z-index: 2; }
-.art-sec, .band, .closing { content-visibility: auto; contain-intrinsic-size: auto 1100px; }
 @media (max-width: 900px), (pointer: coarse) { .drift, .flow { animation: none; } .glass, .panel { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); } }
 
 /* footer */
-footer { background: var(--s-h3d); padding: 40px 0 44px; font-size: var(--text-sm); color: var(--foot-ink); }
+footer { background: var(--v-g2); padding: 40px 0 44px; font-size: var(--text-sm); color: var(--foot-ink); }
 .foot { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
 .foot ul { display: flex; gap: 22px; flex-wrap: wrap; }
 .foot a { text-decoration: none; color: var(--foot-ink); }
@@ -612,6 +703,7 @@ function tokenize(css) {
 const sharedDefs = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
   ${['paint-s', 'paint', 'paint-l'].map((id, i) => { const dy = [4, 10, 16][i], sd = [4, 11, 16][i], sh = i === 2 ? 'var(--scene-shadow-l)' : 'var(--scene-shadow)';
     return `<filter id="${id}" x="-15%" y="-25%" width="130%" height="170%" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="${dy}" stdDeviation="${sd}" style="flood-color:${sh}"/></filter>`; }).join('')}
+  ${VSYM}
   <filter id="bloom" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="30"/></filter>
 </defs></svg>`;
 
@@ -625,7 +717,7 @@ const html = `<!DOCTYPE html>
 <title>Nawala, undangan pernikahan yang dilukis berlapis</title>
 <meta name="description" content="Undangan pernikahan digital berupa lukisan berlapis, dengan RSVP, buku tamu QR, dan live streaming dalam satu pesanan.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;800&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('nawala-theme');document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}</script>
 <style>
 ${tokenize(css)}
@@ -648,25 +740,11 @@ ${sharedDefs}
 </nav>
 
 <main id="top">
-<div class="hero-wrap">${heroBack()}
+<div class="hero-wrap">${vista({ sym: 'vsA', cls: 'hero-back' })}
 <header class="hero container">
-  <div class="hero-head">
-    <h1>Undangan pernikahan <span class="soft">yang dilukis lapis demi lapis.</span></h1>
-    <div class="hero-sub">
-      <p class="lead">Lima lukisan siap pakai, dengan nama tiap tamu di undangannya.</p>
-      <a class="btn" href="#template">Lihat semua template</a>
-    </div>
-  </div>
-  <div class="arch">
-    ${heroScenes}
-    <div class="hero-card glass" aria-live="polite">
-      <p class="k">Undangan pernikahan</p>
-      <p class="n" id="hc-n">Laras &amp; Bima</p>
-      <p class="d" id="hc-d">Sabtu, 12 Juli 2027</p>
-      <p class="to">Kepada Tante Rina</p>
-    </div>
-    <div class="tabs glass" role="tablist" aria-label="Pilih lukisan">${heroTabs.replace(/<\/span>([^<]+)<\/button>/g, '</span><span class="tab-label">$1</span></button>')}</div>
-  </div>
+  <h1>Undangan pernikahan yang <span class="soft">dilukis</span> lapis demi lapis.</h1>
+  <p class="lead">Lima lukisan siap pakai, dengan nama tiap tamu di undangannya.</p>
+  <div class="hero-actions"><a class="btn" href="#template">Lihat template</a><a class="btn btn-glass" href="#harga">Lihat harga</a></div>
 </header>
 </div>
 
@@ -682,7 +760,7 @@ ${sharedDefs}
 </section>
 
 <section id="layanan" class="band" aria-labelledby="layanan-h">
-  ${bandScene()}
+  ${vista({ sym: 'vsB', cls: 'band-art', flip: true })}
   <div class="container">
     <div class="band-head glass">
       <h2 id="layanan-h">Dari undangan pertama terkirim <span class="soft">sampai tamu terakhir pulang.</span></h2>
@@ -764,7 +842,7 @@ ${sharedDefs}
 </section>
 
 <section class="closing" aria-labelledby="close-h">
-  ${closingScene()}
+  ${vista({ sym: 'vsA', cls: 'closing-art', flip: true })}
   <div class="container"><div class="closing-box glass">
     <h2 id="close-h">Pilih lukisanmu, <span class="soft">tamu yang menunggu.</span></h2>
     <a class="btn" href="#template">Lihat semua template</a>
