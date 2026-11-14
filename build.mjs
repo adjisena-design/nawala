@@ -242,6 +242,22 @@ function heroBack() {
     'hero-back', 'xMidYMax slice', `0 0 ${BW} ${BH}`);
 }
 
+
+function backdrop(kind, seed) {
+  const BW = 1600, BH = 1000, rr = rng(Math.round(seed * 100));
+  const sky = `<defs><linearGradient id="bk${kind}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hb-sky1)"/><stop offset=".75" style="stop-color:var(--hb-sky2)"/></linearGradient></defs><rect width="${BW}" height="${BH}" style="fill:url(#bk${kind})"/>`;
+  const r1 = ridge({ w: BW, h: BH, y: 740, amp: 46, seed, f: 2.3, fill: [v('hb-r1'), v('hb-r1d')], line: v('hb-line'), lines: 3, sh: 'paint-s' });
+  const r2 = ridge({ w: BW, h: BH, y: 840, amp: 36, seed: seed + 2.9, f: 1.7, fill: [v('hb-r2'), v('hb-r2d')], line: v('hb-line'), lines: 3 });
+  const r3 = ridge({ w: BW, h: BH, y: 940, amp: 22, seed: seed + 5.3, f: 2, fill: [v('hb-r3'), v('hb-r3')], line: v('hb-line'), lines: 1, sh: 'paint-l' });
+  let mid = '', far = '';
+  if (kind === 'meadow') { far = sun(1520, 560, 60, v('hb-r1d'), v('hb-r1'), v('hb-line')); mid = tree(1480, r2.yAt(1480) + 10, 1.4, v('hb-r2d'), v('hb-line')) + tree(140, r2.yAt(140) + 10, 1.7, v('hb-r2d'), v('hb-line')) + tree(260, r2.yAt(260) + 10, 1.2, v('hb-r2d'), v('hb-line')); }
+  if (kind === 'lake') { far = alps({ h: BH, base: 760, fill: [v('hb-r2'), v('hb-r2d')], snow: v('hb-r3'), line: v('hb-line'), pts: [[-80, 760], [180, 560], [380, 680], [560, 520], [760, 690], [980, 560], [1180, 700], [1400, 540], [1680, 760]] }); mid = pine(120, r1.yAt(120) + 12, 1.5, v('hb-r1d')) + pine(1480, r1.yAt(1480) + 12, 1.6, v('hb-r1d')) + pine(1540, r1.yAt(1540) + 12, 1.1, v('hb-r1d')); }
+  if (kind === 'dusk') { far = sun(1500, 560, 64, v('hb-r1d'), v('hb-r1'), v('hb-line')); mid = [1180, 1240, 1300].map((x, i) => house(x, r1.yAt(x) + 10, 1.1 + (i % 2) * .2, v('hb-r3'), v('hb-r1d'))).join(''); }
+  if (kind === 'fields') { far = sun(1500, 580, 56, v('hb-r1d'), v('hb-r1'), v('hb-line')); mid = [120, 175, 230].map((x, i) => house(x, r1.yAt(x) + 10, 1 + (i % 2) * .2, v('hb-r3'), v('hb-r1d'))).join('') + tree(1500, r2.yAt(1500) + 10, 1.6, v('hb-r2d'), v('hb-line')); }
+  const clouds = `<g class="drift">${cloud(60 + rr() * 40, 620 + rr() * 30, .8, v('hb-cloud'), v('hb-cline'))}${cloud(1540 + rr() * 40, 640 + rr() * 30, .8, v('hb-cloud'), v('hb-cline'))}</g>`;
+  return svg(sky + far + clouds + r1.svg + mid + r2.svg + r3.svg, 'art-back', 'xMidYMax slice', `0 0 ${BW} ${BH}`);
+}
+
 /* ---------- logo pack (flattened marble) ---------- */
 let lg = 0;
 function marble(id, W2, H2, seed) {
@@ -343,7 +359,7 @@ const css = `/* Hallmark · shape: arch-window gallery · genre: editorial · th
   --b-glass: oklch(28% 0.05 252 / .42); --b-glass-strong: oklch(28% 0.05 252 / .62); --b-glass-edge: oklch(88% 0.03 245 / .2); --b-glass-hi: oklch(100% 0 0 / .14); --b-glass-ink: oklch(96% 0.01 250); --b-shadow: oklch(6% 0.03 255 / .6); --b-demo: oklch(18% 0.04 255 / .45);
 }
 html[data-theme="light"] {
-  --hb-sky1:#D9E9F9; --hb-sky2:#FFF1E6; --hb-r1:#F8DDCB; --hb-r1d:#F1C9B0; --hb-r2:#D3E4F5; --hb-r2d:#B7D1EC; --hb-r3:#F7FAFD; --hb-line:#FFFFFF; --hb-cloud:#FFFFFF; --hb-cline:#F0D9CB; --color-head-soft: oklch(56% 0.03 45);
+  --foot-ink: #3A1E12; --hb-sky1:#D9E9F9; --hb-sky2:#FFF1E6; --hb-r1:#F8DDCB; --hb-r1d:#F1C9B0; --hb-r2:#D3E4F5; --hb-r2d:#B7D1EC; --hb-r3:#F7FAFD; --hb-line:#FFFFFF; --hb-cloud:#FFFFFF; --hb-cline:#F0D9CB; --color-head-soft: oklch(56% 0.03 45);
   --color-paper: oklch(98.6% 0.006 250); --color-paper-2: oklch(96.2% 0.013 245); --color-paper-3: oklch(95% 0.025 60);
   --color-ink: oklch(23% 0.02 40); --color-ink-2: oklch(36% 0.02 40); --color-muted: oklch(50% 0.02 40);
   --color-rule: oklch(90.5% 0.01 250); --color-accent: oklch(74% 0.13 55); --color-accent-ink: oklch(22% 0.03 45); --color-accent-deep: oklch(48% 0.12 50); --color-focus: oklch(52% 0.15 250);
@@ -356,7 +372,7 @@ html[data-theme="light"] {
   --s-wall:#FFF6EE; --s-roof:#FF9A5C; --s-river:#D6EAFB; --s-riverd:#A6CDF2; --s-rline:#FFFFFF; --s-tree:#C9745A; --s-treel:#EFAA8C;
 }
 html[data-theme="dark"] {
-  --hb-sky1:#0A1430; --hb-sky2:#1A3158; --hb-r1:#1F3A63; --hb-r1d:#172E52; --hb-r2:#162C50; --hb-r2d:#10223F; --hb-r3:#0D1628; --hb-line:#4C6C9E; --hb-cloud:#24406C; --hb-cline:#3F5F92; --color-head-soft: oklch(72% 0.04 245);
+  --foot-ink: oklch(92% 0.02 250); --hb-sky1:#0A1430; --hb-sky2:#1A3158; --hb-r1:#1F3A63; --hb-r1d:#172E52; --hb-r2:#162C50; --hb-r2d:#10223F; --hb-r3:#0D1628; --hb-line:#4C6C9E; --hb-cloud:#24406C; --hb-cline:#3F5F92; --color-head-soft: oklch(72% 0.04 245);
   --color-paper: oklch(17% 0.035 255); --color-paper-2: oklch(21% 0.04 252); --color-paper-3: oklch(25% 0.045 250);
   --color-ink: oklch(96% 0.01 250); --color-ink-2: oklch(86% 0.02 250); --color-muted: oklch(72% 0.03 250);
   --color-rule: oklch(32% 0.04 252); --color-accent: oklch(79% 0.12 58); --color-accent-ink: oklch(17% 0.035 255); --color-accent-deep: oklch(82% 0.11 58); --color-focus: oklch(80% 0.1 250);
@@ -415,7 +431,7 @@ html[data-theme="dark"] .theme .i-moon { display: block; }
 @media (max-width: 480px) { .nav { padding-left: 14px; gap: 8px; } .nav .btn { padding: 0 14px; } .nav-right { gap: 2px; } }
 
 /* hero */
-.hero-wrap { position: relative; isolation: isolate; margin-top: -86px; padding-top: 100px; padding-bottom: 72px; overflow: hidden; }
+.hero-wrap { position: relative; isolation: isolate; margin-top: -86px; padding-top: 100px; padding-bottom: 120px; overflow: hidden; }
 .hero-back { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
 .hero { padding-top: 36px; }
 .soft { color: var(--color-head-soft); }
@@ -448,7 +464,7 @@ html:not(.js) .scene + .scene { display: none; }
 @media (max-width: 760px) { .hero-head { grid-template-columns: minmax(0, 1fr); } .arch { border-radius: 50% 50% 24px 24px / 34% 34% 24px 24px; height: 560px; } .hero-card { left: 50%; right: auto; transform: translateX(-50%); top: 30%; width: min(280px, 80%); } .tab { padding-right: 4px; } .tab-label { display: none; } }
 
 /* sections */
-section { padding-top: var(--section-gap); }
+section { padding-top: 0; }
 .sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gap-columns); align-items: end; margin-bottom: 48px; }
 h2 { font-size: var(--text-section); line-height: 1.05; max-width: 16ch; }
 .sec-head p { color: var(--color-ink-2); max-width: 44ch; }
@@ -473,7 +489,7 @@ h2 { font-size: var(--text-section); line-height: 1.05; max-width: 16ch; }
 @media (max-width: 640px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } }
 
 /* services over the night painting */
-.band { position: relative; margin-top: var(--section-gap); padding: 120px 0 140px; overflow: hidden; isolation: isolate; }
+.band { position: relative; padding: 120px 0 140px; overflow: hidden; isolation: isolate; }
 .band-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .band-head { max-width: 560px; padding: 32px 34px; border-radius: 28px; }
 .band-head h2 { color: var(--b-glass-ink); }
@@ -499,7 +515,7 @@ h2 { font-size: var(--text-section); line-height: 1.05; max-width: 16ch; }
 @media (max-width: 560px) { .svc { grid-template-columns: minmax(0, 1fr); } .band-head { padding: 24px; } }
 
 /* pricing */
-.price-wrap { border: 1px solid var(--color-rule); border-radius: 28px; overflow: hidden; background: var(--color-paper); padding: 8px; }
+.price-wrap { border-radius: 28px; overflow: hidden; padding: 8px; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 th, td { padding: 16px 22px; text-align: left; border-bottom: 1px solid var(--color-rule); vertical-align: middle; }
 th { font-weight: 500; } b { font-weight: 500; }
@@ -508,21 +524,22 @@ thead th:first-child { width: 34%; }
 .pk { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; font-size: var(--text-xl); display: block; }
 .pp { display: block; font-size: 2rem; font-family: var(--font-display); font-weight: 800; letter-spacing: -0.03em; margin-top: 6px; font-variant-numeric: tabular-nums; }
 .pd { display: block; color: var(--color-muted); font-size: var(--text-xs); margin-top: 4px; }
-.pop { background: var(--color-paper-3); }
+.pop { background: color-mix(in oklab, var(--color-paper-3) 70%, transparent); }
 td .ico { color: var(--color-accent-deep); }
 td .no { color: var(--color-muted); }
+table th, table td { border-bottom-color: color-mix(in oklab, var(--color-rule) 80%, transparent); }
 tbody tr:last-child td { border-bottom: 0; }
 tfoot td { padding: 20px 22px; border-top: 1px solid var(--color-rule); border-bottom: 0; }
 tfoot .btn { min-height: 44px; }
 .btn-quiet { background: transparent; color: var(--color-ink); box-shadow: inset 0 0 0 1px var(--color-rule); }
 .btn-quiet:hover { box-shadow: inset 0 0 0 1px var(--color-ink-2); }
-.day { margin-top: 20px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--color-rule); border-radius: 22px; overflow: hidden; }
+.day { margin-top: 20px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 22px; overflow: hidden; }
 .day li { padding: 22px; display: grid; gap: 6px; align-content: start; }
 .day li + li { border-left: 1px solid var(--color-rule); }
 .day h3 { font-family: var(--font-body); font-weight: 800; font-size: var(--text-md); letter-spacing: 0; }
 .day p { font-size: var(--text-sm); color: var(--color-muted); }
 .day .pp { font-size: 1.6rem; }
-.day .full { background: var(--color-paper-2); }
+.day .full { background: color-mix(in oklab, var(--color-paper-2) 70%, transparent); }
 .later { margin-top: 14px; font-size: var(--text-sm); color: var(--color-muted); }
 @media (max-width: 900px) { .price-scroll { overflow-x: auto; } tbody th, thead th:first-child, tfoot td:first-child { position: sticky; left: 0; z-index: 1; background: var(--color-paper); } table { min-width: 720px; } .day { grid-template-columns: repeat(2, minmax(0, 1fr)); } .day li:nth-child(3) { border-left: 0; } .day li:nth-child(n+3) { border-top: 1px solid var(--color-rule); } }
 
@@ -530,10 +547,10 @@ tfoot .btn { min-height: 44px; }
 .pack { display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: auto auto; gap: 16px; }
 .tile { border-radius: var(--radius-card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 48px 24px 20px; min-height: 220px; border: 1px solid var(--color-rule); }
 .tile .logo { flex: none; max-width: 100%; margin-block: auto; }
-.tile.big { grid-row: span 2; background: var(--color-paper-2); }
+.tile.big { grid-row: span 2; background: var(--glass-strong); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-color: var(--glass-edge); }
 .tile.night { background: var(--b-sky1); border-color: transparent; }
 .tile.peach { background: var(--t1-sky2); border-color: transparent; }
-.tile.plain { background: var(--color-paper); }
+.tile.plain { background: var(--glass-strong); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-color: var(--glass-edge); }
 .tile .cap { align-self: flex-start; font-size: var(--text-xs); color: var(--color-muted); }
 .tile.night .cap { color: var(--b-cline); }
 .tile.peach .cap { color: var(--t1-tc); }
@@ -541,8 +558,8 @@ tfoot .btn { min-height: 44px; }
 
 /* faq */
 .faq { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--gap-columns); }
-.faq-list { border-top: 1px solid var(--color-rule); }
-details { border-bottom: 1px solid var(--color-rule); }
+.faq-list { border-radius: 24px; padding: 4px 28px; }
+details + details { border-top: 1px solid var(--color-rule); }
 summary { list-style: none; cursor: pointer; padding: 22px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: var(--text-lg); }
 summary::-webkit-details-marker { display: none; }
 summary .ico { flex: none; transition: transform var(--dur-short) var(--ease-out); }
@@ -552,16 +569,22 @@ details p { padding: 0 0 22px; color: var(--color-ink-2); max-width: 60ch; }
 @media (max-width: 760px) { .faq { grid-template-columns: minmax(0, 1fr); } }
 
 /* closing */
-.closing { position: relative; margin-top: var(--section-gap); height: 620px; overflow: hidden; isolation: isolate; }
+.closing { position: relative; height: 620px; overflow: hidden; isolation: isolate; }
 .closing-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .closing-box { position: relative; top: 70px; max-width: 520px; margin-inline: auto; text-align: center; padding: 34px; border-radius: 28px; display: grid; gap: 18px; justify-items: center; }
 .closing-box h2 { margin-inline: auto; }
 
+
+/* every section sits on artwork */
+.art-sec { position: relative; isolation: isolate; overflow: hidden; padding: var(--section-gap) 0 calc(var(--section-gap) + 120px); }
+.art-back { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
+.panel { background: var(--glass-strong); -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--glass-edge); box-shadow: 0 1px 0 var(--glass-hi) inset, 0 24px 50px -28px var(--shadow-deep); }
+
 /* footer */
-footer { background: var(--color-paper-2); padding: 40px 0 44px; font-size: var(--text-sm); color: var(--color-muted); }
+footer { background: var(--s-h3d); padding: 40px 0 44px; font-size: var(--text-sm); color: var(--foot-ink); }
 .foot { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
 .foot ul { display: flex; gap: 22px; flex-wrap: wrap; }
-.foot a { text-decoration: none; color: var(--color-ink-2); }
+.foot a { text-decoration: none; color: var(--foot-ink); }
 .foot a:hover { text-decoration: underline; }
 
 @media (max-width: 760px) { :root { --gutter: 20px; --section-gap: 88px; } }
@@ -647,12 +670,15 @@ ${sharedDefs}
 </header>
 </div>
 
-<section id="template" class="container">
+<section id="template" class="art-sec">
+  ${backdrop('meadow', 1.4)}
+<div class="container">
   <div class="sec-head">
     <h2>Lima lukisan siap pakai, <span class="soft">masing-masing punya ceritanya.</span></h2>
     <p>Taman, gunung, kota, pegunungan, dan pantai. Warnanya bisa diubah mengikuti dekorasi acaramu.</p>
   </div>
   <ul class="gallery">${gallery}</ul>
+</div>
 </section>
 
 <section id="layanan" class="band" aria-labelledby="layanan-h">
@@ -676,12 +702,14 @@ ${sharedDefs}
   </div>
 </section>
 
-<section id="harga" class="container" aria-labelledby="harga-h">
+<section id="harga" class="art-sec" aria-labelledby="harga-h">
+  ${backdrop('lake', 3.1)}
+<div class="container">
   <div class="sec-head">
     <h2 id="harga-h">Harga lengkap, <span class="soft">tanpa harga coret.</span></h2>
     <p>Angka di bawah adalah yang kamu bayar, sudah termasuk revisi tanpa batas. Layanan hari H dipesan terpisah, sesuai kebutuhan.</p>
   </div>
-  <div class="price-wrap"><div class="price-scroll">
+  <div class="price-wrap panel"><div class="price-scroll">
     <table>
       <caption class="visually-hidden">Paket undangan</caption>
       <thead><tr><th scope="col">Undangan</th>
@@ -695,16 +723,19 @@ ${sharedDefs}
       <tfoot><tr><td></td><td><a class="btn btn-quiet" href="#template">Pilih Sketsa</a></td><td class="pop"><a class="btn" href="#template">Pilih Lukisan</a></td><td><a class="btn btn-quiet" href="#template">Pilih Mahakarya</a></td></tr></tfoot>
     </table>
   </div></div>
-  <ul class="day">
+  <ul class="day panel">
     <li><h3>Asisten RSVP</h3><p>Tamu dihubungi tim kami.</p><span class="pp">Rp990rb</span></li>
     <li><h3>Buku tamu QR</h3><p>Dua tablet dan kru, 4 jam.</p><span class="pp">Rp1,79jt</span></li>
     <li><h3>Live streaming</h3><p>Dua jam, dua kamera.</p><span class="pp">Rp3,49jt</span></li>
     <li class="full"><h3>Paket utuh</h3><p>Mahakarya dan semua di atas.</p><span class="pp">Rp5,9jt</span></li>
   </ul>
   <p class="later">Koordinator hari H dan wedding organizer sedang kami siapkan.</p>
+</div>
 </section>
 
-<section id="logo" class="container" aria-labelledby="logo-h">
+<section id="logo" class="art-sec" aria-labelledby="logo-h">
+  ${backdrop('dusk', 5.5)}
+<div class="container">
   <div class="sec-head">
     <h2 id="logo-h">Satu logo, <span class="soft">dipakai dengan cara yang sama.</span></h2>
     <p>Marmer lembut yang dipipihkan, satu pola di setiap ukuran.</p>
@@ -716,16 +747,20 @@ ${sharedDefs}
     <div class="tile plain">${logo('mark', 56, 7, 'Tanda Nawala kecil')}<p class="cap">Ikon</p></div>
     <div class="tile night">${logo('word', 46, 7, 'Wordmark Nawala')}<p class="cap">Ukuran kecil</p></div>
   </div>
+</div>
 </section>
 
-<section id="tanya" class="container" aria-labelledby="tanya-h">
+<section id="tanya" class="art-sec" aria-labelledby="tanya-h">
+  ${backdrop('fields', 8.2)}
+<div class="container">
   <div class="faq">
     <h2 id="tanya-h">Yang sering <span class="soft">ditanyakan.</span></h2>
-    <div class="faq-list">
+    <div class="faq-list panel">
       ${[['Apakah harga di sini sudah final?', 'Ya. Tanpa harga coret, tanpa biaya tersembunyi.'], ['Bisa diisi sendiri atau dibuatkan?', 'Keduanya. Isi lewat editor, atau tim kami yang menyusun. Revisi tanpa batas.'], ['Bagaimana undangan dikirim?', 'Lewat WhatsApp dari dasbor, satu tautan per tamu.'], ['Layanan hari H tersedia di kota mana?', 'Bandung dan Jakarta dulu. Undangannya bisa dipakai di mana saja.']]
         .map(([q, a]) => `<details><summary>${q}${I.plus}</summary><p>${a}</p></details>`).join('')}
     </div>
   </div>
+</div>
 </section>
 
 <section class="closing" aria-labelledby="close-h">
