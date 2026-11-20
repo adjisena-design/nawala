@@ -14,10 +14,11 @@
 <link rel="apple-touch-icon" href="assets/img/icon-180.png">
 <link rel="preload" href="assets/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="assets/img/plate-forest-mobile-sm.webp" media="(max-width: 520px)">
-<link rel="preload" as="image" href="assets/img/plate-forest-mobile.webp" media="(min-width: 521px) and (max-width: 899px)">
-<link rel="preload" as="image" href="assets/img/plate-forest-desktop-sm.webp" media="(min-width: 900px) and (max-width: 1500px)">
-<link rel="preload" as="image" href="assets/img/plate-forest-desktop.webp" media="(min-width: 1501px)">
+<link rel="preload" as="image" href="assets/img/plate-sky-mobile-sm.webp" media="(max-width: 520px)">
+<link rel="preload" as="image" href="assets/img/plate-sky-mobile.webp" media="(min-width: 521px) and (max-width: 899px)">
+<link rel="preload" as="image" href="assets/img/plate-sky-desktop-sm.webp" media="(min-width: 900px) and (max-width: 1500px)">
+<link rel="preload" as="image" href="assets/img/plate-sky-desktop.webp" media="(min-width: 1501px)">
+<link rel="preload" as="image" href="assets/img/nw-fly-2.webp">
 <script>
 (function(){var d=document.documentElement,q=new URLSearchParams(location.search);
 if(q.get('font')==='2')d.classList.add('font-b');
@@ -30,90 +31,113 @@ d.classList.add('js');})();
 
 <a class="skip" href="#isi" data-en="Skip to content">Langsung ke isi</a>
 
-<!-- Left menu: a glass rail on desktop, a slide-in panel on phones -->
-<button class="menu-btn" type="button" aria-controls="menu" aria-expanded="false">
+<!-- Menu. Desktop: a glass bar across the top of the hero that folds into a rail on the left as you scroll.
+     Phones: a bar that shrinks into the round menu button; the links live in a slide-in panel. -->
+<button class="menu-btn" type="button" aria-controls="menu-items" aria-expanded="false">
   <span class="menu-btn__bars" aria-hidden="true"><i></i><i></i><i></i></span>
   <span class="sr" data-en="Menu">Menu</span>
 </button>
 <div class="menu-veil" hidden></div>
-<nav class="rail" id="menu" aria-label="Utama">
-  <a class="rail__brand" href="#beranda" aria-label="Nawala, ke atas">
+<nav class="nav" id="menu" aria-label="Utama">
+  <div class="nav__top glass" aria-hidden="true"></div>
+  <div class="nav__side glass" aria-hidden="true"></div>
+  <a class="nav__brand" href="#beranda" aria-label="Nawala, ke atas">
     <img src="assets/img/nawala-hero-480.webp" width="480" height="413" alt="">
-    <span class="rail__word">nawala</span>
+    <span class="nav__word">nawala</span>
   </a>
-  <ul class="rail__list">
-    <li><a href="#tentang" data-nav="tentang">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 13l9-5.5M4.5 6h15A1.5 1.5 0 0 1 21 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5v-9A1.5 1.5 0 0 1 4.5 6Z"/></svg>
-      <span data-en="About">Tentang</span></a></li>
-    <li><a href="#layanan" data-nav="layanan">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3.5h9A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5a1.5 1.5 0 0 1 1.5-1.5ZM10.5 17.5h3"/></svg>
-      <span data-en="Services">Layanan</span></a></li>
-    <li><a href="#tema" data-nav="tema">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 8.5 4.5-8.5 4.5L3.5 8 12 3.5ZM3.5 12l8.5 4.5 8.5-4.5M3.5 16l8.5 4.5 8.5-4.5"/></svg>
-      <span data-en="Themes">Tema</span></a></li>
-    <li><a href="#kontak" data-nav="kontak">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8 8 0 0 1-11.6 7.1L4 20l1.3-4.4A8 8 0 1 1 20.5 11.5Z"/></svg>
-      <span data-en="Contact">Kontak</span></a></li>
-  </ul>
-  <div class="rail__lang" role="group" aria-label="Bahasa">
-    <button type="button" data-lang="id" aria-pressed="true">ID</button>
-    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  <button class="bar-login" type="button" data-open="login" data-en="Log in">Masuk</button>
+  <div class="nav__items" id="menu-items">
+    <ul class="nav__list">
+      <li style="--i:0"><a href="#tentang" data-nav="tentang" data-flip>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 13l9-5.5M4.5 6h15A1.5 1.5 0 0 1 21 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5v-9A1.5 1.5 0 0 1 4.5 6Z"/></svg>
+        <span data-en="About">Tentang</span></a></li>
+      <li style="--i:1"><a href="#layanan" data-nav="layanan" data-flip>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3.5h9A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5a1.5 1.5 0 0 1 1.5-1.5ZM10.5 17.5h3"/></svg>
+        <span data-en="Services">Layanan</span></a></li>
+      <li style="--i:2"><a href="#tema" data-nav="tema" data-flip>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 8.5 4.5-8.5 4.5L3.5 8 12 3.5ZM3.5 12l8.5 4.5 8.5-4.5M3.5 16l8.5 4.5 8.5-4.5"/></svg>
+        <span data-en="Themes">Tema</span></a></li>
+      <li style="--i:3"><a href="#kontak" data-nav="kontak" data-flip>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8 8 0 0 1-11.6 7.1L4 20l1.3-4.4A8 8 0 1 1 20.5 11.5Z"/></svg>
+        <span data-en="Contact">Kontak</span></a></li>
+    </ul>
+    <div class="nav__end">
+      <div class="nav__lang" role="group" aria-label="Bahasa">
+        <button type="button" data-lang="id" aria-pressed="true" data-flip>ID</button>
+        <button type="button" data-lang="en" aria-pressed="false" data-flip>EN</button>
+      </div>
+      <button class="nav__login" type="button" data-open="login" data-flip>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM10.8 12.2l8.7-8.7M16 7l3 3M13.2 9.8l2.6 2.6"/></svg>
+        <span data-en="Log in">Masuk</span>
+      </button>
+    </div>
   </div>
 </nav>
 
+<!-- Nawala itself. One letter that travels down the whole page and changes pose on the way. -->
+<div class="nw" id="nw" data-pose="fly" aria-hidden="true">
+  <div class="nw__bob">
+    <span class="nw__glow"></span>
+    <span class="nw__love"><i></i><i></i><i></i><i></i><i></i></span>
+    <div class="nw__turn">
+      <div class="nw__face">
+        <img data-p="fly1" src="assets/img/nw-fly-1.webp" width="720" height="529" alt="">
+        <img data-p="fly2" src="assets/img/nw-fly-2.webp" width="720" height="529" alt="">
+        <img data-p="fly3" src="assets/img/nw-fly-3.webp" width="720" height="529" alt="">
+        <img data-p="front" data-src="assets/img/nw-front.webp" width="720" height="387" alt="">
+        <img data-p="tilt" data-src="assets/img/nw-tilt.webp" width="640" height="345" alt="">
+        <img data-p="back34" data-src="assets/img/nw-back34.webp" width="600" height="361" alt="">
+        <img data-p="tumble" data-src="assets/img/nw-tumble.webp" width="560" height="508" alt="">
+        <img data-p="perch" data-src="assets/img/nw-perch.webp" width="360" height="595" alt="">
+        <img data-p="open" data-src="assets/img/nawala-open-720.webp" width="720" height="619" alt="">
+        <span class="nw__blush"></span>
+      </div>
+      <div class="nw__face nw__face--back"><img data-src="assets/img/nw-back.webp" width="720" height="395" alt=""></div>
+    </div>
+    <span class="nw__tap"></span>
+  </div>
+</div>
+
 <main id="isi">
 
-<!-- 1. Hero: the forest -->
+<!-- 1. Hero: the sky above the clouds, seen through the arch -->
 <section class="hero" id="beranda" data-scroll>
-  <div class="hero__plate">
+  <div class="plate">
     <picture>
-      <source media="(max-width: 520px)" srcset="assets/img/plate-forest-mobile-sm.webp">
-      <source media="(max-width: 899px)" srcset="assets/img/plate-forest-mobile.webp">
-      <source media="(max-width: 1500px)" srcset="assets/img/plate-forest-desktop-sm.webp">
-      <img src="assets/img/plate-forest-desktop.webp" width="2400" height="1340" alt="" fetchpriority="high">
+      <source media="(max-width: 520px)" srcset="assets/img/plate-sky-mobile-sm.webp">
+      <source media="(max-width: 899px)" srcset="assets/img/plate-sky-mobile.webp">
+      <source media="(max-width: 1500px)" srcset="assets/img/plate-sky-desktop-sm.webp">
+      <img src="assets/img/plate-sky-desktop.webp" width="2400" height="1340" alt="" fetchpriority="high">
     </picture>
-    <video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
   </div>
   <div class="hero__rays" aria-hidden="true"></div>
-  <canvas class="hero__dust" aria-hidden="true"></canvas>
-  <div class="hero__shade" aria-hidden="true"></div>
-
-  <div class="hero__mascot" aria-hidden="true">
-    <div class="mascot">
-      <span class="mascot__glow"></span>
-      <span class="mascot__trail"><i></i><i></i><i></i><i></i><i></i></span>
-      <img src="assets/img/nawala-hero-900.webp" srcset="assets/img/nawala-hero-480.webp 480w, assets/img/nawala-hero-900.webp 900w" sizes="(max-width: 899px) 46vw, 22vw" width="900" height="774" alt="">
-    </div>
-  </div>
+  <div class="flock flock--a" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="flock flock--b" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="hero__mist" aria-hidden="true"></div>
 
   <div class="hero__copy">
     <h1 class="hero__title" data-h1 data-en="The living letter.">Surat yang hidup.</h1>
     <p class="hero__lead" data-en="A wedding invitation that arrives for every guest, greets them by name, then leads them into your world.">Undangan pernikahan yang datang kepada setiap tamu, menyapa namanya, lalu membawanya masuk ke dunia kalian.</p>
     <div class="hero__actions">
       <a class="btn btn--glow" href="#kontak" data-en="Start your invitation">Mulai undangan kalian</a>
-      <a class="btn btn--quiet" href="#tema" data-en="See the themes">Lihat tema</a>
+      <button class="btn btn--line" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
     </div>
   </div>
   <a class="hero__next" href="#tentang" aria-label="Gulir ke bagian berikutnya"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg></a>
 </section>
 
-<!-- 2. About: the arch above the clouds. A pinned scene; three statements swap as you scroll. -->
+<!-- 2. About: the moss arch. A pinned scene; three statements swap as you scroll. -->
 <section class="about" id="tentang" data-scroll data-steps="3">
-  <div class="horizon" aria-hidden="true"></div>
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="fade-top" aria-hidden="true"></div>
   <div class="about__stage">
-    <div class="about__plate">
+    <div class="plate">
       <picture>
         <source media="(max-width: 520px)" srcset="assets/img/plate-arch-mobile-sm.webp">
         <source media="(max-width: 899px)" srcset="assets/img/plate-arch-mobile.webp">
         <source media="(max-width: 1500px)" srcset="assets/img/plate-arch-desktop-sm.webp">
         <img src="assets/img/plate-arch-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
-    </div>
-    <div class="about__flyer" aria-hidden="true">
-      <div class="mascot mascot--small">
-        <span class="mascot__glow"></span>
-        <img src="assets/img/nawala-hero-480.webp" width="480" height="413" alt="" loading="lazy">
-      </div>
     </div>
     <div class="about__copy">
       <div class="say is-on" data-step="0">
@@ -133,8 +157,21 @@ d.classList.add('js');})();
   </div>
 </section>
 
-<!-- 3. Services: the phone stays, the service changes -->
-<section class="services" id="layanan">
+<!-- 3. Services: among the trees. The phone stays, the service changes. -->
+<section class="services" id="layanan" data-scroll>
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="services__bg" aria-hidden="true">
+    <div class="plate">
+      <picture>
+        <source media="(max-width: 520px)" srcset="assets/img/plate-forest-mobile-sm.webp">
+        <source media="(max-width: 899px)" srcset="assets/img/plate-forest-mobile.webp">
+        <source media="(max-width: 1500px)" srcset="assets/img/plate-forest-desktop-sm.webp">
+        <img src="assets/img/plate-forest-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
+      </picture>
+    </div>
+    <div class="services__shade"></div>
+  </div>
+  <div class="fade-top" aria-hidden="true"></div>
   <div class="wrap services__grid">
     <div class="services__intro">
       <h2 data-en="One letter, the whole wedding day.">Satu surat, untuk seluruh hari pernikahan.</h2>
@@ -194,44 +231,37 @@ d.classList.add('js');})();
   </div>
 </section>
 
-<!-- 4. Themes: a sideways row -->
+<!-- 4. Themes: a river of covers drifts behind; one button opens the collection -->
 <section class="themes" id="tema" data-scroll>
-  <div class="themes__stage">
-    <div class="wrap themes__head">
-      <h2 data-en="More than 500 themes are being painted.">Lebih dari 500 tema sedang dilukis.</h2>
-      <p data-en="Ready in January 2027. These are the seven families they come from.">Siap pada Januari 2027. Inilah tujuh keluarga asalnya.</p>
-    </div>
-    <div class="themes__view">
-    <div class="themes__track" tabindex="0" aria-label="Keluarga tema">
-      <article class="fam fam--alam"><div class="fam__art"></div><h3 data-en="Nature">Alam</h3><p data-en="Forest, coast, mountain, garden and sky.">Hutan, pantai, gunung, taman, dan langit.</p></article>
-      <article class="fam fam--royal"><div class="fam__art"></div><h3 data-en="Royal">Kerajaan</h3><p data-en="Palace halls in ten colours, always with gold.">Balairung istana dalam sepuluh warna, selalu berpadu emas.</p></article>
-      <article class="fam fam--religi"><div class="fam__art"></div><h3 data-en="Faith">Religi</h3><p data-en="For akad, blessing and every ceremony of faith.">Untuk akad, pemberkatan, dan setiap upacara keagamaan.</p></article>
-      <article class="fam fam--nusa"><div class="fam__art"></div><h3 data-en="Nusantara">Nusantara</h3><p data-en="Betawi, Javanese, Sundanese, Balinese, Palembang and more.">Betawi, Jawa, Sunda, Bali, Palembang, dan banyak lagi.</p></article>
-      <article class="fam fam--dunia"><div class="fam__art"></div><h3 data-en="The world">Mancanegara</h3><p data-en="Tuscany, Paris, Santorini, Kyoto.">Toskana, Paris, Santorini, Kyoto.</p></article>
-      <article class="fam fam--era"><div class="fam__art"></div><h3 data-en="Eras">Lintas masa</h3><p data-en="Old days, noir, the Old West, the age of samurai.">Tempo doeloe, noir, koboi, zaman samurai.</p></article>
-      <article class="fam fam--elemen"><div class="fam__art"></div><h3 data-en="Elements">Elemen</h3><p data-en="Water, fire, earth, gold, pearl.">Air, api, bumi, emas, mutiara.</p></article>
-      <article class="fam fam--couple">
-        <div class="fam__pair"><img src="assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy"><img src="assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy"></div>
-        <h3 data-en="No borrowed faces">Tanpa wajah pinjaman</h3>
-        <p data-en="In every sample, Nawala stands in for the couple. Your own photos take its place.">Di setiap contoh, Nawala menggantikan pengantin. Foto kalian sendiri yang nanti mengisinya.</p>
-      </article>
-    </div>
-    </div>
-    <div class="wrap themes__foot">
-      <a class="btn btn--dark" data-wa="Halo Nawala, saya ingin membuka akses katalog tema." data-wa-en="Hello Nawala, I would like access to the theme catalogue." href="#kontak" data-en="Open the full catalogue on WhatsApp">Buka katalog lengkap lewat WhatsApp</a>
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="themes__bg" aria-hidden="true">
+    <div class="plate"><img src="assets/img/plate-deep-soft.webp" width="960" height="536" alt="" loading="lazy"></div>
+    <div class="river" id="river"></div>
+    <div class="themes__shade"></div>
+  </div>
+  <div class="fade-top" aria-hidden="true"></div>
+  <div class="themes__panel glass" id="themes-panel">
+    <h2 data-en="More than 500 themes are being painted.">Lebih dari 500 tema sedang dilukis.</h2>
+    <p data-en="Ready in January 2027. Here are the first 28 directions, from seven families.">Siap pada Januari 2027. Inilah 28 arah pertama, dari tujuh keluarga.</p>
+    <div class="themes__actions">
+      <button class="btn btn--glow" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
+      <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
     </div>
   </div>
 </section>
 
 <!-- 5. Contact: the bright hill, one question at a time -->
 <section class="contact" id="kontak" data-scroll>
-  <div class="contact__plate">
-    <picture>
-      <source media="(max-width: 520px)" srcset="assets/img/plate-hill-mobile-sm.webp">
-      <source media="(max-width: 899px)" srcset="assets/img/plate-hill-mobile.webp">
-      <source media="(max-width: 1500px)" srcset="assets/img/plate-hill-desktop-sm.webp">
-      <img src="assets/img/plate-hill-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
-    </picture>
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="contact__bg" aria-hidden="true">
+    <div class="plate">
+      <picture>
+        <source media="(max-width: 520px)" srcset="assets/img/plate-hill-mobile-sm.webp">
+        <source media="(max-width: 899px)" srcset="assets/img/plate-hill-mobile.webp">
+        <source media="(max-width: 1500px)" srcset="assets/img/plate-hill-desktop-sm.webp">
+        <img src="assets/img/plate-hill-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
+      </picture>
+    </div>
   </div>
   <div class="wrap contact__inner">
     <div class="contact__lead">
@@ -244,6 +274,8 @@ d.classList.add('js');})();
         <img class="ask__closed" src="assets/img/nawala-hero-480.webp" width="480" height="413" alt="" loading="lazy">
         <img class="ask__open" src="assets/img/nawala-open-720.webp" width="720" height="619" alt="" loading="lazy">
       </div>
+      <p class="ask__theme" hidden><span data-en="Chosen theme:">Tema pilihan:</span> <b></b>
+        <button type="button" class="ask__theme-x"><span class="sr" data-en="Remove the chosen theme">Hapus tema pilihan</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg></button></p>
       <form class="ask__form" novalidate>
         <p class="ask__count" aria-live="polite"><span id="ask-n">1</span> <span data-en="of 3">dari 3</span></p>
 
@@ -286,7 +318,16 @@ d.classList.add('js');})();
       </div>
     </div>
 
-    <p class="contact__note" data-en="Company profile and price list (PDF) will be available here soon.">Profil perusahaan dan daftar harga (PDF) segera tersedia di sini.</p>
+    <div class="contact__side">
+      <p class="contact__note" data-en="Company profile and price list (PDF) will be available here soon.">Profil perusahaan dan daftar harga (PDF) segera tersedia di sini.</p>
+      <!-- The couple. Nawala stands in for bride and groom, so no borrowed faces. They hop toward each other as you arrive. -->
+      <div class="pair" id="pair" aria-hidden="true">
+        <span class="pair__heart"></span>
+        <div class="pair__one pair__one--groom"><i></i><div class="pair__body"><img src="assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy"><span class="pair__blush"></span></div></div>
+        <div class="pair__one pair__one--bride"><i></i><div class="pair__body"><img src="assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy"><span class="pair__blush"></span></div></div>
+      </div>
+      <p class="pair__cap" data-en="In every sample, Nawala stands in for the bride and groom. Your own photos take its place.">Di setiap contoh, Nawala menggantikan pengantin. Foto kalian sendiri yang nanti mengisinya.</p>
+    </div>
   </div>
 
   <footer class="foot">
@@ -299,6 +340,70 @@ d.classList.add('js');})();
 </section>
 
 </main>
+
+<!-- The theme collection. Covers are colour fields until the real ones are painted. -->
+<dialog class="pop pop--themes" id="pop-themes" aria-labelledby="pop-themes-h">
+  <div class="pop__box">
+    <div class="pop__head">
+      <div>
+        <h2 id="pop-themes-h" data-en="The first themes">Tema pembuka</h2>
+        <p data-en="28 directions from seven families. The covers are still being painted, so for now you see their colours.">28 arah dari tujuh keluarga. Sampulnya masih dilukis, jadi untuk saat ini yang tampak adalah warnanya.</p>
+      </div>
+      <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="pop__body" id="pop-list">
+      <div class="grid" id="theme-grid"></div>
+      <div class="pop__more">
+        <h3 data-en="This is only the beginning.">Ini baru permulaan.</h3>
+        <p data-en="Register your WhatsApp number and we will send an access code that opens more themes as they are finished.">Daftarkan nomor WhatsApp Anda, lalu kami kirimkan kode akses untuk membuka lebih banyak tema begitu selesai dilukis.</p>
+        <div class="pop__actions">
+          <button class="btn btn--glow" type="button" data-goto="kontak" data-en="Register my WhatsApp">Daftarkan WhatsApp saya</button>
+          <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
+        </div>
+      </div>
+    </div>
+    <div class="pop__body pop__detail" id="pop-detail" hidden tabindex="-1">
+      <div class="detail">
+        <div class="detail__cover" id="detail-cover">
+          <div class="detail__couple"><img src="assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy"><img src="assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy"></div>
+        </div>
+        <div class="detail__text">
+          <p class="detail__fam" id="detail-fam"></p>
+          <h3 id="detail-name"></h3>
+          <p id="detail-desc"></p>
+          <p class="detail__note" data-en="The bride and groom shown here are Nawala. Your own photos take their place.">Pengantin di contoh ini adalah Nawala. Foto kalian sendiri yang nanti menggantikannya.</p>
+          <div class="pop__actions">
+            <button class="btn btn--glow" type="button" id="detail-use" data-en="Use this theme">Gunakan tema ini</button>
+            <button class="btn btn--quiet" type="button" id="detail-back" data-en="Back to all themes">Kembali ke semua tema</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Log in with an access code -->
+<dialog class="pop pop--login" id="pop-login" aria-labelledby="pop-login-h">
+  <div class="pop__box">
+    <div class="pop__head">
+      <div>
+        <h2 id="pop-login-h" data-en="Log in with your access code">Masuk dengan kode akses</h2>
+        <p data-en="We send the code on WhatsApp after you register your number. It opens more themes.">Kode kami kirim lewat WhatsApp setelah Anda mendaftarkan nomor. Kode itu membuka lebih banyak tema.</p>
+      </div>
+      <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form class="pop__body login" id="login-form" novalidate>
+      <label for="login-code" data-en="Access code">Kode akses</label>
+      <input id="login-code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" placeholder="NAWALA-0000">
+      <p class="login__msg" id="login-msg" role="alert" hidden></p>
+      <div class="pop__actions">
+        <button class="btn btn--glow" type="submit" data-en="Open the themes">Buka tema</button>
+        <button class="btn btn--quiet" type="button" data-goto="kontak" data-en="I do not have a code yet">Saya belum punya kode</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <script src="assets/js/site.js" defer></script>
 </body>
 </html>
