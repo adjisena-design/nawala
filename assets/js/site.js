@@ -22,6 +22,8 @@
     era: ['Lintas masa', 'Eras', 'Tempo doeloe, noir, koboi, zaman samurai.', 'Old days, noir, the Old West, the age of samurai.'],
     elemen: ['Elemen', 'Elements', 'Air, api, bumi, emas, mutiara.', 'Water, fire, earth, gold, pearl.']
   };
+  /* cover pictures are named after the Indonesian theme name: assets/img/cover-<slug>.webp (and -s for the small one) */
+  function cover(th, small) { return 'assets/img/cover-' + th[1].toLowerCase().replace(/ /g, '-') + (small ? '-s' : '') + '.webp'; }
   var THEMES = [
     ['alam', 'Hutan Pagi', 'Morning Forest'], ['royal', 'Balairung Merah', 'Crimson Hall'], ['religi', 'Akad Putih', 'White Akad'], ['nusa', 'Pendopo Jawa', 'Javanese Pendopo'],
     ['dunia', 'Toskana', 'Tuscany'], ['era', 'Tempo Doeloe', 'Old Days'], ['elemen', 'Air', 'Water'],
@@ -158,7 +160,8 @@
      --e: 0 when the section's top reaches the bottom of the screen, 1 when it reaches the top.
      --p: 0 when the section's top reaches the top of the screen, 1 when the section has passed. */
   var scrollEls = $$('[data-scroll]').map(function (el) { return { el: el, e: -1, p: -1 }; });
-  var about = $('.about'), says = $$('.say'), pips = $$('.about__pips i'), aboutStep = -1;
+  var about = $('.about'), says = $$('.say');
+  var lastAboutP = -1;
   function measure(vh) {
     scrollEls.forEach(function (s) {
       var r = s.el.getBoundingClientRect();
@@ -168,13 +171,16 @@
       var p = Math.round(clamp(-r.top / Math.max(1, span)) * 1000) / 1000;
       if (e !== s.e) { s.e = e; s.el.style.setProperty('--e', e); }
       if (p !== s.p) { s.p = p; s.el.style.setProperty('--p', p); }
-      if (s.el === about) {
-        var step = Math.min(2, Math.floor(p * 3));
-        if (step !== aboutStep) {
-          aboutStep = step;
-          says.forEach(function (x, i) { x.classList.toggle('is-on', i === step); });
-          pips.forEach(function (x, i) { x.classList.toggle('is-on', i === step); });
-        }
+      if (s.el === about && p !== lastAboutP) {
+        /* each message has its own moment: it rises from below, slows through the middle, and leaves upward */
+        lastAboutP = p;
+        var travel = s.el.querySelector('.about__says').offsetHeight * .62;
+        says.forEach(function (el, i) {
+          var x = p * 3 - i - .5, ax = Math.abs(x);
+          var y = -(x < 0 ? -1 : 1) * Math.pow(ax, 1.5) * travel * 1.7;
+          el.style.setProperty('--y', y.toFixed(1));
+          el.style.setProperty('--o', clamp(1 - (ax - .26) / .3).toFixed(3));
+        });
       }
     });
   }
@@ -193,13 +199,13 @@
     if (!travel) return;
     nwBase = D ? 300 : 190;
     var A = docTop(about), aS = about.offsetHeight - vh, S = docTop(services), sH = services.offsetHeight, T = docTop(themes), C = docTop(contact);
-    var pr = $('#themes-panel').getBoundingClientRect(), pT = pr.top + window.scrollY;
-    var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
+        var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
     var ph = D ? $('.services__phone').getBoundingClientRect() : null;
-    var perchS = D ? .5 : .78, perchY = bT - nwBase * .3636 * perchS + (D ? 24 : 5);
+    var perchS = D ? .5 : .78, perchY = bT - nwBase * .26 * perchS + (D ? 20 : 6);
     var land0 = Math.max(T + vh * .5, bT - vh * .74), land1 = Math.min(Math.max(land0 + vh * .3, bT - vh * .3), maxY);
     var side = D ? ph.left - 84 : vw - 58, sideS = D ? .5 : .42;
-    var cx = D ? .6 : .5;
+    var cx = D ? .4 : .5;
+    var bn = $('#branch').getBoundingClientRect(), tipX = bn.left + bn.width * .1, tipY = bn.top + window.scrollY + bn.height * .3;
     W = [
       { at: 0, x: (D ? .73 : .5) * vw, y: (D ? .47 : .6) * vh, s: D ? 1.3 : 1.2, r: -4, pose: 'fly' },
       { at: A - vh * .45, x: (D ? .67 : .6) * vw, y: (D ? .4 : .5) * vh, s: 1.02, r: 10, pose: 'tilt' },
@@ -213,13 +219,13 @@
       { at: S + vh * .12, x: side, y: D ? .26 * vh : 60, s: sideS, r: -5, pose: 'fly' },
       { at: S + sH * .5, x: side - (D ? 8 : 0), y: D ? .5 * vh : 62, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
       { at: T - vh, x: side, y: D ? .64 * vh : 60, s: sideS, r: 0, pose: 'fly' },
-      { at: T - vh * .55, x: (D ? .6 : .7) * vw, y: .32 * vh, s: .58, r: 8, pose: 'fly' },
-      { at: T - vh * .25, x: pr.right - (D ? 96 : 70), dy: pT - nwBase * .2, s: .58, r: 0, pose: 'fly', cue: 'bump' },
-      { at: T - vh * .23, x: pr.right - (D ? 96 : 70), dy: pT - nwBase * .2, s: .58, r: 0, pose: 'tumble' },
-      { at: T + vh * .25, x: D ? Math.min(vw - 120, pr.right + vw * .16) : .8 * vw, y: .76 * vh, s: .56, r: 400, pose: 'tumble' },
+      { at: T - vh * .6, x: Math.max(60, tipX - vw * .3), y: .34 * vh, s: .56, r: 6, pose: 'fly' },
+      { at: T - vh * .27, x: tipX - nwBase * .16, dy: tipY, s: .56, r: -4, pose: 'fly', cue: 'bump' },   // straight into the tip of the branch
+      { at: T - vh * .25, x: tipX - nwBase * .2, dy: tipY + 8, s: .56, r: 0, pose: 'tumble' },
+      { at: T + vh * .25, x: D ? Math.min(vw - 120, tipX + vw * .1) : .78 * vw, y: .78 * vh, s: .56, r: 400, pose: 'tumble' },
       { at: land0 - vh * .12, x: (D ? .72 : .7) * vw, y: .48 * vh, s: .5, r: 720, pose: 'tumble' },
-      { at: land0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 720, pose: 'perch', hop: 4 },
-      { at: land1, x: br.right - (D ? 86 : 62), dy: perchY, s: perchS, r: 720, pose: 'perch' }
+      { at: land0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 720, pose: 'hop', hop: 4 },
+      { at: land1, x: br.right - (D ? 96 : 70), dy: perchY + (D ? 6 : 4), s: perchS * 1.15, r: 720, pose: 'rest' }
     ];
     for (var i = 1; i < W.length; i++) if (W[i].at <= W[i - 1].at) W[i].at = W[i - 1].at + 1;
     nwIdx = -1;
@@ -242,14 +248,17 @@
     var k = b === a ? 0 : clamp((y - a.at) / (b.at - a.at)), ke = ease(k);
     var ay = a.dy != null ? a.dy - y : a.y, by = b.dy != null ? b.dy - y : b.y;
     var x = lerp(a.x, b.x, ke), yy = lerp(ay, by, ke), s = lerp(a.s, b.s, ke), r = lerp(a.r, b.r, ke);
+    var poseA = a.pose;
     if (a.hop) {
+      /* small hops, one at a time: crouch, in the air, land */
       x = lerp(a.x, b.x, k);
-      var wave = Math.abs(Math.sin(k * Math.PI * a.hop));
-      yy -= wave * 34 * s; r += Math.sin(k * Math.PI * a.hop * 2) * 6;
+      var ph = (k * a.hop) % 1, wave = Math.sin(ph * Math.PI);
+      yy -= wave * 40 * s;
+      poseA = ph < .14 ? 'hop1' : ph < .7 ? 'hop2' : 'hop3';
     }
     if (y < vh) { var near = 1 - y / vh; x += mx * near; yy += my * near; }
     var done = ask.classList.contains('is-done') && i >= W.length - 2;
-    setPose(poseHold || (done ? 'open' : a.pose));
+    setPose(poseHold || (done ? 'open' : poseA));
     if (done) yy -= 26;
     nw.style.transform = 'translate3d(' + (x - nwBase / 2).toFixed(1) + 'px,' + (yy - nwBase * .367).toFixed(1) + 'px,0) rotate(' + r.toFixed(1) + 'deg) scale(' + s.toFixed(3) + ')';
     if (nwIdx !== -1 && i !== nwIdx) {
@@ -315,13 +324,27 @@
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(replan);
   if (travel) { nw.classList.add('is-live'); root.classList.add('nw-live'); }
   if (calm && pair) pair.classList.add('is-met');
-  /* pictures used as CSS backgrounds and masks wait until their section is close */
+  /* a section is "live" while it is on or near the screen (its creatures and light move only then),
+     and "near" once it has come close (pictures used as backgrounds and masks load only then) */
+  var nearJobs = [];
   if ('IntersectionObserver' in window) {
+    var liveIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { en.target.classList.toggle('is-live', en.isIntersecting); });
+    }, { rootMargin: '45% 0px' });
     var nearIO = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-near'); nearIO.unobserve(en.target); } });
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-near'); nearIO.unobserve(en.target);
+        nearJobs.forEach(function (j) { if (j[0] === en.target) j[1](); });
+      });
     }, { rootMargin: '120% 0px' });
-    [services, pair].forEach(function (el) { if (el) nearIO.observe(el); });
-  } else { [services, pair].forEach(function (el) { if (el) el.classList.add('is-near'); }); }
+    $$('[data-scroll]').forEach(function (el) { liveIO.observe(el); });
+    [services, themes, pair].forEach(function (el) { if (el) nearIO.observe(el); });
+  } else {
+    $$('[data-scroll]').forEach(function (el) { el.classList.add('is-live'); });
+    [services, themes, pair].forEach(function (el) { if (el) el.classList.add('is-near'); });
+    setTimeout(function () { nearJobs.forEach(function (j) { j[1](); }); }, 0);
+  }
 
   /* ---------- Services: the phone stays, the screen changes ---------- */
   (function () {
@@ -369,25 +392,22 @@
   function turn(i) { return Math.floor(i / 7); }
   (function () {
     var river = $('#river');
-    if (river) {
+    if (river) nearJobs.push([themes, function () {
       var rows = desktop.matches ? 3 : 2, per = desktop.matches ? 14 : 8, html = '';
       for (var r = 0; r < rows; r++) {
         var cards = '';
-        for (var c = 0; c < per; c++) { var i = (r * 9 + c * 5) % THEMES.length; cards += '<i class="rc cf cf--' + THEMES[i][0] + '" style="--k:' + turn(i) + '"></i>'; }
+        for (var c = 0; c < per; c++) { var i = (r * 9 + c * 5) % THEMES.length; cards += '<i class="rc" style="background-image:url(' + cover(THEMES[i], true) + ')"></i>'; }
         html += '<div class="river__row">' + cards + cards + '</div>';
       }
       river.innerHTML = html;
-      if (!calm && 'IntersectionObserver' in window) {
-        new IntersectionObserver(function (en) { themes.classList.toggle('is-live', en[0].isIntersecting); }, { rootMargin: '10% 0px' }).observe(themes);
-      }
-    }
+    }]);
 
     var pops = { themes: $('#pop-themes'), login: $('#pop-login') };
     var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), built = false, viewing = -1;
     function build() {
       built = true;
       grid.innerHTML = THEMES.map(function (th, i) {
-        return '<button class="tc" type="button" data-i="' + i + '"><span class="tc__art cf cf--' + th[0] + '" style="--k:' + turn(i) + '"></span><b>' + t(th[1], th[2]) + '</b><small>' + t(FAMILIES[th[0]][0], FAMILIES[th[0]][1]) + '</small></button>';
+        return '<button class="tc" type="button" data-i="' + i + '"><span class="tc__art cf cf--' + th[0] + '" style="--k:' + turn(i) + '"><img src="' + cover(th) + '" alt="" loading="lazy" width="640" height="800"></span><b>' + t(th[1], th[2]) + '</b><small>' + t(FAMILIES[th[0]][0], FAMILIES[th[0]][1]) + '</small></button>';
       }).join('');
     }
     function showList(focusCard) {
@@ -399,9 +419,10 @@
       viewing = i; var th = THEMES[i], fam = FAMILIES[th[0]];
       $('#detail-cover').className = 'detail__cover cf cf--' + th[0];
       $('#detail-cover').style.setProperty('--k', turn(i));
+      $('#detail-cover').style.backgroundImage = 'url(' + cover(th) + ')';
       $('#detail-fam').textContent = t(fam[0], fam[1]);
       $('#detail-name').textContent = t(th[1], th[2]);
-      $('#detail-desc').textContent = t(fam[2], fam[3]) + ' ' + t('Sampulnya masih dilukis; warna ini menunjukkan arahnya.', 'Its cover is still being painted; this colour shows where it is heading.');
+      $('#detail-desc').textContent = t(fam[2], fam[3]) + ' ' + t('Ini adegan pembukanya. Halaman undangan di baliknya masih kami kerjakan.', 'This is its opening scene. The invitation pages behind it are still being built.');
       list.hidden = true; detail.hidden = false; detail.scrollTop = 0;
       try { detail.focus({ preventScroll: true }); } catch (e) {}
     }

@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="assets/img/plate-sky-mobile.webp" media="(min-width: 521px) and (max-width: 899px)">
 <link rel="preload" as="image" href="assets/img/plate-sky-desktop-sm.webp" media="(min-width: 900px) and (max-width: 1500px)">
 <link rel="preload" as="image" href="assets/img/plate-sky-desktop.webp" media="(min-width: 1501px)">
-<link rel="preload" as="image" href="assets/img/nw-fly-2.webp">
+<link rel="preload" as="image" href="assets/img/nw-flap.webp">
 <script>
 (function(){var d=document.documentElement,q=new URLSearchParams(location.search);
 if(q.get('font')==='2')d.classList.add('font-b');
@@ -81,14 +81,15 @@ d.classList.add('js');})();
     <span class="nw__love"><i></i><i></i><i></i><i></i><i></i></span>
     <div class="nw__turn">
       <div class="nw__face">
-        <img data-p="fly1" src="assets/img/nw-fly-1.webp" width="720" height="529" alt="">
-        <img data-p="fly2" src="assets/img/nw-fly-2.webp" width="720" height="529" alt="">
-        <img data-p="fly3" src="assets/img/nw-fly-3.webp" width="720" height="529" alt="">
+        <span class="nw__fly"><img src="assets/img/nw-flap.webp" width="4800" height="167" alt=""></span>
         <img data-p="front" data-src="assets/img/nw-front.webp" width="720" height="387" alt="">
         <img data-p="tilt" data-src="assets/img/nw-tilt.webp" width="640" height="345" alt="">
         <img data-p="back34" data-src="assets/img/nw-back34.webp" width="600" height="361" alt="">
         <img data-p="tumble" data-src="assets/img/nw-tumble.webp" width="560" height="508" alt="">
-        <img data-p="perch" data-src="assets/img/nw-perch.webp" width="360" height="595" alt="">
+        <img data-p="hop1" data-src="assets/img/nw-hop-1.webp" width="480" height="318" alt="">
+        <img data-p="hop2" data-src="assets/img/nw-hop-2.webp" width="480" height="440" alt="">
+        <img data-p="hop3" data-src="assets/img/nw-hop-3.webp" width="480" height="403" alt="">
+        <img data-p="rest" data-src="assets/img/nw-rest.webp" width="600" height="482" alt="">
         <img data-p="open" data-src="assets/img/nawala-open-720.webp" width="720" height="619" alt="">
         <span class="nw__blush"></span>
       </div>
@@ -111,8 +112,10 @@ d.classList.add('js');})();
     </picture>
   </div>
   <div class="hero__rays" aria-hidden="true"></div>
-  <div class="flock flock--a" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="flock flock--b" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="blimp" aria-hidden="true"><img src="assets/img/fx-blimp.webp" width="520" height="232" alt=""></div>
+  <div class="plane" aria-hidden="true"><i></i><img src="assets/img/fx-plane.webp" width="420" height="133" alt=""></div>
+  <div class="flock flock--a" aria-hidden="true"><i class="dove" style="--x:46%;--y:6%;--s:1;--d:0s"><b></b></i><i class="dove" style="--x:26%;--y:28%;--s:0.8;--d:-0.2s"><b></b></i><i class="dove" style="--x:66%;--y:26%;--s:0.9;--d:-0.33s"><b></b></i><i class="dove" style="--x:6%;--y:54%;--s:0.7;--d:-0.1s"><b></b></i><i class="dove" style="--x:84%;--y:50%;--s:0.75;--d:-0.4s"><b></b></i><i class="dove" style="--x:50%;--y:68%;--s:0.6;--d:-0.27s"><b></b></i><i class="dove" style="--x:28%;--y:84%;--s:0.55;--d:-0.05s"><b></b></i></div>
+  <div class="flock flock--b" aria-hidden="true"><i class="dove" style="--x:40%;--y:10%;--s:0.6;--d:-0.1s"><b></b></i><i class="dove" style="--x:14%;--y:40%;--s:0.5;--d:-0.3s"><b></b></i><i class="dove" style="--x:70%;--y:36%;--s:0.55;--d:-0.2s"><b></b></i><i class="dove" style="--x:44%;--y:70%;--s:0.45;--d:-0.35s"><b></b></i><i class="dove" style="--x:86%;--y:74%;--s:0.4;--d:-0.15s"><b></b></i></div>
   <div class="hero__mist" aria-hidden="true"></div>
 
   <div class="hero__copy">
@@ -128,7 +131,7 @@ d.classList.add('js');})();
 
 <!-- 2. About: the moss arch. A pinned scene; three statements swap as you scroll. -->
 <section class="about" id="tentang" data-scroll data-steps="3">
-  <div class="sweep" aria-hidden="true"></div>
+  <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="fade-top" aria-hidden="true"></div>
   <div class="about__stage">
     <div class="plate">
@@ -139,36 +142,38 @@ d.classList.add('js');})();
         <img src="assets/img/plate-arch-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
     </div>
-    <div class="about__copy">
-      <div class="say is-on" data-step="0">
-        <h2 data-en="Ordinary invitations sink in the group chat.">Undangan biasa tenggelam di grup chat.</h2>
-        <p data-en="One link for everyone, glanced at once, then forgotten.">Satu tautan untuk semua orang, dibuka sekilas, lalu terlupa.</p>
+    <div class="flock flock--c" aria-hidden="true"><i class="dove" style="--x:30%;--y:20%;--s:0.7;--d:0s"><b></b></i><i class="dove" style="--x:60%;--y:48%;--s:0.55;--d:-0.2s"><b></b></i><i class="dove" style="--x:12%;--y:70%;--s:0.5;--d:-0.3s"><b></b></i></div>
+    <div class="about__fade" aria-hidden="true"></div>
+    <div class="about__says">
+      <div class="say" data-step="0">
+        <h2 data-en="Every guest receives a letter of their own.">Setiap tamu menerima suratnya sendiri.</h2>
+        <p data-en="Not one link dropped into a group chat. Nawala arrives with the guest's name on the envelope, so it gets opened, not scrolled past.">Bukan satu tautan yang dilempar ke grup chat. Nawala datang dengan nama tamu di amplopnya, sehingga dibuka, bukan dilewati.</p>
       </div>
       <div class="say" data-step="1">
-        <h2 data-en="Nawala means letter.">Nawala berarti surat.</h2>
-        <p data-en="We brought it to life: a winged letter that finds each guest and greets them by name.">Kami menghidupkannya: surat bersayap yang mendatangi setiap tamu dan menyapa namanya.</p>
+        <h2 data-en="It opens like a gift, not like a brochure.">Dibuka seperti hadiah, bukan seperti brosur.</h2>
+        <p data-en="The envelope opens and your guest steps into the world you chose: a forest, a palace, a shore, or a place made only for you.">Amplop terbuka, lalu tamu melangkah masuk ke dunia yang kalian pilih: hutan, istana, pantai, atau tempat yang dibuat hanya untuk kalian.</p>
       </div>
       <div class="say" data-step="2">
-        <h2 data-en="Then it opens, and your guest steps into your world.">Lalu ia membuka, dan tamu masuk ke dunia kalian.</h2>
-        <p data-en="Themes as real as a photograph, and light enough for any phone.">Tema yang nyata seperti foto, dan tetap ringan di ponsel apa pun.</p>
+        <h2 data-en="You choose. We do the work.">Kalian memilih. Kami yang mengerjakan.</h2>
+        <p data-en="Pick a theme and answer three questions on WhatsApp. Names, RSVP, map and guest list are set up by us, and it stays light on any phone.">Pilih tema, jawab tiga pertanyaan lewat WhatsApp. Nama tamu, RSVP, peta, dan daftar tamu kami yang siapkan, dan tetap ringan di ponsel apa pun.</p>
       </div>
     </div>
-    <div class="about__pips" aria-hidden="true"><i></i><i></i><i></i></div>
   </div>
 </section>
 
 <!-- 3. Services: among the trees. The phone stays, the service changes. -->
 <section class="services" id="layanan" data-scroll>
-  <div class="sweep" aria-hidden="true"></div>
+  <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="services__bg" aria-hidden="true">
     <div class="plate">
       <picture>
-        <source media="(max-width: 520px)" srcset="assets/img/plate-forest-mobile-sm.webp">
-        <source media="(max-width: 899px)" srcset="assets/img/plate-forest-mobile.webp">
-        <source media="(max-width: 1500px)" srcset="assets/img/plate-forest-desktop-sm.webp">
-        <img src="assets/img/plate-forest-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
+        <source media="(max-width: 520px)" srcset="assets/img/plate-treetops-mobile-sm.webp">
+        <source media="(max-width: 899px)" srcset="assets/img/plate-treetops-mobile.webp">
+        <source media="(max-width: 1500px)" srcset="assets/img/plate-treetops-desktop-sm.webp">
+        <img src="assets/img/plate-treetops-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
     </div>
+    <div class="flock flock--d"><i class="dove" style="--x:40%;--y:30%;--s:0.6;--d:0s"><b></b></i><i class="dove" style="--x:70%;--y:60%;--s:0.45;--d:-0.2s"><b></b></i></div>
     <div class="services__shade"></div>
   </div>
   <div class="fade-top" aria-hidden="true"></div>
@@ -233,16 +238,25 @@ d.classList.add('js');})();
 
 <!-- 4. Themes: a river of covers drifts behind; one button opens the collection -->
 <section class="themes" id="tema" data-scroll>
-  <div class="sweep" aria-hidden="true"></div>
+  <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="themes__bg" aria-hidden="true">
-    <div class="plate"><img src="assets/img/plate-deep-soft.webp" width="960" height="536" alt="" loading="lazy"></div>
+    <div class="plate">
+      <picture>
+        <source media="(max-width: 520px)" srcset="assets/img/plate-branches-mobile-sm.webp">
+        <source media="(max-width: 899px)" srcset="assets/img/plate-branches-mobile.webp">
+        <source media="(max-width: 1500px)" srcset="assets/img/plate-branches-desktop-sm.webp">
+        <img src="assets/img/plate-branches-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
+      </picture>
+    </div>
     <div class="river" id="river"></div>
     <div class="themes__shade"></div>
   </div>
   <div class="fade-top" aria-hidden="true"></div>
+  <div class="themes__branch" id="branch" aria-hidden="true"><img src="assets/img/fx-branch.webp" width="1500" height="564" alt="" loading="lazy"></div>
+  <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:58%;--y:78%;--n:5;--s:0.7;--t:13s;--d:-6s"></i></div>
   <div class="themes__panel glass" id="themes-panel">
     <h2 data-en="More than 500 themes are being painted.">Lebih dari 500 tema sedang dilukis.</h2>
-    <p data-en="Ready in January 2027. Here are the first 28 directions, from seven families.">Siap pada Januari 2027. Inilah 28 arah pertama, dari tujuh keluarga.</p>
+    <p data-en="Ready in January 2027. Here are the first 28 covers, from seven families.">Siap pada Januari 2027. Inilah 28 sampul pertama, dari tujuh keluarga.</p>
     <div class="themes__actions">
       <button class="btn btn--glow" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
       <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
@@ -252,17 +266,18 @@ d.classList.add('js');})();
 
 <!-- 5. Contact: the bright hill, one question at a time -->
 <section class="contact" id="kontak" data-scroll>
-  <div class="sweep" aria-hidden="true"></div>
+  <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="contact__bg" aria-hidden="true">
     <div class="plate">
       <picture>
-        <source media="(max-width: 520px)" srcset="assets/img/plate-hill-mobile-sm.webp">
-        <source media="(max-width: 899px)" srcset="assets/img/plate-hill-mobile.webp">
-        <source media="(max-width: 1500px)" srcset="assets/img/plate-hill-desktop-sm.webp">
-        <img src="assets/img/plate-hill-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
+        <source media="(max-width: 520px)" srcset="assets/img/plate-boulder-mobile-sm.webp">
+        <source media="(max-width: 899px)" srcset="assets/img/plate-boulder-mobile.webp">
+        <source media="(max-width: 1500px)" srcset="assets/img/plate-boulder-desktop-sm.webp">
+        <img src="assets/img/plate-boulder-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
     </div>
   </div>
+  <div class="bflies" aria-hidden="true"><i style="--x:8%;--y:72%;--n:0;--s:1.1;--t:14s;--d:-2s"></i><i style="--x:18%;--y:84%;--n:1;--s:0.8;--t:17s;--d:-8s"></i><i style="--x:30%;--y:66%;--n:2;--s:0.9;--t:12s;--d:-5s"></i><i style="--x:40%;--y:88%;--n:3;--s:1;--t:19s;--d:-11s"></i><i style="--x:52%;--y:74%;--n:4;--s:0.7;--t:15s;--d:-1s"></i><i style="--x:62%;--y:86%;--n:5;--s:1;--t:13s;--d:-7s"></i><i style="--x:74%;--y:70%;--n:6;--s:0.8;--t:18s;--d:-4s"></i><i style="--x:86%;--y:82%;--n:7;--s:0.9;--t:16s;--d:-10s"></i><i style="--x:46%;--y:58%;--n:1;--s:0.6;--t:21s;--d:-13s"></i></div>
   <div class="wrap contact__inner">
     <div class="contact__lead">
       <h2 data-en="Three answers, and we take it from there.">Tiga jawaban, sisanya urusan kami.</h2>
@@ -341,13 +356,13 @@ d.classList.add('js');})();
 
 </main>
 
-<!-- The theme collection. Covers are colour fields until the real ones are painted. -->
+<!-- The theme collection: 28 cover pictures. The invitation pages behind them are not built yet, and the copy says so. -->
 <dialog class="pop pop--themes" id="pop-themes" aria-labelledby="pop-themes-h">
   <div class="pop__box">
     <div class="pop__head">
       <div>
         <h2 id="pop-themes-h" data-en="The first themes">Tema pembuka</h2>
-        <p data-en="28 directions from seven families. The covers are still being painted, so for now you see their colours.">28 arah dari tujuh keluarga. Sampulnya masih dilukis, jadi untuk saat ini yang tampak adalah warnanya.</p>
+        <p data-en="28 covers from seven families. These are the opening scenes; the invitation pages behind them are still being built.">28 sampul dari tujuh keluarga. Ini adegan pembukanya; halaman undangan di baliknya masih kami kerjakan.</p>
       </div>
       <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     </div>
