@@ -289,8 +289,8 @@
     var q = clamp((vh - (pairTop - y)) / pairSpan);
     var w = Math.sin(q * Math.PI * 6);
     pair.style.setProperty('--hx', ease(q).toFixed(3));
-    pair.style.setProperty('--hop', (q < 1 ? Math.max(0, w) * 20 : 0).toFixed(1));
-    pair.style.setProperty('--hop2', (q < 1 ? Math.max(0, -w) * 20 : 0).toFixed(1));
+    pair.style.setProperty('--hop', (q < 1 ? Math.max(0, w) * 24 : 0).toFixed(1));
+    pair.style.setProperty('--hop2', (q < 1 ? Math.max(0, -w) * 24 : 0).toFixed(1));
     pair.style.setProperty('--lean', (q < 1 ? w * 5 : 0).toFixed(1));
     var met = q >= .97;
     if (met !== metNow) { metNow = met; pair.classList.toggle('is-met', met); }

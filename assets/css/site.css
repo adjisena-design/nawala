@@ -481,20 +481,55 @@ main{overflow-x:clip}
 
 /* bride and groom: two small letters that hop toward each other, one hop at a time */
 .contact__side{display:grid;gap:1rem;justify-items:start}
-.pair{position:relative;width:100%;max-width:26rem;height:150px;--hx:1}
-.pair__one{position:absolute;left:50%;bottom:10px;width:108px;will-change:transform}
-.pair__one--groom{margin-left:-112px;transform:translate3d(calc((1 - var(--hx)) * -30vw),0,0)}
-.pair__one--bride{width:98px;margin-left:2px;transform:translate3d(calc((1 - var(--hx)) * 30vw),0,0)}
+.pair{position:relative;width:100%;max-width:26rem;height:206px;--hx:1;--d:62px;--w:128px;--jump:-34px}
+.pair__one{position:absolute;left:50%;bottom:16px;width:var(--w);margin-left:calc(var(--w) / -2);will-change:transform}
+.pair__one--groom{transform:translate3d(calc(var(--d) * -1 - (1 - var(--hx)) * 30vw),0,0)}
+.pair__one--bride{--w:116px;transform:translate3d(calc(var(--d) + (1 - var(--hx)) * 30vw),0,0)}
 .pair__one > i{position:absolute;left:14%;right:14%;bottom:-9px;height:12px;border-radius:50%;background:radial-gradient(rgba(22,48,31,.34),transparent 70%)}
 .pair__body{position:relative;isolation:isolate;transform-origin:50% 100%;transform:translate3d(0,calc(var(--hop,0) * -1px),0) rotate(calc(var(--lean,0) * 1deg))}
 .pair__one--bride .pair__body{transform:translate3d(0,calc(var(--hop2,0) * -1px),0) rotate(calc(var(--lean,0) * -1deg))}
 .pair__body img{width:100%;height:auto;filter:drop-shadow(0 8px 8px rgba(22,48,31,.22))}
-.pair__blush{position:absolute;inset:0;background:#F27BA6;mix-blend-mode:multiply;opacity:0;visibility:hidden;transition:opacity .9s .25s}
+.pair__blush{position:absolute;inset:0;background:#F27BA6;mix-blend-mode:multiply;opacity:0;visibility:hidden}
 .pair.is-near .pair__blush{visibility:visible;-webkit-mask:url("../img/nawala-groom-640.webp") center/100% 100% no-repeat;mask:url("../img/nawala-groom-640.webp") center/100% 100% no-repeat}
 .pair.is-near .pair__one--bride .pair__blush{-webkit-mask-image:url("../img/nawala-bride-640.webp");mask-image:url("../img/nawala-bride-640.webp")}
-.pair.is-met .pair__blush{opacity:.42}
-.pair__heart{position:absolute;left:50%;bottom:112px;width:26px;height:24px;margin-left:-13px;background:var(--rose);clip-path:path("M13 23.5C3.2 16.2 0 11.4 0 6.8 0 3 2.9 0 6.5 0c2.6 0 4.9 1.5 6.5 3.7C14.6 1.5 16.9 0 19.5 0 23.1 0 26 3 26 6.8c0 4.6-3.2 9.4-13 16.7Z");opacity:0;transform:translateY(14px) scale(.3);transition:opacity .5s .35s,transform .8s var(--spring) .35s}
-.pair.is-met .pair__heart{opacity:1;transform:none}
+.pair__heart{position:absolute;left:50%;bottom:calc(var(--w) + 34px);width:26px;height:24px;margin-left:-13px;background:var(--rose);clip-path:path("M13 23.5C3.2 16.2 0 11.4 0 6.8 0 3 2.9 0 6.5 0c2.6 0 4.9 1.5 6.5 3.7C14.6 1.5 16.9 0 19.5 0 23.1 0 26 3 26 6.8c0 4.6-3.2 9.4-13 16.7Z");opacity:0;transform:translateY(14px) scale(.3)}
+/* once they have met they keep playing, on a loop: blush, jump together, turn white again,
+   hop in a circle around each other, come back and blush again */
+.pair.is-met .pair__one--groom{animation:circle-g 8s linear infinite}
+.pair.is-met .pair__one--bride{animation:circle-b 8s linear infinite}
+.pair.is-met .pair__body{animation:hopping .46s ease-in-out infinite alternate}
+.pair.is-met .pair__one--bride .pair__body{animation-delay:-.46s}
+.pair.is-met .pair__blush{animation:blushing 8s ease-in-out infinite}
+.pair.is-met .pair__heart{animation:hearting 8s ease-in-out infinite}
+@keyframes hopping{from{transform:translate3d(0,0,0) rotate(-3deg)}to{transform:translate3d(0,-16px,0) rotate(3deg)}}
+@keyframes blushing{0%{opacity:.1}9%,20%{opacity:.48}29%,77%{opacity:0}90%{opacity:.4}100%{opacity:.1}}
+@keyframes hearting{0%,6%{opacity:0;transform:translateY(14px) scale(.3)}12%,20%{opacity:1;transform:none}28%,100%{opacity:0;transform:translateY(-26px) scale(.6)}}
+@keyframes circle-g{
+  0%,11%{transform:translate3d(calc(var(--d) * -1),0,0) scale(1);z-index:2}
+  15%{transform:translate3d(calc(var(--d) * -.86),var(--jump),0) scale(1)}
+  19%,25%{transform:translate3d(calc(var(--d) * -1),0,0) scale(1);z-index:3}
+  31.25%{transform:translate3d(calc(var(--d) * -.707),7px,0) scale(1.05)}
+  37.5%{transform:translate3d(0,10px,0) scale(1.08)}
+  43.75%{transform:translate3d(calc(var(--d) * .707),7px,0) scale(1.05)}
+  50%{transform:translate3d(var(--d),0,0) scale(1);z-index:3}
+  50.1%{z-index:1}
+  56.25%{transform:translate3d(calc(var(--d) * .707),-7px,0) scale(.95)}
+  62.5%{transform:translate3d(0,-10px,0) scale(.92)}
+  68.75%{transform:translate3d(calc(var(--d) * -.707),-7px,0) scale(.95)}
+  75%,100%{transform:translate3d(calc(var(--d) * -1),0,0) scale(1);z-index:1}}
+@keyframes circle-b{
+  0%,11%{transform:translate3d(var(--d),0,0) scale(1);z-index:2}
+  15%{transform:translate3d(calc(var(--d) * .86),var(--jump),0) scale(1)}
+  19%,25%{transform:translate3d(var(--d),0,0) scale(1);z-index:1}
+  31.25%{transform:translate3d(calc(var(--d) * .707),-7px,0) scale(.95)}
+  37.5%{transform:translate3d(0,-10px,0) scale(.92)}
+  43.75%{transform:translate3d(calc(var(--d) * -.707),-7px,0) scale(.95)}
+  50%{transform:translate3d(calc(var(--d) * -1),0,0) scale(1);z-index:1}
+  50.1%{z-index:3}
+  56.25%{transform:translate3d(calc(var(--d) * -.707),7px,0) scale(1.05)}
+  62.5%{transform:translate3d(0,10px,0) scale(1.08)}
+  68.75%{transform:translate3d(calc(var(--d) * .707),7px,0) scale(1.05)}
+  75%,100%{transform:translate3d(var(--d),0,0) scale(1);z-index:3}}
 .pair__cap{max-width:26rem;font-size:.9375rem;color:rgba(22,48,31,.86);padding:.7rem 1rem;border-radius:14px;background:rgba(251,246,234,.72)}
 
 .foot{position:relative;z-index:6;margin-top:auto;padding:5rem 0 calc(1.5rem + env(safe-area-inset-bottom));color:var(--ivory);background:linear-gradient(0deg,rgba(12,29,19,.86) 0%,rgba(12,29,19,.55) 55%,transparent 100%)}
@@ -509,11 +544,9 @@ main{overflow-x:clip}
   .ask{grid-column:2;grid-row:1 / span 2;margin-top:0;padding:2.5rem 2.2rem 2rem;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
   .ask__mascot{width:150px;top:-84px;right:14px}
   .contact__side{grid-column:1}
-  .pair{height:190px}
-  .pair__one{width:140px}
-  .pair__one--groom{margin-left:-146px;transform:translate3d(calc((1 - var(--hx)) * -16vw),0,0)}
-  .pair__one--bride{width:128px;transform:translate3d(calc((1 - var(--hx)) * 16vw),0,0)}
-  .pair__heart{bottom:150px}
+  .pair{height:300px;--d:96px;--w:196px;--jump:-48px}
+  .pair__one--groom{transform:translate3d(calc(var(--d) * -1 - (1 - var(--hx)) * 16vw),0,0)}
+  .pair__one--bride{--w:178px;transform:translate3d(calc(var(--d) + (1 - var(--hx)) * 16vw),0,0)}
 }
 
 /* ---------- Calm mode ---------- */
@@ -530,4 +563,5 @@ main{overflow-x:clip}
   .say{opacity:1;transform:none;margin-bottom:1.5rem;pointer-events:auto}
   .about__pips{display:none}
   .tick circle,.tick path{stroke-dashoffset:0}
+  .pair.is-met .pair__heart{opacity:1;transform:none}
 }
