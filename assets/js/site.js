@@ -22,8 +22,48 @@
     era: ['Lintas masa', 'Eras', 'Tempo doeloe, noir, koboi, zaman samurai.', 'Old days, noir, the Old West, the age of samurai.'],
     elemen: ['Elemen', 'Elements', 'Air, api, bumi, emas, mutiara.', 'Water, fire, earth, gold, pearl.']
   };
-  /* cover pictures are named after the Indonesian theme name: assets/img/cover-<slug>.webp (and -s for the small one) */
-  function cover(th, small) { return 'assets/img/cover-' + th[1].toLowerCase().replace(/ /g, '-') + (small ? '-s' : '') + '.webp'; }
+  /* pictures and films are named after the Indonesian theme name: assets/img/cover-<slug>.webp (-s for the small one),
+     assets/video/<slug>.mp4 */
+  function slug(th) { return th[1].toLowerCase().replace(/ /g, '-'); }
+  /* -s (220 wide) and -m (400 wide) are toned down on purpose so many covers can sit together quietly;
+     the full-colour picture is only shown once a theme is opened */
+  function cover(th, size) { return 'assets/img/cover-' + slug(th) + (size ? '-' + size : '') + '.webp'; }
+  /* Four tiers. Dasar: one scene, a gentle camera move. Premium: the camera travels into the scene.
+     Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
+  var TIERS = {
+    dasar: ['Dasar', 'Basic', 'Aman, disukai semua orang, dan tetap bermakna. Satu adegan nyata dengan gerak kamera yang lembut.', 'Safe, liked by everyone, and still meaningful. One real scene with a gentle camera move.'],
+    premium: ['Premium', 'Premium', 'Kamera membawa tamu masuk ke dalam adegan pembuka. Tujuh keluarga, 28 tema.', 'The camera carries your guest into the opening scene. Seven families, 28 themes.'],
+    eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again.'],
+    kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
+  };
+  var BASIC = [
+    ['Putih Klasik', 'Classic White', 'Mawar putih dan sutra gading dalam cahaya pagi.', 'White roses and ivory silk in morning light.'],
+    ['Sage', 'Sage', 'Daun eukaliptus, bunga putih, dan linen hijau sage.', 'Eucalyptus, white flowers and sage green linen.'],
+    ['Dusty Rose', 'Dusty Rose', 'Peony merah muda dan pita sutra.', 'Blush peonies and silk ribbon.'],
+    ['Emas Lembut', 'Soft Gold', 'Satin sampanye, lilin, dan cahaya keemasan.', 'Champagne satin, candles and golden light.'],
+    ['Biru Langit', 'Sky Blue', 'Hortensia biru muda dan linen putih.', 'Pale blue hydrangea and white linen.'],
+    ['Lavender', 'Lavender', 'Lavender dan mawar ungu muda di senja hari.', 'Lavender and lilac roses at dusk.'],
+    ['Terakota', 'Terracotta', 'Rumput pampas, daun palem kering, dan tembikar.', 'Pampas grass, dried palm and terracotta.'],
+    ['Daun Tropis', 'Tropical Leaves', 'Daun monstera dan anggrek putih.', 'Monstera leaves and white orchids.'],
+    ['Marun', 'Maroon', 'Mawar merah tua dan cahaya lilin.', 'Deep red roses and candlelight.'],
+    ['Melati', 'Jasmine', 'Roncean melati putih dan daun segar.', 'Garlands of white jasmine and fresh leaves.'],
+    ['Senja', 'Sunset', 'Pantai tenang saat matahari terbenam.', 'A quiet beach at sunset.'],
+    ['Malam Bintang', 'Starry Night', 'Langit berbintang, lampu kecil, dan bunga putih.', 'A starry sky, fairy lights and white flowers.']
+  ];
+  var EXCLUSIVE = [
+    ['Istana Awan', 'Cloud Palace', 'Tangga marmer menuju istana di atas awan.', 'A marble staircase to a palace above the clouds.'],
+    ['Taman Kaca', 'Glass Garden', 'Rumah kaca penuh anggrek saat fajar.', 'A glasshouse full of orchids at dawn.'],
+    ['Perpustakaan Emas', 'Golden Library', 'Perpustakaan keemasan; bukunya terbuka dan bercahaya saat tamu tiba.', 'A golden library; its book opens and glows as your guest arrives.'],
+    ['Kapal Bulan', 'Moon Boat', 'Perahu kecil di lautan bintang menuju bulan sabit.', 'A small boat on a sea of stars, heading for the crescent moon.'],
+    ['Seribu Lentera', 'A Thousand Lanterns', 'Lorong seribu lentera; gerbangnya terbuka di ujung.', 'A corridor of a thousand lanterns; the gate opens at its end.'],
+    ['Bawah Laut', 'Under the Sea', 'Paviliun karang dan mutiara di dasar laut yang jernih.', 'A pavilion of coral and pearl on a clear sea floor.'],
+    ['Teater Tua', 'Old Opera House', 'Gedung opera tua; tirainya terbuka saat tamu mendekat.', 'An old opera house; the curtain parts as your guest approaches.'],
+    ['Keraton Malam', 'Palace by Lamplight', 'Pelataran keraton yang diterangi ratusan pelita.', 'A palace courtyard lit by hundreds of oil lamps.'],
+    ['Aurora', 'Aurora', 'Paviliun kaca di atas salju, di bawah cahaya utara.', 'A glass pavilion on snow under the northern lights.'],
+    ['Kebun Mawar', 'Secret Rose Garden', 'Taman mawar rahasia; pintunya terbuka untuk tamu.', 'A secret rose garden; its door opens for your guest.']
+  ];
+  var FILMS = ' hutan-pagi balairung-merah akad-putih songket-palembang santorini tempo-doeloe air putih-klasik dusty-rose malam-bintang istana-awan taman-kaca perpustakaan-emas kapal-bulan seribu-lentera bawah-laut teater-tua keraton-malam aurora kebun-mawar ';
+  var OWNED = '';   // slugs of Exclusive themes a couple has bought, e.g. ' istana-awan '. Empty until there is a real sale.
   var THEMES = [
     ['alam', 'Hutan Pagi', 'Morning Forest'], ['royal', 'Balairung Merah', 'Crimson Hall'], ['religi', 'Akad Putih', 'White Akad'], ['nusa', 'Pendopo Jawa', 'Javanese Pendopo'],
     ['dunia', 'Toskana', 'Tuscany'], ['era', 'Tempo Doeloe', 'Old Days'], ['elemen', 'Air', 'Water'],
@@ -390,51 +430,94 @@
   /* ---------- Themes: the river behind, the collection in a pop-up ---------- */
   var chosen = null, showChosen = function () {};
   function turn(i) { return Math.floor(i / 7); }
+  /* every theme as one list: [tier, name, English name, description, English description, family] */
+  var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
+    .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
+    .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
+  function hasFilm(th) { return FILMS.indexOf(' ' + slug(th) + ' ') > -1; }
   (function () {
     var river = $('#river');
     if (river) nearJobs.push([themes, function () {
       var rows = desktop.matches ? 3 : 2, per = desktop.matches ? 14 : 8, html = '';
       for (var r = 0; r < rows; r++) {
         var cards = '';
-        for (var c = 0; c < per; c++) { var i = (r * 9 + c * 5) % THEMES.length; cards += '<i class="rc" style="background-image:url(' + cover(THEMES[i], true) + ')"></i>'; }
+        for (var c = 0; c < per; c++) { var i = (r * 17 + c * 7) % ALL.length; cards += '<i class="rc" style="background-image:url(' + cover(ALL[i], 's') + ')"></i>'; }
         html += '<div class="river__row">' + cards + cards + '</div>';
       }
       river.innerHTML = html;
     }]);
 
     var pops = { themes: $('#pop-themes'), login: $('#pop-login') };
-    var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), built = false, viewing = -1;
+    var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), viewing = -1, tier = 'premium', builtFor = '';
+    var tabs = $$('.tabs [data-tier]'), note = $('#tier-note'), custom = $('#tier-custom'), more = $('.pop__more');
+    var coverEl = $('#detail-cover'), play = $('#detail-play'), lock = $('#detail-lock'), one = $('#detail-one');
+    var conn = navigator.connection || {}, lowData = !!conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '');
+    function unlocked() { try { if (sessionStorage.getItem('nawala-code')) return true; } catch (e) {} return query.get('film') === '1'; }
     function build() {
-      built = true;
-      grid.innerHTML = THEMES.map(function (th, i) {
-        return '<button class="tc" type="button" data-i="' + i + '"><span class="tc__art cf cf--' + th[0] + '" style="--k:' + turn(i) + '"><img src="' + cover(th) + '" alt="" loading="lazy" width="640" height="800"></span><b>' + t(th[1], th[2]) + '</b><small>' + t(FAMILIES[th[0]][0], FAMILIES[th[0]][1]) + '</small></button>';
+      builtFor = tier + lang;
+      tabs.forEach(function (b) { var on = b.getAttribute('data-tier') === tier; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+      note.textContent = t(TIERS[tier][2], TIERS[tier][3]);
+      var isCustom = tier === 'kustom';
+      custom.hidden = !isCustom; grid.hidden = isCustom; more.hidden = isCustom;
+      if (isCustom) return;
+      grid.innerHTML = ALL.map(function (th, i) {
+        if (th[0] !== tier) return '';
+        var tag = OWNED.indexOf(' ' + slug(th) + ' ') > -1 ? t('Sudah dimiliki', 'Owned') : hasFilm(th) ? t('Ada film', 'With film') : '';
+        var sub = th[5] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
+        return '<button class="tc" type="button" data-i="' + i + '"><span class="tc__art' + (th[5] ? ' cf cf--' + th[5] : '') + '"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" width="400" height="500">' +
+          (tag ? '<em>' + tag + '</em>' : '') + '</span><b>' + t(th[1], th[2]) + '</b><small>' + sub + '</small></button>';
       }).join('');
+      list.scrollTop = 0;
     }
+    function stopFilm() { var v = $('video', coverEl); if (v) { v.pause(); v.remove(); } coverEl.classList.remove('is-playing'); }
     function showList(focusCard) {
-      detail.hidden = true; list.hidden = false;
+      stopFilm(); detail.hidden = true; list.hidden = false;
       if (focusCard && viewing > -1) { var c = $('[data-i="' + viewing + '"]', grid); if (c) c.focus({ preventScroll: true }); }
       viewing = -1;
     }
     function showDetail(i) {
-      viewing = i; var th = THEMES[i], fam = FAMILIES[th[0]];
-      $('#detail-cover').className = 'detail__cover cf cf--' + th[0];
-      $('#detail-cover').style.setProperty('--k', turn(i));
-      $('#detail-cover').style.backgroundImage = 'url(' + cover(th) + ')';
-      $('#detail-fam').textContent = t(fam[0], fam[1]);
+      stopFilm();
+      viewing = i; var th = ALL[i], isX = th[0] === 'eksklusif', owned = OWNED.indexOf(' ' + slug(th) + ' ') > -1;
+      coverEl.className = 'detail__cover' + (th[5] ? '' : ' is-tall');
+      coverEl.style.backgroundImage = 'url(' + cover(th) + ')';
+      $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (th[5] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
       $('#detail-name').textContent = t(th[1], th[2]);
-      $('#detail-desc').textContent = t(fam[2], fam[3]) + ' ' + t('Ini adegan pembukanya. Halaman undangan di baliknya masih kami kerjakan.', 'This is its opening scene. The invitation pages behind it are still being built.');
+      $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + t('Ini adegan pembukanya. Halaman undangan di baliknya masih kami kerjakan.', 'This is its opening scene. The invitation pages behind it are still being built.');
+      one.hidden = !isX;
+      one.textContent = owned ? t('Tema ini sudah dimiliki satu pasangan dan tidak dijual lagi.', 'This theme already belongs to a couple and is no longer for sale.')
+        : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');
+      $('#detail-use').hidden = owned;
+      lock.hidden = true;
+      play.hidden = !hasFilm(th) || lowData;
       list.hidden = true; detail.hidden = false; detail.scrollTop = 0;
       try { detail.focus({ preventScroll: true }); } catch (e) {}
     }
-    function closeAll() { Object.keys(pops).forEach(function (k) { if (pops[k] && pops[k].open) pops[k].close(); }); }
-    function open(name) {
+    /* films are small, silent, and only ever start from a tap */
+    play.addEventListener('click', function () {
+      var th = ALL[viewing]; if (!th) return;
+      if (th[0] === 'eksklusif' && !unlocked()) { lock.hidden = false; lock.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); return; }
+      var v = doc.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.src = 'assets/video/' + slug(th) + '.mp4';
+      coverEl.insertBefore(v, coverEl.firstChild); coverEl.classList.add('is-playing');
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () { stopFilm(); });
+    });
+    function closeAll() { stopFilm(); Object.keys(pops).forEach(function (k) { if (pops[k] && pops[k].open) pops[k].close(); }); }
+    function open(name, wantTier) {
       var d = pops[name]; if (!d || !d.showModal) { location.hash = name === 'themes' ? 'tema' : 'kontak'; return; }
       closeAll();
-      if (name === 'themes') { if (!built) build(); showList(false); }
+      if (name === 'themes') { if (wantTier) tier = wantTier; build(); showList(false); }
       if (name === 'login') { var m = $('#login-msg'); m.hidden = true; }
       d.showModal();
       if (name === 'login') $('#login-code').focus();
     }
+    pops.themes.addEventListener('close', stopFilm);
+    tabs.forEach(function (b, k) {
+      b.addEventListener('click', function () { tier = b.getAttribute('data-tier'); build(); showList(false); });
+      b.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var n = tabs[(k + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click();
+      });
+    });
     function goTo(id) {
       closeAll();
       var el = doc.getElementById(id); if (!el) return;
@@ -442,7 +525,7 @@
       if (id === 'kontak') setTimeout(function () { var f = $('#q-name'); if (f && !f.closest('[hidden]')) try { f.focus({ preventScroll: true }); } catch (e) {} }, 900);
     }
     doc.addEventListener('click', function (e) {
-      var o = e.target.closest('[data-open]'); if (o) { e.preventDefault(); return open(o.getAttribute('data-open')); }
+      var o = e.target.closest('[data-open]'); if (o) { e.preventDefault(); return open(o.getAttribute('data-open'), o.getAttribute('data-tier')); }
       var g = e.target.closest('[data-goto]'); if (g) return goTo(g.getAttribute('data-goto'));
       if (e.target.closest('[data-close]')) return closeAll();
       if (e.target.classList && e.target.classList.contains('pop')) return closeAll();   // a tap on the dark area around the box
@@ -450,9 +533,9 @@
     });
     $('#detail-back').addEventListener('click', function () { showList(true); });
     $('#detail-use').addEventListener('click', function () {
-      chosen = THEMES[viewing]; showChosen(); goTo('kontak');
+      chosen = ALL[viewing]; showChosen(); goTo('kontak');
     });
-    afterLang.push(function () { if (built) { var v = viewing; build(); if (v > -1) showDetail(v); } });
+    afterLang.push(function () { if (builtFor && builtFor !== tier + lang) { var v = viewing; build(); if (v > -1) showDetail(v); } });
 
     /* log in with an access code. Codes live in the Nawala database, which is not connected yet. */
     var form = $('#login-form'), code = $('#login-code'), msg = $('#login-msg');

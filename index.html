@@ -255,8 +255,14 @@ d.classList.add('js');})();
   <div class="themes__branch" id="branch" aria-hidden="true"><img src="assets/img/fx-branch.webp" width="1000" height="376" alt="" loading="lazy"></div>
   <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:58%;--y:78%;--n:5;--s:0.7;--t:13s;--d:-6s"></i></div>
   <div class="themes__panel glass" id="themes-panel">
-    <h2 data-en="More than 500 themes are being painted.">Lebih dari 500 tema sedang dilukis.</h2>
-    <p data-en="Ready in January 2027. Here are the first 28 covers, from seven families.">Siap pada Januari 2027. Inilah 28 sampul pertama, dari tujuh keluarga.</p>
+    <h2 data-en="Four ways to begin your invitation.">Empat cara memulai undangan kalian.</h2>
+    <p data-en="From simple and safe to made only for you. Every one is a real scene in motion, never a flat paper template. These are opening scenes; the full invitations are ready in January 2027.">Dari yang sederhana dan aman sampai yang dibuat hanya untuk kalian. Semuanya adegan nyata yang bergerak, bukan templat kertas tempel. Ini adegan pembukanya; undangan lengkapnya siap Januari 2027.</p>
+    <div class="tiers">
+      <button type="button" data-open="themes" data-tier="dasar"><b data-en="Basic">Dasar</b><span data-en="12 themes">12 tema</span></button>
+      <button type="button" data-open="themes" data-tier="premium"><b>Premium</b><span data-en="28 themes">28 tema</span></button>
+      <button type="button" data-open="themes" data-tier="eksklusif"><b data-en="Exclusive">Eksklusif</b><span data-en="10, one couple each">10, satu pasangan</span></button>
+      <button type="button" data-open="themes" data-tier="kustom"><b data-en="Custom">Kustom</b><span data-en="made for you">dibuat untuk kalian</span></button>
+    </div>
     <div class="themes__actions">
       <button class="btn btn--glow" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
       <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
@@ -361,16 +367,33 @@ d.classList.add('js');})();
   <div class="pop__box">
     <div class="pop__head">
       <div>
-        <h2 id="pop-themes-h" data-en="The first themes">Tema pembuka</h2>
-        <p data-en="28 covers from seven families. These are the opening scenes; the invitation pages behind them are still being built.">28 sampul dari tujuh keluarga. Ini adegan pembukanya; halaman undangan di baliknya masih kami kerjakan.</p>
+        <h2 id="pop-themes-h" data-en="Nawala themes">Tema Nawala</h2>
+        <div class="tabs" role="tablist" aria-label="Tingkat tema">
+          <button type="button" role="tab" data-tier="dasar" aria-selected="false" data-en="Basic">Dasar</button>
+          <button type="button" role="tab" data-tier="premium" aria-selected="true">Premium</button>
+          <button type="button" role="tab" data-tier="eksklusif" aria-selected="false" data-en="Exclusive">Eksklusif</button>
+          <button type="button" role="tab" data-tier="kustom" aria-selected="false" data-en="Custom">Kustom</button>
+        </div>
+        <p id="tier-note"></p>
       </div>
       <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="pop__body" id="pop-list">
       <div class="grid" id="theme-grid"></div>
+      <div class="custom" id="tier-custom" hidden>
+        <ol class="custom__steps">
+          <li><b data-en="Send us your inspiration">Kirim inspirasi kalian</b><span data-en="Photos, videos, colours or simply your story, on WhatsApp.">Foto, video, warna, atau cukup cerita kalian, lewat WhatsApp.</span></li>
+          <li><b data-en="A video call">Panggilan video</b><span data-en="We listen until we truly understand what you want.">Kami mendengarkan sampai benar-benar paham yang kalian inginkan.</span></li>
+          <li><b data-en="The concept">Konsep</b><span data-en="We send the scenes and the journey for you to approve.">Kami kirim rancangan adegan dan alurnya untuk kalian setujui.</span></li>
+          <li><b data-en="Production">Produksi</b><span data-en="The theme is built from scratch, for you alone.">Tema dibuat dari nol, hanya untuk kalian.</span></li>
+        </ol>
+        <div class="pop__actions">
+          <a class="btn btn--glow" data-wa="Halo Nawala, saya ingin tema kustom. Saya akan kirim inspirasinya." data-wa-en="Hello Nawala, I would like a custom theme. I will send my inspiration." href="#kontak" data-en="Start on WhatsApp">Mulai lewat WhatsApp</a>
+        </div>
+      </div>
       <div class="pop__more">
         <h3 data-en="This is only the beginning.">Ini baru permulaan.</h3>
-        <p data-en="Register your WhatsApp number and we will send an access code that opens more themes as they are finished.">Daftarkan nomor WhatsApp Anda, lalu kami kirimkan kode akses untuk membuka lebih banyak tema begitu selesai dilukis.</p>
+        <p data-en="Register your WhatsApp number and we will send an access code that opens more themes, and the Exclusive films, as they are finished.">Daftarkan nomor WhatsApp Anda, lalu kami kirimkan kode akses untuk membuka lebih banyak tema, juga film tema Eksklusif, begitu selesai dikerjakan.</p>
         <div class="pop__actions">
           <button class="btn btn--glow" type="button" data-goto="kontak" data-en="Register my WhatsApp">Daftarkan WhatsApp saya</button>
           <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
@@ -380,12 +403,15 @@ d.classList.add('js');})();
     <div class="pop__body pop__detail" id="pop-detail" hidden tabindex="-1">
       <div class="detail">
         <div class="detail__cover" id="detail-cover">
+          <button class="detail__play" id="detail-play" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg><span data-en="Play the film">Putar film</span></button>
           <div class="detail__couple"><img src="assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy"><img src="assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy"></div>
         </div>
         <div class="detail__text">
           <p class="detail__fam" id="detail-fam"></p>
           <h3 id="detail-name"></h3>
           <p id="detail-desc"></p>
+          <p class="detail__one" id="detail-one" hidden></p>
+          <p class="detail__lock" id="detail-lock" hidden><span data-en="Exclusive films open with an access code. Ask us for one on WhatsApp.">Film tema Eksklusif dibuka dengan kode akses. Minta kodenya lewat WhatsApp.</span> <button type="button" data-open="login" data-en="Enter a code">Masukkan kode</button></p>
           <p class="detail__note" data-en="The bride and groom shown here are Nawala. Your own photos take their place.">Pengantin di contoh ini adalah Nawala. Foto kalian sendiri yang nanti menggantikannya.</p>
           <div class="pop__actions">
             <button class="btn btn--glow" type="button" id="detail-use" data-en="Use this theme">Gunakan tema ini</button>
