@@ -391,13 +391,15 @@
     var phone = $('#phone-screen'), items = $$('.svc');
     if (!phone || !items.length) return;
     var screens = items.map(function (li) { return $('.svc__screen', li); });
-    var qr = $('.qr');
+    var qr = $('.qr'), frame = $('#phone'), tabs = $$('#phone-tabs i');
     if (qr) qr.innerHTML = fakeQr();
     var current = 0;
     function setActive(i) {
       current = i;
       items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); });
       screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+      tabs.forEach(function (tab, k) { tab.classList.toggle('is-on', k === i); });
+      if (frame) frame.classList.toggle('is-cover', i === 0);   /* the opening has no tab bar, like the real thing */
     }
     function place() {
       screens.forEach(function (s, i) {
