@@ -393,6 +393,12 @@
     var screens = items.map(function (li) { return $('.svc__screen', li); });
     var qr = $('.qr'), frame = $('#phone'), tabs = $$('#phone-tabs i');
     if (qr) qr.innerHTML = fakeQr();
+    function plans() {
+      var p = $('.seat__plan--p'), l = $('.seat__plan--l');
+      if (p) p.innerHTML = floorPlan(false);
+      if (l) l.innerHTML = floorPlan(true);
+    }
+    plans(); afterLang.push(plans);
     var current = 0;
     function setActive(i) {
       current = i;
@@ -416,6 +422,46 @@
       items.forEach(function (li) { io.observe(li); });
     }
   })();
+
+  /* A sample reception room: stage with the couple, parents' tables, the aisle, ten round tables of eight,
+     buffet, gifts and the entrance. Table 3 is the guest's. Drawn standing up (200 x 240), or lying down for
+     the wide service card on phones, where every x and y simply trade places. */
+  function floorPlan(lying) {
+    var W = 200, H = 240, o = '';
+    function pt(x, y) { return lying ? [y, x] : [x, y]; }
+    function box(x, y, w, h, r, style) {
+      var a = pt(x, y);
+      return '<rect x="' + a[0] + '" y="' + a[1] + '" width="' + (lying ? h : w) + '" height="' + (lying ? w : h) + '" rx="' + r + '" ' + style + '/>';
+    }
+    function dot(x, y, r, style) { var a = pt(x, y); return '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="' + r + '" ' + style + '/>'; }
+    function label(x, y, str, size, fill, turned) {
+      var a = pt(x, y);
+      return '<text x="' + a[0] + '" y="' + a[1] + '" font-size="' + size + '" fill="' + fill + '"' + (turned && lying ? ' transform="rotate(-90 ' + a[0] + ' ' + a[1] + ')"' : '') + '>' + str + '</text>';
+    }
+    var ivory = '251,246,234';
+    o += box(3, 3, W - 6, H - 6, 16, 'fill="rgba(12,29,19,.34)" stroke="rgba(' + ivory + ',.3)" stroke-width="1.5"');
+    [[15, 15], [185, 15], [11, 112], [189, 112], [189, 205]].forEach(function (c) { o += dot(c[0], c[1], 5, 'fill="#4F7A3A"') + dot(c[0] + 3, c[1] - 3, 3, 'fill="#A9C98A"'); });
+    o += box(92, 46, 16, 178, 7, 'fill="rgba(216,67,107,.5)"');                                   /* the aisle */
+    o += box(60, 9, 80, 36, 9, 'fill="#FFE9A8"');                                                  /* the stage */
+    o += label(100, 21, t('Pelaminan', 'Stage'), 8.5, '#16301F', true);
+    o += dot(lying ? 100 - 8 : 92, lying ? 35 : 36, 3.6, 'fill="#D8436B"') + dot(lying ? 100 + 8 : 108, lying ? 35 : 36, 3.6, 'fill="#F4A6C0"');
+    o += box(28, 15, 24, 13, 5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + box(148, 15, 24, 13, 5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"');
+    var seats = [[140, 72], [168, 98], [140, 124], [168, 150], [140, 176], [60, 72], [32, 98], [60, 124], [32, 150], [60, 176]];
+    seats.forEach(function (c, i) {
+      var you = i === 2, k, a;
+      if (you) o += dot(c[0], c[1], 19, 'fill="rgba(244,166,192,.3)"');
+      for (k = 0; k < 8; k++) {
+        a = k * Math.PI / 4 + Math.PI / 8;
+        o += dot(c[0] + Math.cos(a) * 14.5, c[1] + Math.sin(a) * 14.5, 2.4, 'fill="' + (you && k === 5 ? '#F6C445' : 'rgba(' + ivory + ',.55)') + '"');
+      }
+      o += dot(c[0], c[1], 10.5, you ? 'fill="#F4A6C0"' : 'fill="rgba(' + ivory + ',.18)" stroke="rgba(' + ivory + ',.5)" stroke-width="1.2"');
+      o += label(c[0], c[1], i + 1, 9.5, you ? '#16301F' : 'rgba(' + ivory + ',.92)');
+    });
+    o += box(12, 204, 66, 15, 7.5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + label(45, 211.5, t('Prasmanan', 'Buffet'), 8, 'rgba(' + ivory + ',.92)', true);
+    o += box(146, 204, 38, 15, 6, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + label(165, 211.5, t('Kado', 'Gifts'), 8, 'rgba(' + ivory + ',.92)', true);
+    o += box(84, 231, 32, 6, 3, 'fill="#FFE9A8"');                                                 /* the entrance */
+    return '<svg viewBox="0 0 ' + (lying ? H + ' ' + W : W + ' ' + H) + '" role="img" aria-label="' + t('Denah ruangan resepsi', 'Plan of the reception room') + '">' + o + '</svg>';
+  }
 
   /* a drawing that reads as a QR code; it does not encode anything */
   function fakeQr() {
