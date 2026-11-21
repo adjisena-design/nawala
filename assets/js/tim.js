@@ -31,14 +31,23 @@
   function forget() { try { sessionStorage.removeItem(STORE); localStorage.removeItem(STORE); } catch (e) {} }
   function note(pair) { gateNote = pair || null; var m = $('#gate-msg'); m.hidden = !pair; m.textContent = pair ? t(pair[0], pair[1]) : ''; }
   function take(d) { D = d; skew = ms(d.now) - Date.now(); loadedAt = Date.now(); }
-  function lock(pair) {
-    token = ''; forget();
+  var LOCKED = ['Terlalu banyak percobaan yang salah. Pintu terkunci 15 menit, lalu coba lagi.', 'Too many wrong tries. The door is locked for 15 minutes; try again after that.'];
+  var ENDED = ['Token ini tidak berlaku lagi. Masuk kembali.', 'This token no longer works. Please log in again.'];
+  /* keep: the token may still be good (the door is only locked for a while), so it is not forgotten */
+  function lock(pair, keep) {
+    token = ''; if (!keep) forget();
     document.body.classList.add('is-locked');
     $('#gate-token').value = ''; note(pair);
   }
   function enter(tok, always) {
     $('#gate-go').disabled = true; note(null);
     return DB.rpc('team_data', { t: tok }).then(function (d) {
+      if (d && d.denied === 'terkunci') { note(LOCKED); return; }
+      if (!d || d.denied) {
+        forget();
+        note(['Token tidak dikenali. Sisa ' + d.sisa + ' percobaan sebelum pintu terkunci 15 menit.', 'That token is not recognised. ' + d.sisa + (d.sisa === 1 ? ' try' : ' tries') + ' left before the door locks for 15 minutes.']);
+        return;
+      }
       token = tok; take(d); remember(tok, always);
       $('#gate-token').value = '';
       document.body.classList.remove('is-locked');
@@ -51,23 +60,29 @@
   $('#gate-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var tok = $('#gate-token').value.trim() || stored();
-    if (tok.length < 32) { note(['Tempel token tim Anda di sini.', 'Paste your team token here.']); $('#gate-token').focus(); return; }
+    if (tok.length < 12) { note(['Tulis token tim Anda di sini, misalnya NAWALA-TIM-XXXXXX.', 'Write your team token here, for example NAWALA-TIM-XXXXXX.']); $('#gate-token').focus(); return; }
     enter(tok, $('#gate-keep').checked);
   });
   $('#logout').addEventListener('click', function () { lock(null); });
 
-  /* every write goes through here: a token that stopped working sends the team back to the door */
+  /* every call goes through here. A token that stopped working, or a locked door, sends the team back to the door:
+     team_data says so with { denied }, the writing functions answer null and the refresh that follows explains why. */
   function call(name, body) {
     body = body || {}; body.t = token;
     return DB.rpc(name, body).catch(function (e) {
-      if (e.status === 401 || e.status === 403) lock(['Token ini tidak berlaku lagi. Masuk kembali.', 'This token no longer works. Please log in again.']);
+      if (e.status === 401 || e.status === 403) lock(ENDED);
       else K.offline();
       throw e;
     });
   }
-  function refresh() { return call('team_data').then(function (d) { take(d); all(); }); }
+  function refresh() {
+    return call('team_data').then(function (d) {
+      if (!d || d.denied) { var shut = d && d.denied === 'terkunci'; lock(shut ? LOCKED : ENDED, shut); throw new Error('denied'); }
+      take(d); all();
+    });
+  }
   function write(name, body, done) {
-    return call(name, body).then(function (r) { if (done) done(r); return refresh(); }).catch(function () {});
+    return call(name, body).then(function (r) { if (r !== null && done) done(r); return refresh(); }).catch(function () {});
   }
   $('#reload').addEventListener('click', function () { refresh().then(function () { K.toast(t('Data diperbarui.', 'The data is up to date.')); }, function () {}); });
   document.addEventListener('visibilitychange', function () {

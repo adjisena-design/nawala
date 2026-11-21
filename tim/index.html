@@ -25,9 +25,9 @@
   <form class="gate__box g" id="gate-form" novalidate>
     <img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt="">
     <h1 data-en="Nawala team console">Konsol tim Nawala</h1>
-    <p data-en="Enter your team token. It is never shown on screen.">Masukkan token tim Anda. Token tidak pernah ditampilkan di layar.</p>
+    <p data-en="Enter your team token. Capitals or small letters both work. Five wrong tries lock the door for 15 minutes.">Masukkan token tim Anda. Huruf besar atau kecil sama saja. Lima kali salah, pintu terkunci 15 menit.</p>
     <label class="field"><span class="sr" data-en="Team token">Token tim</span>
-      <input id="gate-token" type="password" autocomplete="current-password" spellcheck="false" placeholder="Token tim" data-en-placeholder="Team token">
+      <input id="gate-token" type="password" autocomplete="current-password" autocapitalize="characters" spellcheck="false" maxlength="128" placeholder="NAWALA-TIM-XXXXXX">
     </label>
     <label class="check"><input type="checkbox" id="gate-keep"><span data-en="Remember me on this device">Ingat saya di perangkat ini</span></label>
     <p class="gate__msg" id="gate-msg" role="alert" hidden></p>
