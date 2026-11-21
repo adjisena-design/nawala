@@ -13,7 +13,7 @@
   if (window.NAWALA_ORIGIN) return;
   var doc = document, reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
   var canAnimate = !!(Element.prototype.animate);
-  var EASE_IN = 'cubic-bezier(.2,.8,.2,1)', EASE_OUT = 'cubic-bezier(.55,0,.8,.3)';
+  var EASE_IN = 'cubic-bezier(.16,1,.3,1)', EASE_OUT = 'cubic-bezier(.5,0,.75,0)';
 
   /* the control the visitor touched last */
   var last = null, lastAt = 0;
@@ -37,7 +37,8 @@
   /* the transform that puts box b on top of source s */
   function onto(b, s) {
     if (!s) return 'translate3d(0,18px,0) scale(.92)';
-    var k = Math.max(.06, Math.min(1, Math.min(s.width / b.width, s.height / b.height) * 1.15));
+    /* never smaller than 40%: a box shrunk to a dot shows its writing as a smear for a few frames */
+    var k = Math.max(.4, Math.min(1, Math.min(s.width / b.width, s.height / b.height) * 1.15));
     var dx = (s.left + s.width / 2) - (b.left + b.width / 2), dy = (s.top + s.height / 2) - (b.top + b.height / 2);
     return 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0) scale(' + k.toFixed(3) + ')';
   }
@@ -60,10 +61,10 @@
     var host = el; stop(host); el = vis(el);
     var b = el.getBoundingClientRect(), from = onto(b, rectOf(src));
     var a = run(el, [
-      { transform: from, opacity: 0, offset: 0 },
-      { opacity: 1, offset: .35 },
+      { transform: from, opacity: 0, offset: 0, easing: EASE_IN },
       { transform: 'none', opacity: 1, offset: 1 }
-    ], { duration: 460, easing: EASE_IN }, host);
+    ], { duration: 520 }, host);
+    if (a) run(el, [{ opacity: 0 }, { opacity: 1, offset: .55 }, { opacity: 1 }], { duration: 520, easing: 'linear', composite: 'replace' }, host);
     if (backdrop) run(host, [{ opacity: 0 }, { opacity: 1 }], { duration: 360, easing: 'ease-out', pseudoElement: '::backdrop' }, host);
     return a;
   }
@@ -72,10 +73,9 @@
     var host = el; el = vis(el);
     var b = el.getBoundingClientRect(), to = onto(b, rectOf(src));
     var a = run(el, [
-      { transform: 'none', opacity: 1, offset: 0 },
-      { opacity: 1, offset: .55 },
+      { transform: 'none', opacity: 1, offset: 0, easing: EASE_OUT },
       { transform: to, opacity: 0, offset: 1 }
-    ], { duration: 320, easing: EASE_OUT, fill: 'forwards' }, host);
+    ], { duration: 300, fill: 'forwards' }, host);
     if (backdrop) run(host, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-in', fill: 'forwards', pseudoElement: '::backdrop' }, host);
     if (!a) { done(); return; }
     var called = false;

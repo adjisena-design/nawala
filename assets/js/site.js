@@ -287,7 +287,7 @@
      --p: 0 when the section's top reaches the top of the screen, 1 when the section has passed. */
   var scrollEls = $$('[data-scroll]').map(function (el) { return { el: el, e: -1, p: -1 }; });
   var about = $('.about'), says = $$('.say');
-  var lastAboutP = -1;
+  var lastAboutP = -1, aboutStep = -1;
   function measure(vh) {
     scrollEls.forEach(function (s) {
       var r = s.el.getBoundingClientRect();
@@ -298,18 +298,55 @@
       if (e !== s.e) { s.e = e; s.el.style.setProperty('--e', e); }
       if (p !== s.p) { s.p = p; s.el.style.setProperty('--p', p); }
       if (s.el === about && p !== lastAboutP) {
-        /* each message has its own moment: it rises from below, slows through the middle, and leaves upward */
+        /* the scroll only picks the message; each one glides in and out on its own clock */
         lastAboutP = p;
-        var travel = s.el.querySelector('.about__says').offsetHeight * .62;
-        says.forEach(function (el, i) {
-          var x = p * 3 - i - .5, ax = Math.abs(x);
-          var y = -(x < 0 ? -1 : 1) * Math.pow(ax, 1.5) * travel * 1.7;
-          el.style.setProperty('--y', y.toFixed(1));
-          el.style.setProperty('--o', clamp(1 - (ax - .26) / .3).toFixed(3));
-        });
+        var step = Math.max(0, Math.min(says.length - 1, Math.floor(p * says.length)));
+        if (step !== aboutStep) {
+          aboutStep = step;
+          says.forEach(function (el, i) { el.classList.toggle('is-on', i === step); el.classList.toggle('is-past', i < step); });
+        }
       }
     });
   }
+
+  /* ---------- The arch: one swipe, one message ----------
+     When a swipe or a wheel turn ends inside the arch's pinned stretch, the page glides to the next
+     message's resting point in the direction of that swipe (one step, however hard the swipe), so the
+     stage never rests between two messages. Swipes that end outside the arch are left alone. */
+  (function () {
+    if (calm || !about) return;
+    var gesture = null, gliding = false, timer = 0, touching = false, rest = window.scrollY;   // rest: where the page stood still last
+    function stops() {
+      var top = about.getBoundingClientRect().top + window.scrollY, span = about.offsetHeight - window.innerHeight;
+      return [top + span * (.5 / 3), top + span * .5, top + span * (2.5 / 3)].map(Math.round).concat([top, top + span]);
+    }
+    function settle() {
+      if (touching) { timer = setTimeout(settle, 120); return; }
+      var y = window.scrollY, s = stops(), from = gesture; gesture = null; rest = y;
+      if (from === null || y <= s[3] + 2 || y >= s[4] - 2) return;     // ended outside the pinned stretch
+      var d = y - from, near = 0;
+      for (var i = 1; i < 3; i++) if (Math.abs(s[i] - from) < Math.abs(s[near] - from)) near = i;
+      var target;
+      if (from < s[3]) target = s[0];
+      else if (from > s[4]) target = s[2];
+      else if (Math.abs(d) < 24) target = s[near];
+      else if (near === 2 && d > 0) target = s[4] + 2;                 // past the last message: on to the next section
+      else if (near === 0 && d < 0) target = s[3] - 2;                 // before the first: back up toward the sky
+      else target = s[near + (d > 0 ? 1 : -1)];
+      if (Math.abs(target - y) < 3) return;
+      gliding = true;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+      setTimeout(function () { gliding = false; rest = window.scrollY; }, 900);
+    }
+    addEventListener('touchstart', function () { touching = true; }, { passive: true });
+    addEventListener('touchend', function () { touching = false; }, { passive: true });
+    addEventListener('touchcancel', function () { touching = false; }, { passive: true });
+    addEventListener('scroll', function () {
+      if (gliding) return;
+      if (gesture === null) gesture = rest;
+      clearTimeout(timer); timer = setTimeout(settle, 140);
+    }, { passive: true });
+  })();
 
   /* ---------- Nawala: one letter, with a will of its own ----------
      Scrolling only decides which section Nawala belongs to (the one under the middle of the screen).
@@ -787,7 +824,8 @@
       if (name === 'themes') { if (wantTier) tier = wantTier; build(); showList(false); }
       if (name === 'login') { var m = $('#login-msg'); m.hidden = true; }
       d.showModal();
-      if (name === 'login') $('#login-code').focus();
+      /* the keyboard waits until the box has finished growing; on touch screens the visitor taps the field */
+      if (name === 'login' && matchMedia('(pointer: fine)').matches) setTimeout(function () { try { $('#login-code').focus({ preventScroll: true }); } catch (e) {} }, 540);
     }
     tabs.forEach(function (b, k) {
       b.addEventListener('click', function () { tier = b.getAttribute('data-tier'); build(); showList(false); });

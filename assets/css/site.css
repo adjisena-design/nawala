@@ -116,22 +116,23 @@ main{overflow-x:clip}
   .menu-veil{display:block;position:fixed;inset:0;z-index:55;background:rgba(8,18,12,.5);opacity:0;transition:opacity .4s}
   .menu-veil[hidden]{display:none}
   .menu-open .menu-veil{opacity:1}
-  .nav__items{position:absolute;inset:0 auto 0 0;width:min(84vw,330px);display:flex;flex-direction:column;border-radius:0 32px 32px 0;padding:92px 18px 24px;background:#0e2015;pointer-events:auto;
-    transform:scale(.12);transform-origin:40px 46px;opacity:0;visibility:hidden;transition:transform .5s var(--ease),opacity .3s,visibility 0s .5s}
+  .nav__items{position:absolute;left:10px;top:var(--bar-top);width:min(76vw,280px);display:flex;flex-direction:column;border-radius:26px;padding:70px 12px 12px;background:#0e2015;pointer-events:auto;box-shadow:0 30px 60px -24px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.07);
+    transform:scale(.18);transform-origin:30px 30px;opacity:0;visibility:hidden;transition:transform .5s var(--ease),opacity .3s,visibility 0s .5s}
   /* the menu grows out of its round button and folds back into it */
   .menu-open .nav__items{transform:none;opacity:1;visibility:visible;transition:transform .5s var(--ease),opacity .22s}
-  .nav__list{display:flex;flex-direction:column;gap:.5rem}
-  .nav__list a{height:56px;gap:.6rem;font-size:1.125rem}
+  .nav__list{display:flex;flex-direction:column;gap:.15rem}
+  .nav__list a{height:48px;gap:.5rem;font-size:1.0625rem}
+  .nav__list svg,.nav__login svg{width:44px;height:44px;padding:11px}
   .nav__list li{opacity:0;transform:translateX(-18px);transition:opacity .35s,transform .5s var(--ease)}
   .menu-open .nav__list li{opacity:1;transform:none}
   .menu-open .nav__list li:nth-child(1){transition-delay:.12s}
   .menu-open .nav__list li:nth-child(2){transition-delay:.17s}
   .menu-open .nav__list li:nth-child(3){transition-delay:.22s}
   .menu-open .nav__list li:nth-child(4){transition-delay:.27s}
-  .nav__end{margin-top:auto;display:grid;gap:.9rem}
+  .nav__end{margin-top:.9rem;padding-top:.9rem;border-top:1px solid rgba(251,246,234,.1);display:grid;gap:.6rem}
   .nav__lang{display:flex;gap:6px}
-  .nav__lang button{flex:1;height:48px;font-size:.9375rem}
-  .nav__login{height:56px;gap:.6rem;font-size:1.125rem}
+  .nav__lang button{flex:1;height:44px;font-size:.875rem}
+  .nav__login{height:48px;gap:.5rem;font-size:1.0625rem}
 }
 
 /* ---------- Nawala, the travelling letter ---------- */
@@ -220,18 +221,18 @@ main{overflow-x:clip}
   background:conic-gradient(from 196deg at 86% -8%,transparent 0deg,rgba(255,244,200,.5) 6deg,transparent 12deg,rgba(255,244,200,.3) 19deg,transparent 26deg,rgba(255,244,200,.42) 33deg,transparent 41deg,rgba(255,244,200,.26) 48deg,transparent 56deg);
   animation:rays 9s ease-in-out infinite alternate}
 @keyframes rays{from{opacity:.35}to{opacity:.8}}
-.hero__mist{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.86) 0%,rgba(251,246,234,.62) 26%,rgba(251,246,234,0) 50%)}
+.hero__mist{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.9) 0%,rgba(251,246,234,.78) 32%,rgba(251,246,234,.4) 46%,rgba(251,246,234,0) 58%)}
 /* doves in flocks, one small plane far off, one slow blimp */
-.flock{position:absolute;left:0;top:41%;width:300px;height:150px;pointer-events:none;animation:cross 58s linear infinite;animation-delay:-14s;will-change:transform}
-.flock--b{top:52%;animation-duration:84s;animation-delay:-46s}
+.flock{position:absolute;left:0;top:47%;width:300px;height:150px;pointer-events:none;animation:cross 58s linear infinite;animation-delay:-14s;will-change:transform}
+.flock--b{top:57%;animation-duration:84s;animation-delay:-46s}
 .dove{position:absolute;left:var(--x);top:var(--y);width:calc(58px * var(--s,1));aspect-ratio:160/150;overflow:hidden}
 .dove b{position:absolute;left:0;top:0;width:400%;height:100%;background:url("../img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:wing .44s steps(4) infinite;animation-delay:var(--d,0s)}
 @keyframes wing{to{transform:translate3d(-100%,0,0)}}
 @keyframes cross{from{transform:translate3d(-40vw,0,0)}to{transform:translate3d(120vw,-5vh,0)}}
-.plane{position:absolute;left:0;top:35%;width:64px;pointer-events:none;animation:far 130s linear infinite;animation-delay:-52s;will-change:transform}
+.plane{position:absolute;left:0;top:49%;width:56px;pointer-events:none;animation:far 130s linear infinite;animation-delay:-52s;will-change:transform}
 .plane img,.blimp img{width:100%;height:auto}
 .plane i{position:absolute;right:88%;top:56%;width:34vw;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));transform:rotate(-7deg);transform-origin:100% 50%}
-.blimp{position:absolute;left:0;top:40%;width:92px;pointer-events:none;animation:drift 240s linear infinite;animation-delay:-96s;will-change:transform}
+.blimp{position:absolute;left:0;top:52%;width:84px;pointer-events:none;animation:drift 240s linear infinite;animation-delay:-96s;will-change:transform}
 @keyframes far{from{transform:translate3d(-30vw,5vh,0)}to{transform:translate3d(125vw,-3vh,0)}}
 @keyframes drift{from{transform:translate3d(-30vw,0,0)}to{transform:translate3d(120vw,-3vh,0)}}
 
@@ -270,9 +271,11 @@ main{overflow-x:clip}
 .about__fade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.95) 0%,rgba(251,246,234,.86) 36%,rgba(251,246,234,.4) 54%,rgba(251,246,234,0) 68%)}
 .about__says{position:absolute;z-index:2;left:1.25rem;right:1.25rem;top:calc(60px + env(safe-area-inset-top));height:52%;color:var(--forest-deep)}
 /* each message travels upward with the scroll: it rises in, slows as it passes the middle, then leaves */
-.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + var(--y,0) * 1px),0);opacity:var(--o,0);will-change:transform,opacity;
+.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + 70px),0);opacity:0;visibility:hidden;transition:transform .8s var(--ease),opacity .55s,visibility 0s .8s;
   padding:1.4rem 1.4rem 1.5rem;border-radius:28px;background:rgba(251,246,234,.84);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.45),0 0 48px 18px rgba(251,246,234,.34),0 24px 50px -30px rgba(12,29,19,.45)}
+.say.is-on{transform:translate3d(0,-50%,0);opacity:1;visibility:visible;transition:transform .8s var(--ease),opacity .6s .12s}
+.say.is-past{transform:translate3d(0,calc(-50% - 70px),0)}
 .say h2{font-size:clamp(2rem,8.2vw,2.8rem);line-height:1.05;letter-spacing:-.018em}
 .say p{margin-top:.8rem;font-size:1.0625rem;line-height:1.6;letter-spacing:.003em;word-spacing:.02em;color:rgba(12,29,19,.88);max-width:34em}
 .flock--c{top:58%;animation-duration:70s;animation-delay:-30s}
@@ -682,3 +685,4 @@ main{overflow-x:clip}
 .detail__msg{padding:.8rem 1rem;border-radius:16px;background:rgba(251,246,234,.1);color:var(--ivory)}
 .detail__msg[hidden]{display:none}
 #detail-save[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--blush);color:var(--blush)}
+@media (prefers-reduced-motion:reduce){.say{visibility:visible}}
