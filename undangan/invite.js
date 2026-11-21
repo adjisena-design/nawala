@@ -10,6 +10,7 @@
   var D = window.NAWALA_INVITE;
   var KIT = window.NAWALA_KIT || {};          /* the theme kit chosen in the head of the page */
   var FILM = KIT.film || D.film || null;      /* the kit's opening film */
+  var MUSIC = KIT.music ? { src: KIT.music } : (D.music || null);   /* a kit's own music, or the couple's */
   if (!D) return;
 
   var root = document.documentElement;
@@ -80,6 +81,7 @@
     b.setAttribute('aria-label', state.lang === 'en' ? 'Ganti ke bahasa Indonesia' : 'Switch to English');
     $('#music').setAttribute('aria-label', t('Musik', 'Music'));
     $('#next').setAttribute('aria-label', t('Berikutnya', 'Next'));
+    $('#map-btn').setAttribute('aria-label', t('Peta', 'Map'));
     document.title = t('Undangan pernikahan ', 'The wedding of ') + D.bride.short + ' & ' + D.groom.short;
   }
   function make(tag, cls, pair) {
@@ -345,19 +347,19 @@
 
   /* ---------- Music: starts with the tap that opens the letter ---------- */
   var audio = $('#audio'), musicBtn = $('#music'), triedFallback = false, wanted = false;
-  function musicOn() { return D.music && state.level >= 2; }
+  function musicOn() { return MUSIC && state.level >= 2; }
   function showMusic() { musicBtn.hidden = !musicOn(); if (!musicOn()) stop(); }
   function play() {
     if (!musicOn()) return;
     wanted = true;
-    if (!audio.getAttribute('src')) audio.src = D.music.src;
+    if (!audio.getAttribute('src')) audio.src = MUSIC.src;
     audio.volume = 0.6;
     var p = audio.play();
     if (p && p.catch) p.catch(function () {});
   }
   function stop() { wanted = false; audio.pause(); }
   audio.addEventListener('error', function () {
-    if (!triedFallback && D.music && D.music.fallback) { triedFallback = true; audio.src = D.music.fallback; if (wanted) play(); }
+    if (!triedFallback && MUSIC && MUSIC.fallback) { triedFallback = true; audio.src = MUSIC.fallback; if (wanted) play(); }
     else { musicBtn.hidden = true; wanted = false; }
   });
   audio.addEventListener('playing', function () { musicBtn.setAttribute('aria-pressed', 'true'); });
@@ -492,9 +494,31 @@
     $$('#bar a').forEach(function (a) { a.classList.toggle('is-here', a === here); });
     list.forEach(function (s, i) { if (i === cur) s.removeAttribute('inert'); else s.setAttribute('inert', ''); });
     if (list[cur] && list[cur].id === 'acara') tick();
+    if (typeof visited === 'function') visited();
   }
 
   /* put a step on screen at once (start, level change, resize) */
+  /* ----- Journeys: a kit may move from scene to scene in its own direction instead of the light sweep.
+     Both scenes are on screen while they move; #seam covers the join. Only transform and opacity change. ----- */
+  var JTIME = { up: 1350, side: 1250, diagonal: 1500, hop: 900 };
+  var JOURNEY = JTIME[KIT.journey] ? KIT.journey : '', JT = JTIME[JOURNEY] || 0, seam = $('#seam');
+  if (JOURNEY) { stage.setAttribute('data-journey', JOURNEY); stage.style.setProperty('--jt', JT + 'ms'); }
+  function travel(a, b, next) {
+    var out = [worlds[a], fronts[a]], inn = [worlds[b], fronts[b]], all = out.concat(inn);
+    clearTimeout(travel.t);
+    $$('.j-in,.j-out', stage).forEach(function (el) { el.classList.remove('j-in', 'j-out'); });
+    inn.forEach(function (el) { el.classList.add('is-near'); });
+    seam.setAttribute('data-scene', b);
+    seam.classList.remove('is-run'); void seam.offsetWidth;
+    out.forEach(function (el) { el.classList.add('j-out'); });
+    inn.forEach(function (el) { el.classList.add('j-in'); });
+    seam.classList.add('is-run');
+    travel.t = setTimeout(function () {
+      camera(next); setScene(b);
+      all.forEach(function (el) { el.classList.remove('j-in', 'j-out'); });
+      seam.classList.remove('is-run');
+    }, JT);
+  }
   function jump(i) {
     var list = seq(); cur = clamp(i, 0, list.length - 1);
     $$('.step', stepsBox).forEach(function (s) { s.classList.remove('is-on', 'is-out'); });
@@ -517,7 +541,10 @@
       setTimeout(function () { next.classList.add('is-on'); }, wait);
       setTimeout(function () { busy = false; }, wait + (reduced ? 60 : 640));
     }
-    if (change && !reduced) {
+    if (change && !reduced && JOURNEY) {
+      travel(sceneOf(from), sceneOf(next), next);
+      fly(next); arrive(JT * 0.6);
+    } else if (change && !reduced) {
       runSweep(dir, sceneOf(next));
       fly(next);
       setTimeout(function () { setScene(sceneOf(next)); camera(next); }, SWEEP * 0.5);
@@ -573,6 +600,49 @@
     else if (e.key === 'End') go(seq().length - 1);
   });
   nextBtn.addEventListener('click', function () { go(cur + 1); });
+
+  /* ----- A map (kits with `map`): one more step after the cover with the kit's places on a picture.
+     Tapping a place goes to the first step of that scene; the next button and the bottom bar still walk the suggested order. ----- */
+  var mapStep = null;
+  (function buildMap() {
+    var M = KIT.map; if (!M) return;
+    var step = make('section', 'step'); step.id = 'peta';
+    step.setAttribute('data-scene', 'sky'); step.setAttribute('data-tone', (KIT.tones && KIT.tones.sky) || 'light'); step.setAttribute('data-nw', M.nw || 'perch:.82');
+    var pane = make('div', 'pane');
+    pane.appendChild(make('h2', '', M.title));
+    pane.appendChild(make('p', '', M.hint));
+    var box = make('div', 'map'), img = document.createElement('img');
+    img.alt = ''; img.width = M.w || 720; img.height = M.h || 960; img.loading = 'lazy'; img.src = M.img; box.appendChild(img);
+    M.places.forEach(function (p) {
+      var b = make(p.to ? 'button' : 'span', 'map__pin' + (p.to ? '' : ' map__pin--here'));
+      if (p.to) { b.type = 'button'; b.setAttribute('data-to', p.to); }
+      b.style.setProperty('--x', (p.x * 100) + '%'); b.style.setProperty('--y', (p.y * 100) + '%');
+      b.appendChild(make('i', '')); b.appendChild(make('b', '', p.name)); b.appendChild(make('small', '', p.what));
+      box.appendChild(b);
+    });
+    pane.appendChild(box); step.appendChild(pane);
+    var cover = $('#sampul'); cover.parentNode.insertBefore(step, cover.nextSibling);
+    mapStep = step;
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-to]') : null; if (!b) return;
+      var i = seq().indexOf(document.getElementById(b.getAttribute('data-to')));
+      if (i > -1) go(i);
+    });
+    var btn = $('#map-btn'); btn.hidden = false;
+    btn.addEventListener('click', function () { var i = seq().indexOf(step); if (i > -1) go(i); });
+  })();
+  /* places the guest has been to are ticked on the map; every picture is fetched once the map is reached, since any place may be next */
+  function visited() {
+    if (!mapStep) return;
+    var list = seq(), here = list[cur]; if (!here) return;
+    here.setAttribute('data-seen', '');
+    $$('.map__pin[data-to]', mapStep).forEach(function (b) {
+      var first = document.getElementById(b.getAttribute('data-to')), scene = first && sceneOf(first);
+      var seen = list.some(function (s) { return sceneOf(s) === scene && s.hasAttribute('data-seen') && s !== mapStep && s.id !== 'sampul'; });
+      b.classList.toggle('is-seen', seen);
+    });
+    if (here === mapStep) Object.keys(worlds).forEach(function (k) { worlds[k].classList.add('is-near'); fronts[k].classList.add('is-near'); });
+  }
   $$('#bar a').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();

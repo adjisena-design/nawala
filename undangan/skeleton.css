@@ -123,6 +123,8 @@ html:not(.js) .pane{color:var(--main);text-shadow:none;background:#fff;box-shado
 .scrolls{overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;min-height:0}
 .on-plate{text-align:center;color:var(--paper);text-shadow:0 2px 18px rgba(8,18,12,.7)}
 [data-tone="light"] .on-plate{color:var(--main);text-shadow:0 1px 14px rgba(255,255,255,.8)}
+[data-tone="dark"] .cover{color:var(--paper);text-shadow:0 2px 18px rgba(8,10,12,.75)}
+[data-tone="dark"] .cover h1 i{color:var(--accent-soft)}
 
 /* ---------- Opening: Nawala brings the letter with the guest's name ---------- */
 .gate{display:none}
@@ -401,3 +403,80 @@ dialog::backdrop{background:rgba(8,18,12,.8)}
 }
 
 #send[aria-busy="true"]{opacity:.6;pointer-events:none}
+
+/* ---------- Journeys: how a world moves from one scene to the next ----------
+   A kit names its journey in KITS (index.html): up, side, diagonal or hop. Without one, the light sweep above carries the change.
+   Both pictures are on screen while they move; .seam covers the join so no hard edge crosses the screen.
+   Only transform and opacity are animated. Under reduced motion none of this runs (invite.js swaps the scene at once). */
+.fit.j-in,.fit.j-out{opacity:1;transition:none;animation:var(--jt,1.3s) cubic-bezier(.62,.03,.3,1) both}
+.fit.j-in{--cam:1;--camf:1;z-index:2}
+.fit.j-out{z-index:1}
+.seam{display:none}
+.js .seam{display:block;position:absolute;inset:0;z-index:4;pointer-events:none;visibility:hidden;overflow:hidden}
+.seam.is-run{visibility:visible}
+.seam__fit{position:absolute;left:50%;bottom:0;width:max(100%,calc(var(--sh) * var(--world)));aspect-ratio:720/1290;margin-left:calc(max(100%,calc(var(--sh) * var(--world))) / -2)}
+.seam__fit i{position:absolute;inset:0;will-change:transform,opacity}
+.seam s{display:none}
+.seam.is-run .seam__fit i{animation:var(--jt,1.3s) cubic-bezier(.62,.03,.3,1) both}
+
+/* up: climbing. The new scene comes down from above, the old one leaves below; a band of light rides on the join. */
+[data-journey="up"] .j-out{animation-name:j-up-out}
+[data-journey="up"] .j-in,[data-journey="up"] .seam.is-run .seam__fit i{animation-name:j-up-in}
+@keyframes j-up-out{to{transform:translate3d(0,calc(var(--dir,1) * 100%),0) scale(var(--cam,1))}}
+@keyframes j-up-in{from{transform:translate3d(0,calc(var(--dir,1) * -100%),0) scale(var(--cam,1))}}
+[data-journey="up"] .seam__fit i::before{content:"";position:absolute;left:-10%;right:-10%;height:76%;top:calc(50% + var(--dir,1) * 50% - 38%);
+  background:linear-gradient(180deg,transparent 0,var(--g2) 16%,var(--g1) 30%,var(--veil) 43%,var(--veil) 57%,var(--g1) 70%,var(--g2) 84%,transparent 100%)}
+
+/* side: an old film reel. Scenes pass sideways as frames; the dark frame line rides on the join and the perforations run along the edges. */
+[data-journey="side"] .j-out{animation-name:j-side-out}
+[data-journey="side"] .j-in,[data-journey="side"] .seam.is-run .seam__fit i{animation-name:j-side-in}
+@keyframes j-side-out{to{transform:translate3d(calc(var(--dir,1) * -100%),0,0) scale(var(--cam,1))}}
+@keyframes j-side-in{from{transform:translate3d(calc(var(--dir,1) * 100%),0,0) scale(var(--cam,1))}}
+[data-journey="side"] .seam__fit i::before{content:"";position:absolute;top:-6%;bottom:-6%;width:44px;left:calc(50% - var(--dir,1) * 50% - 22px);
+  background:linear-gradient(90deg,rgba(10,7,5,0) 0,rgba(10,7,5,.92) 20%,#0A0705 34%,#0A0705 66%,rgba(10,7,5,.92) 80%,rgba(10,7,5,0) 100%)}
+[data-journey="side"] .seam s{display:block;position:absolute;left:-60%;width:220%;height:30px;opacity:0;will-change:transform,opacity;
+  background:#0A0705 radial-gradient(closest-side,rgba(255,244,222,.82) 0,rgba(255,244,222,.82) 72%,rgba(255,244,222,0) 100%) 0 50%/30px 16px repeat-x}
+[data-journey="side"] .seam s:nth-of-type(1){top:0}
+[data-journey="side"] .seam s:nth-of-type(2){bottom:0}
+[data-journey="side"] .seam.is-run s{animation:j-reel var(--jt,1.3s) cubic-bezier(.62,.03,.3,1) both}
+@keyframes j-reel{0%{opacity:0;transform:translate3d(calc(var(--dir,1) * 24%),0,0)}18%,82%{opacity:.92}100%{opacity:0;transform:translate3d(calc(var(--dir,1) * -24%),0,0)}}
+[data-journey="side"] .step{transform:translate3d(calc(var(--dir) * 54px),0,0)}
+[data-journey="side"] .step.is-on{transform:none}
+[data-journey="side"] .step.is-out{transform:translate3d(calc(var(--dir) * -44px),0,0)}
+
+/* diagonal: gliding across and upward. The new scene drifts in from the upper right over the old one; a slanting band of light crosses. */
+[data-journey="diagonal"] .j-out{animation-name:j-diag-out}
+[data-journey="diagonal"] .j-in{animation-name:j-diag-in}
+@keyframes j-diag-out{to{transform:translate3d(calc(var(--dir,1) * -5.5%),calc(var(--dir,1) * 5.5%),0) scale(calc(var(--cam,1) * 1.16))}}
+@keyframes j-diag-in{from{opacity:0;transform:translate3d(calc(var(--dir,1) * 5.5%),calc(var(--dir,1) * -5.5%),0) scale(1.16)}45%{opacity:1}}
+[data-journey="diagonal"] .seam.is-run .seam__fit i{animation-name:j-diag-seam}
+[data-journey="diagonal"] .seam__fit i{inset:-40%;background:linear-gradient(to bottom left,transparent 28%,var(--g2) 40%,var(--rim) 50%,var(--g2) 60%,transparent 72%)}
+@keyframes j-diag-seam{0%{opacity:0;transform:translate3d(calc(var(--dir,1) * 55%),calc(var(--dir,1) * -55%),0)}30%,60%{opacity:.8}100%{opacity:0;transform:translate3d(calc(var(--dir,1) * -55%),calc(var(--dir,1) * 55%),0)}}
+[data-journey="diagonal"] .step{transform:translate3d(calc(var(--dir) * 38px),calc(var(--dir) * -38px),0)}
+[data-journey="diagonal"] .step.is-on{transform:none}
+[data-journey="diagonal"] .step.is-out{transform:translate3d(calc(var(--dir) * -30px),calc(var(--dir) * 30px),0)}
+
+/* hop: a jump to another place. The old scene rushes closer, the new one lands; a ring of light opens where Nawala took off. */
+[data-journey="hop"] .j-out{animation-name:j-hop-out}
+[data-journey="hop"] .j-in{animation-name:j-hop-in}
+@keyframes j-hop-out{to{transform:scale(calc(var(--cam,1) * 1.24))}}
+@keyframes j-hop-in{0%{opacity:0;transform:scale(1.32)}50%{opacity:1}100%{transform:scale(1)}}
+[data-journey="hop"] .seam.is-run .seam__fit i{animation-name:j-hop-ring}
+[data-journey="hop"] .seam__fit i{inset:auto;left:50%;top:50%;width:120%;aspect-ratio:1;margin:-60% 0 0 -60%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,255,255,0) 52%,rgba(255,255,255,.7) 66%,var(--accent-soft) 74%,rgba(244,166,192,0) 92%)}
+@keyframes j-hop-ring{0%{opacity:0;transform:scale(.08)}18%{opacity:.9}100%{opacity:0;transform:scale(1.9)}}
+
+/* ---------- The map (kits with places): tap a place, or keep walking in order ---------- */
+/* the picture keeps its own shape (pins are placed in shares of it) and never grows taller than about half the screen */
+.map{position:relative;margin:.2rem auto 0;width:min(100%,calc(var(--sh) * .325))}
+.map img{display:block;width:100%;height:auto;aspect-ratio:3/4;border-radius:18px;box-shadow:0 14px 30px -18px rgba(0,0,0,.6)}
+.map__pin{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.05rem;min-width:44px;min-height:44px;
+  padding:.38rem .7rem .42rem;border:0;border-radius:16px;cursor:pointer;font:inherit;line-height:1.1;text-align:center;color:var(--main);background:rgba(255,255,255,.9);box-shadow:0 8px 18px -8px rgba(0,0,0,.55)}
+.map__pin b{font:600 1.0625rem/1.1 var(--display);letter-spacing:-.01em;white-space:nowrap}
+.map__pin small{font-size:.875rem;font-weight:600;opacity:.82;white-space:nowrap}
+.map__pin i{position:absolute;left:50%;top:-7px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px #fff;transition:background .3s}
+.map__pin.is-seen i{background:var(--soft)}
+.map__pin--here{cursor:default;background:var(--main);color:var(--paper)}
+.map__pin--here i{background:var(--light)}
+.map__pin:active{transform:translate(-50%,-50%) scale(.96)}
+.tool svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}

@@ -33,11 +33,11 @@
      for the couple's photos. Premium: an immersive world: opening film, glass panels standing in the scenery, one swipe
      one step. Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   /* Premium worlds that already have a working sample invitation (undangan/?tema=<slug>). Add a slug when its kit is built. */
-  var BUILT = ' pendopo-jawa akad-putih ';
+  var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto ';
   var TIERS = {
     dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar nyata, kartu yang mudah dibaca, dan bingkai untuk foto kalian. Kedua belas contohnya sudah bisa dibuka.', 'The familiar scroll invitation: one real picture, cards that read easily, and frames for your photos. All twelve samples can be opened.'],
-    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, dan Akad Putih sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa and Akad Putih can be opened now; the other worlds are being built one by one.'],
-    eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again.'],
+    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, Akad Putih, dan Kyoto sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa, Akad Putih and Kyoto can be opened now; the other worlds are being built one by one.'],
+    eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi. Istana Awan, Teater Tua, dan Kapal Bulan sudah bisa dibuka sebagai contoh.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again. Istana Awan, Teater Tua and Kapal Bulan can be opened as samples.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
   };
   var BASIC = [

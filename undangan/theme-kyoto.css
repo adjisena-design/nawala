@@ -1,0 +1,60 @@
+/* Theme kit: Kyoto.
+   A stroll garden. Journey: hop. Nawala jumps from place to place and the guest may choose where on a map of the garden:
+   the pond, the tea house, the bamboo path, the cherry garden. A plain garden: no torii, shrine or pagoda.
+   Same contract as the other kits (see theme-umum.css and theme-pendopo-jawa.css): tokens, the picture behind the opening,
+   four scenes and the ornaments. Its journey, music and tones are in KITS (index.html).
+   Front layers are the lower part of each picture with a soft fade at the top, moving exactly with the picture.
+   Pictures, film and music: Higgsfield, 21 Nov 2026 (job numbers in CLAUDE.md). */
+
+:root{
+  --ink:#22271F; --deep:#10160F; --main:#27382A; --soft:#8A9A5B;
+  --paper:#FAF6EC; --mist:#F1ECDF; --light:#E7B85A;
+  --gate-shade:linear-gradient(180deg,rgba(250,246,236,.74) 0,rgba(250,246,236,.42) 20%,rgba(250,246,236,0) 36%,rgba(16,22,15,0) 60%,rgba(16,22,15,.82) 100%);
+  --bar-rgb:18,26,18; --backdrop:url("../assets/img/plate-kyoto-bambu.webp"); --backdrop-veil:rgba(16,22,15,.6);
+  --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6;
+  --plate-gate:url("../assets/img/plate-kyoto-gate.webp");
+  --nw-flap:url("../assets/img/nw-flap.webp");
+}
+
+[data-scene="sky"]{--plate:url("../assets/img/plate-kyoto-kolam.webp");--fg:url("../assets/img/fg-kyoto-kolam.webp");--tone:#F0F2F6;
+  --veil:#F3F1EA;--rim:#FFE6C2;--g1:rgba(255,214,150,.75);--g2:rgba(200,220,190,.35)}
+[data-scene="treetops"]{--plate:url("../assets/img/plate-kyoto-teh.webp");--fg:url("../assets/img/fg-kyoto-teh.webp");--tone:#312D20;
+  --shade:rgba(14,10,6,.3);
+  --veil:#1A140C;--rim:#FFE2A8;--g1:rgba(240,180,90,.8);--g2:rgba(120,100,60,.4)}
+[data-scene="branches"]{--plate:url("../assets/img/plate-kyoto-bambu.webp");--fg:url("../assets/img/fg-kyoto-bambu.webp");--tone:#172B2D;
+  --shade:rgba(6,14,12,.2);
+  --veil:#0C1A18;--rim:#D6F2D0;--g1:rgba(150,200,160,.7);--g2:rgba(246,196,69,.3)}
+[data-scene="boulder"]{--plate:url("../assets/img/plate-kyoto-sakura.webp");--fg:url("../assets/img/fg-kyoto-sakura.webp");--tone:#EEE9F0;
+  --veil:#F8F0F2;--rim:#F9D3DF;--g1:rgba(249,200,216,.85);--g2:rgba(246,220,150,.4)}
+
+.world{--fg-line:.79}
+.front{transform-origin:50% 62%;transform:scale(var(--cam,1))}
+
+/* the doves keep to the open sky above the hills */
+.k-dove{margin-top:-62%}
+/* the guest's name on the cover lies over the pond and the bridge, so its sheet is a little more milky here */
+.cover__to.pane{background:linear-gradient(168deg,rgba(255,255,255,.74),rgba(255,255,255,.6) 40%,rgba(255,255,255,.82))}
+
+/* doves cross the sky */
+.k-dove{left:0;top:var(--y);width:calc(52px * var(--s,1));aspect-ratio:160/150;overflow:hidden;animation:k-cross var(--t,34s) linear var(--d,0s) infinite;will-change:transform}
+.k-dove::before{content:"";position:absolute;left:0;top:0;width:400%;height:100%;background:url("../assets/img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:k-wing .44s steps(4) infinite}
+@keyframes k-wing{to{transform:translate3d(-100%,0,0)}}
+@keyframes k-cross{from{transform:translate3d(-90px,0,0)}to{transform:translate3d(620px,-70px,0)}}
+
+/* fireflies among the branches */
+.k-fly{left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 10px 3px rgba(246,196,69,.55);opacity:0;animation:k-glow var(--t,5s) ease-in-out var(--d,0s) infinite}
+@keyframes k-glow{0%,100%{opacity:0;transform:translate3d(0,0,0)}40%{opacity:.95}70%{opacity:.5;transform:translate3d(14px,-26px,0)}}
+
+/* butterflies over the flower hill */
+.k-bfly{left:var(--x);top:var(--y);width:calc(30px * var(--s,1));aspect-ratio:1;animation:k-wander var(--t,15s) ease-in-out var(--d,0s) infinite alternate;will-change:transform}
+.k-bfly::before{content:"";position:absolute;inset:0;background:url("../assets/img/fx-butterflies.webp") calc(var(--n,0) * 100% / 7) 0/800% 100% no-repeat;animation:k-flutter .26s ease-in-out infinite alternate}
+@keyframes k-flutter{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+@keyframes k-wander{0%{transform:translate3d(0,0,0) rotate(-8deg)}25%{transform:translate3d(26px,-34px,0) rotate(12deg)}50%{transform:translate3d(-14px,-62px,0) rotate(-5deg)}75%{transform:translate3d(30px,-20px,0) rotate(14deg)}100%{transform:translate3d(-20px,18px,0) rotate(-10deg)}}
+
+/* gallery frames: Nawala as bride and groom, set into this world's own scenery */
+.is-near .shot[data-plate="sky"]{background-image:url("../assets/img/plate-kyoto-kolam.webp");background-position:50% 60%}
+.is-near .shot[data-plate="arch"]{background-image:url("../assets/img/plate-kyoto-gate.webp");background-position:50% 55%}
+.is-near .shot[data-plate="treetops"]{background-image:url("../assets/img/plate-kyoto-teh.webp");background-position:50% 45%}
+.is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-kyoto-bambu.webp");background-position:50% 60%}
+.is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-kyoto-sakura.webp");background-position:50% 70%}
+.is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-kyoto-sakura.webp");background-position:50% 100%;background-size:210%}

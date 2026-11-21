@@ -1,0 +1,60 @@
+/* Theme kit: Istana Awan (Cloud Palace).
+   A marble staircase into the clouds. Journey: up. Every scene is one landing higher: the terrace above the clouds, the colonnade,
+   the balcony among the lanterns at dusk, the garden on top of everything. Clouds pass over each join.
+   Same contract as the other kits (see theme-umum.css and theme-pendopo-jawa.css): tokens, the picture behind the opening,
+   four scenes and the ornaments. Its journey, music and tones are in KITS (index.html).
+   Front layers are the lower part of each picture with a soft fade at the top, moving exactly with the picture.
+   Pictures, film and music: Higgsfield, 21 Nov 2026 (job numbers in CLAUDE.md). */
+
+:root{
+  --ink:#2A2B33; --deep:#15182A; --main:#2B3154; --soft:#B99A55;
+  --paper:#FDFBF6; --mist:#F3F0EA; --light:#E9C46A;
+  --gate-shade:linear-gradient(180deg,rgba(253,251,246,.6) 0,rgba(253,251,246,.2) 22%,rgba(253,251,246,0) 36%,rgba(21,24,42,0) 60%,rgba(21,24,42,.8) 100%);
+  --bar-rgb:26,30,52; --backdrop:url("../assets/img/plate-istana-awan-balkon.webp"); --backdrop-veil:rgba(21,24,42,.62);
+  --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6;
+  --plate-gate:url("../assets/img/plate-istana-awan-gate.webp");
+  --nw-flap:url("../assets/img/nw-flap.webp");
+}
+
+[data-scene="sky"]{--plate:url("../assets/img/plate-istana-awan-halaman.webp");--fg:url("../assets/img/fg-istana-awan-halaman.webp");--tone:#D9D7DB;
+  --veil:#F7F1EC;--rim:rgba(255,220,190,.85);--g1:rgba(255,214,170,.75);--g2:rgba(190,205,240,.3)}
+[data-scene="treetops"]{--plate:url("../assets/img/plate-istana-awan-aula.webp");--fg:url("../assets/img/fg-istana-awan-aula.webp");--tone:#6E4533;
+  --shade:linear-gradient(180deg,rgba(30,18,8,.3) 0,rgba(30,18,8,.48) 45%,rgba(30,18,8,.45));
+  --veil:#2A1B10;--rim:#FFE4B0;--g1:rgba(240,180,90,.85);--g2:rgba(170,110,60,.4)}
+[data-scene="branches"]{--plate:url("../assets/img/plate-istana-awan-balkon.webp");--fg:url("../assets/img/fg-istana-awan-balkon.webp");--tone:#243A59;
+  --shade:rgba(10,14,34,.22);
+  --veil:#121A36;--rim:#BFD4FF;--g1:rgba(120,150,230,.7);--g2:rgba(246,196,69,.35)}
+[data-scene="boulder"]{--plate:url("../assets/img/plate-istana-awan-taman.webp");--fg:url("../assets/img/fg-istana-awan-taman.webp");--tone:#C6D8E8;
+  --veil:#F4F7FA;--rim:#FFF0C8;--g1:rgba(255,236,190,.85);--g2:rgba(190,215,240,.4)}
+
+.world{--fg-line:.79}
+.front{transform-origin:50% 62%;transform:scale(var(--cam,1))}
+
+/* the join between two landings is always cloud, whatever scene comes next */
+.seam[data-scene]{--veil:#FBF7F2;--g1:rgba(255,240,222,.92);--g2:rgba(255,226,200,.5)}
+/* the doves keep to the open sky */
+.k-dove{margin-top:-57%}
+
+/* doves cross the sky */
+.k-dove{left:0;top:var(--y);width:calc(52px * var(--s,1));aspect-ratio:160/150;overflow:hidden;animation:k-cross var(--t,34s) linear var(--d,0s) infinite;will-change:transform}
+.k-dove::before{content:"";position:absolute;left:0;top:0;width:400%;height:100%;background:url("../assets/img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:k-wing .44s steps(4) infinite}
+@keyframes k-wing{to{transform:translate3d(-100%,0,0)}}
+@keyframes k-cross{from{transform:translate3d(-90px,0,0)}to{transform:translate3d(620px,-70px,0)}}
+
+/* fireflies among the branches */
+.k-fly{left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 10px 3px rgba(246,196,69,.55);opacity:0;animation:k-glow var(--t,5s) ease-in-out var(--d,0s) infinite}
+@keyframes k-glow{0%,100%{opacity:0;transform:translate3d(0,0,0)}40%{opacity:.95}70%{opacity:.5;transform:translate3d(14px,-26px,0)}}
+
+/* butterflies over the flower hill */
+.k-bfly{left:var(--x);top:var(--y);width:calc(30px * var(--s,1));aspect-ratio:1;animation:k-wander var(--t,15s) ease-in-out var(--d,0s) infinite alternate;will-change:transform}
+.k-bfly::before{content:"";position:absolute;inset:0;background:url("../assets/img/fx-butterflies.webp") calc(var(--n,0) * 100% / 7) 0/800% 100% no-repeat;animation:k-flutter .26s ease-in-out infinite alternate}
+@keyframes k-flutter{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+@keyframes k-wander{0%{transform:translate3d(0,0,0) rotate(-8deg)}25%{transform:translate3d(26px,-34px,0) rotate(12deg)}50%{transform:translate3d(-14px,-62px,0) rotate(-5deg)}75%{transform:translate3d(30px,-20px,0) rotate(14deg)}100%{transform:translate3d(-20px,18px,0) rotate(-10deg)}}
+
+/* gallery frames: Nawala as bride and groom, set into this world's own scenery */
+.is-near .shot[data-plate="sky"]{background-image:url("../assets/img/plate-istana-awan-halaman.webp");background-position:50% 45%}
+.is-near .shot[data-plate="arch"]{background-image:url("../assets/img/plate-istana-awan-gate.webp");background-position:50% 30%}
+.is-near .shot[data-plate="treetops"]{background-image:url("../assets/img/plate-istana-awan-aula.webp");background-position:50% 40%}
+.is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-istana-awan-balkon.webp");background-position:50% 55%}
+.is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-istana-awan-taman.webp");background-position:50% 62%}
+.is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-istana-awan-taman.webp");background-position:50% 100%;background-size:210%}

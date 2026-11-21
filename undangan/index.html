@@ -17,6 +17,7 @@
 <script>
 /* The theme kit (the world this invitation lives in). The couple file names it; on a sample, ?tema= shows another one.
    A kit is: theme-<id>.css with its pictures, plus this entry (its name, the picture behind the opening, its opening film,
+   optionally its own music, its journey (up, side, diagonal, hop; none = the light sweep) and a map of places,
    whether the writing in each of the four scenes is light on dim scenery ("dark") or dark on bright scenery ("light"),
    and, if the picture needs it, another place for Nawala on a step).
    The four scenes keep the names of the first kit: sky (cover), treetops (greeting and couple), branches (events and gallery),
@@ -31,7 +32,30 @@
       nw: { sampul: 'fly:.5,.44,1.25' } },
     'akad-putih': { name: ['Akad Putih', 'Akad Putih'], gate: '../assets/img/plate-akad-putih-gate.webp', bar: '#3A372F',
       film: { src: '../assets/video/akad-putih-opening.mp4', rate: 1.2 },
-      tones: { sky: 'light', treetops: 'light', branches: 'dark', boulder: 'light' } }
+      tones: { sky: 'light', treetops: 'light', branches: 'dark', boulder: 'light' } },
+    /* worlds with their own journey (how every scene change moves) and their own music */
+    'istana-awan': { name: ['Istana Awan', 'Cloud Palace'], gate: '../assets/img/plate-istana-awan-gate.webp', bar: '#2B3154',
+      film: { src: '../assets/video/istana-awan-opening.mp4', rate: 1.2 }, music: '../assets/audio/istana-awan.mp3', journey: 'up',
+      tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' } },
+    'teater-tua': { name: ['Teater Tua', 'Old Opera House'], gate: '../assets/img/plate-teater-tua-gate.webp', bar: '#200E0C',
+      film: { src: '../assets/video/teater-tua-opening.mp4', rate: 1.2 }, music: '../assets/audio/teater-tua.mp3', journey: 'side',
+      tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'light' } },
+    'kapal-bulan': { name: ['Kapal Bulan', 'Moon Boat'], gate: '../assets/img/plate-kapal-bulan-gate.webp', bar: '#0C1128',
+      film: { src: '../assets/video/kapal-bulan-opening.mp4', rate: 1.1 }, music: '../assets/audio/kapal-bulan.mp3', journey: 'diagonal',
+      tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'light' } },
+    'kyoto': { name: ['Kyoto', 'Kyoto'], gate: '../assets/img/plate-kyoto-gate.webp', bar: '#121A12',
+      film: { src: '../assets/video/kyoto-opening.mp4', rate: 1.2 }, music: '../assets/audio/kyoto.mp3', journey: 'hop',
+      tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' },
+      /* the garden from above: the guest may tap a place, and the next button still walks everything in order */
+      map: { img: '../assets/img/plate-kyoto-map.webp', w: 720, h: 960, nw: 'perch:.36',
+        title: ['Mau ke mana dulu?', 'Where to first?'],
+        hint: ['Ketuk sebuah tempat, atau geser ke atas untuk berjalan berurutan.', 'Tap a place, or swipe up to walk the garden in order.'],
+        places: [
+          { x: .55, y: .62, name: ['Kolam', 'The pond'], what: ['Anda di sini', 'You are here'] },
+          { x: .2, y: .4, to: 'salam', name: ['Rumah teh', 'Tea house'], what: ['Mempelai', 'The couple'] },
+          { x: .8, y: .27, to: 'acara', name: ['Jalan bambu', 'Bamboo path'], what: ['Acara', 'The day'] },
+          { x: .38, y: .08, to: 'rsvp', name: ['Taman sakura', 'Cherry garden'], what: ['RSVP', 'RSVP'] }
+        ] } }
   };
   var D = window.NAWALA_INVITE || {}, want = '';
   try { want = (new URLSearchParams(location.search).get('tema') || '').toLowerCase(); } catch (e) {}
@@ -80,6 +104,7 @@
     <button class="tool" type="button" id="review" hidden data-en="Sample">Contoh</button>
   </div>
   <div class="tools__group">
+    <button class="tool tool--round" type="button" id="map-btn" hidden aria-label="Peta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button>
     <button class="tool tool--round" type="button" id="lang" aria-label="Switch to English">EN</button>
     <button class="tool tool--round tool--music" type="button" id="music" aria-pressed="false" aria-label="Musik" data-level="2" hidden>
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -347,6 +372,8 @@
     <div class="sweep__body"></div>
     <div class="sweep__tail"></div>
   </div>
+  <!-- the join between two scenes when a world travels (up, sideways, diagonally or by a hop); see "Journeys" in skeleton.css -->
+  <div class="seam" id="seam" aria-hidden="true"><div class="seam__fit"><i></i></div><s></s><s></s></div>
 
   <!-- The one Nawala that walks the guest through -->
   <div class="nw" id="nw" aria-hidden="true">
@@ -384,6 +411,10 @@
       <button type="button" data-v="umum">Nawala</button>
       <button type="button" data-v="pendopo-jawa">Pendopo Jawa</button>
       <button type="button" data-v="akad-putih">Akad Putih</button>
+      <button type="button" data-v="istana-awan">Istana Awan</button>
+      <button type="button" data-v="teater-tua">Teater Tua</button>
+      <button type="button" data-v="kapal-bulan">Kapal Bulan</button>
+      <button type="button" data-v="kyoto">Kyoto</button>
     </div>
   </div>
   <div class="field"><span data-en="Wording">Kata-kata</span>
