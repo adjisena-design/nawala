@@ -590,6 +590,14 @@
         themeWatchers.forEach(function (fn) { fn(); });
       }).catch(function () {});
   })();
+  /* the theme counts on the tier doors follow the list (the database's, once it answers) */
+  function counts() {
+    $$('[data-count]').forEach(function (el) {
+      var tier = el.getAttribute('data-count'), n = ALL.filter(function (th) { return th[0] === tier; }).length;
+      el.setAttribute('data-id', n + ' tema'); el.setAttribute('data-en', n + ' themes'); el.textContent = t(n + ' tema', n + ' themes');
+    });
+  }
+  counts(); themeWatchers.push(counts);
   var SAVE = window.NAWALA_SAVE;
   (function () {
     var river = $('#river');
