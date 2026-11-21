@@ -58,3 +58,12 @@
 .is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-kapal-bulan-bulan.webp");background-position:50% 50%}
 .is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-kapal-bulan-pantai.webp");background-position:50% 62%}
 .is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-kapal-bulan-pantai.webp");background-position:50% 100%;background-size:210%}
+
+/* ---------- The panel is not glass in an Exclusive world ---------- */
+.js .step .pane{border-radius:0;border-style:solid;border-color:transparent;box-shadow:none;background:none;border-width:40px 34px;border-image:url("../assets/img/panel-kapal-bulan-sutra.webp") 120 100 fill / 40px 34px stretch;padding:.6rem .7rem calc(1rem + var(--sink,0px));color:#1B2550;text-shadow:0 1px 8px rgba(255,255,255,.7)}
+.js .step .pane::before{display:none}
+/* a sheet of white silk floating in the night air: it drifts a little and its writing is dark */
+.js .step .pane{animation:k-silk 7s ease-in-out infinite alternate}
+@keyframes k-silk{0%{transform:translate3d(0,0,0) rotate(-.5deg)}50%{transform:translate3d(0,-5px,0) rotate(.3deg)}100%{transform:translate3d(0,-2px,0) rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){.js .step .pane{animation:none}}
+.js .step .pane .pane__seal{color:#D8436B}

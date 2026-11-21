@@ -375,6 +375,14 @@
   var stage = $('#stage'), stepsBox = $('#steps'), nw = $('#nw'), sweepEl = $('#sweep'), nextBtn = $('#next');
   /* a kit may say, per scene, whether the writing is light or dark; without that the page's own tones stay */
   function tones() {
+    if (KIT.scenes) {
+      var place = function (el) {
+        var id = el.id || 'acara';
+        Object.keys(KIT.scenes).forEach(function (k) { if (id === k || id.indexOf(k + '-') === 0) el.setAttribute('data-scene', KIT.scenes[k]); });
+      };
+      $$('.step[data-scene]').forEach(place);
+      var tp = $('#event-step'); if (tp && tp.content) $$('.step[data-scene]', tp.content).forEach(function (el) { el.id = el.id || ''; place(el); });
+    }
     if (!KIT.tones) return;
     var set = function (el) { var t = KIT.tones[el.getAttribute('data-scene')]; if (t) el.setAttribute('data-tone', t); };
     $$('.step[data-scene]').forEach(set);
@@ -500,7 +508,7 @@
   /* put a step on screen at once (start, level change, resize) */
   /* ----- Journeys: a kit may move from scene to scene in its own direction instead of the light sweep.
      Both scenes are on screen while they move; #seam covers the join. Only transform and opacity change. ----- */
-  var JTIME = { up: 1350, side: 1250, diagonal: 1500, hop: 900 };
+  var JTIME = { up: 1350, side: 1250, diagonal: 1500, hop: 900, drop: 1870 };
   var JOURNEY = JTIME[KIT.journey] ? KIT.journey : '', JT = JTIME[JOURNEY] || 0, seam = $('#seam');
   if (JOURNEY) { stage.setAttribute('data-journey', JOURNEY); stage.style.setProperty('--jt', JT + 'ms'); }
   function travel(a, b, next) {
@@ -518,6 +526,23 @@
       all.forEach(function (el) { el.classList.remove('j-in', 'j-out'); });
       seam.classList.remove('is-run');
     }, JT);
+  }
+  /* drop (Kyoto): rise from the place we stand in up to the sky picture, then fall onto the next place.
+     The sky picture zooms about each place's point (KIT.places) with translate and scale only. Returns its length in ms. */
+  function travelDrop(a, b, next) {
+    var sky = worlds.sky, P = KIT.places || {}, rise = a !== 'sky', fall = b !== 'sky';
+    var tR = rise ? 800 : 0, gap = rise && fall ? 120 : 0, tF = fall ? 950 : 0, total = tR + gap + tF;
+    var A = [worlds[a], fronts[a]], Bs = [worlds[b], fronts[b]];
+    function at(p) { sky.style.setProperty('--px', p ? p[0] : .5); sky.style.setProperty('--py', p ? p[1] : .5); }
+    function clear() { $$('.j-rise,.j-fall,.j-leave,.j-land', stage).forEach(function (el) { el.classList.remove('j-rise', 'j-fall', 'j-leave', 'j-land'); }); }
+    clearTimeout(travel.t); clearTimeout(travelDrop.t); clear();
+    sky.classList.add('is-near'); Bs.forEach(function (el) { el.classList.add('is-near'); });
+    if (rise) { at(P[a]); sky.classList.add('j-rise'); A.forEach(function (el) { el.classList.add('j-leave'); }); }
+    travelDrop.t = setTimeout(function () {
+      if (fall) { A.forEach(function (el) { el.classList.remove('j-leave'); el.classList.remove('is-on'); }); at(P[b]); sky.classList.remove('j-rise'); sky.classList.add('j-fall'); Bs.forEach(function (el) { el.classList.add('j-land'); }); }
+      travel.t = setTimeout(function () { camera(next); setScene(b); clear(); }, tF);
+    }, tR + gap);
+    return total;
   }
   function jump(i) {
     var list = seq(); cur = clamp(i, 0, list.length - 1);
@@ -541,7 +566,10 @@
       setTimeout(function () { next.classList.add('is-on'); }, wait);
       setTimeout(function () { busy = false; }, wait + (reduced ? 60 : 640));
     }
-    if (change && !reduced && JOURNEY) {
+    if (change && !reduced && JOURNEY === 'drop') {
+      var T = travelDrop(sceneOf(from), sceneOf(next), next);
+      fly(next); arrive(T * 0.8);
+    } else if (change && !reduced && JOURNEY) {
       travel(sceneOf(from), sceneOf(next), next);
       fly(next); arrive(JT * 0.6);
     } else if (change && !reduced) {

@@ -17,7 +17,7 @@
 <script>
 /* The theme kit (the world this invitation lives in). The couple file names it; on a sample, ?tema= shows another one.
    A kit is: theme-<id>.css with its pictures, plus this entry (its name, the picture behind the opening, its opening film,
-   optionally its own music, its journey (up, side, diagonal, hop; none = the light sweep) and a map of places,
+   how its letter opens and how bride and groom end (open, close: see the end of skeleton.css), optionally its own music, its journey (up, side, diagonal, hop; none = the light sweep) and a map of places,
    whether the writing in each of the four scenes is light on dim scenery ("dark") or dark on bright scenery ("light"),
    and, if the picture needs it, another place for Nawala on a step).
    The four scenes keep the names of the first kit: sky (cover), treetops (greeting and couple), branches (events and gallery),
@@ -26,42 +26,39 @@
   var KITS = {
     'umum': { name: ['Tema Umum Nawala', 'General Nawala theme'], gate: '../assets/img/plate-arch-mobile-sm.webp', bar: '#16301F',
       film: { src: '../assets/video/umum-opening.mp4', rate: 1.2 } },
-    'pendopo-jawa': { name: ['Pendopo Jawa', 'Pendopo Jawa'], gate: '../assets/img/plate-pendopo-jawa-gate.webp', bar: '#2A1A0E',
+    'pendopo-jawa': { open: 'sway', close: 'sway', name: ['Pendopo Jawa', 'Pendopo Jawa'], gate: '../assets/img/plate-pendopo-jawa-gate.webp', bar: '#2A1A0E',
       film: { src: '../assets/video/pendopo-jawa-opening.mp4', rate: 1.2 },
       tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' },
       nw: { sampul: 'fly:.5,.44,1.25' } },
-    'akad-putih': { name: ['Akad Putih', 'Akad Putih'], gate: '../assets/img/plate-akad-putih-gate.webp', bar: '#3A372F',
+    'akad-putih': { open: 'veil', close: 'lean', name: ['Akad Putih', 'Akad Putih'], gate: '../assets/img/plate-akad-putih-gate.webp', bar: '#3A372F',
       film: { src: '../assets/video/akad-putih-opening.mp4', rate: 1.2 },
       tones: { sky: 'light', treetops: 'light', branches: 'dark', boulder: 'light' } },
     /* worlds with their own journey (how every scene change moves) and their own music */
-    'istana-awan': { name: ['Istana Awan', 'Cloud Palace'], gate: '../assets/img/plate-istana-awan-gate.webp', bar: '#2B3154',
+    'istana-awan': { open: 'spin', close: 'circle', name: ['Istana Awan', 'Cloud Palace'], gate: '../assets/img/plate-istana-awan-gate.webp', bar: '#2B3154',
       film: { src: '../assets/video/istana-awan-opening.mp4', rate: 1.2 }, music: '../assets/audio/istana-awan.mp3', journey: 'up',
       tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' } },
-    'teater-tua': { name: ['Teater Tua', 'Old Opera House'], gate: '../assets/img/plate-teater-tua-gate.webp', bar: '#200E0C',
+    'teater-tua': { open: 'fold', close: 'bow', name: ['Teater Tua', 'Old Opera House'], gate: '../assets/img/plate-teater-tua-gate.webp', bar: '#200E0C',
       film: { src: '../assets/video/teater-tua-opening.mp4', rate: 1.2 }, music: '../assets/audio/teater-tua.mp3', journey: 'side',
       tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'light' } },
-    'kapal-bulan': { name: ['Kapal Bulan', 'Moon Boat'], gate: '../assets/img/plate-kapal-bulan-gate.webp', bar: '#0C1128',
+    'kapal-bulan': { open: 'drift', close: 'float', name: ['Kapal Bulan', 'Moon Boat'], gate: '../assets/img/plate-kapal-bulan-gate.webp', bar: '#0C1128',
       film: { src: '../assets/video/kapal-bulan-opening.mp4', rate: 1.1 }, music: '../assets/audio/kapal-bulan.mp3', journey: 'diagonal',
       tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'light' } },
-    'kyoto': { name: ['Kyoto', 'Kyoto'], gate: '../assets/img/plate-kyoto-gate.webp', bar: '#121A12',
-      film: { src: '../assets/video/kyoto-opening.mp4', rate: 1.2 }, music: '../assets/audio/kyoto.mp3', journey: 'hop',
-      tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' },
-      /* the garden from above: the guest may tap a place, and the next button still walks everything in order */
-      map: { img: '../assets/img/plate-kyoto-map.webp', w: 720, h: 960, nw: 'perch:.36',
-        title: ['Mau ke mana dulu?', 'Where to first?'],
-        hint: ['Ketuk sebuah tempat, atau geser ke atas untuk berjalan berurutan.', 'Tap a place, or swipe up to walk the garden in order.'],
-        places: [
-          { x: .55, y: .62, name: ['Kolam', 'The pond'], what: ['Anda di sini', 'You are here'] },
-          { x: .2, y: .4, to: 'salam', name: ['Rumah teh', 'Tea house'], what: ['Mempelai', 'The couple'] },
-          { x: .8, y: .27, to: 'acara', name: ['Jalan bambu', 'Bamboo path'], what: ['Acara', 'The day'] },
-          { x: .38, y: .08, to: 'rsvp', name: ['Taman sakura', 'Cherry garden'], what: ['RSVP', 'RSVP'] }
-        ] } }
+    'kyoto': { open: 'drop', close: 'spin', name: ['Kyoto', 'Kyoto'], gate: '../assets/img/plate-kyoto-gate.webp', bar: '#121A12',
+      /* film: the new one (gate up into the sky, job c0fcd8b1) is waiting to be brought in; until then the gate picture zooms */
+      film: null, music: '../assets/audio/kyoto.mp3', journey: 'drop',
+      /* the cover looks down on the garden from the sky; every change of place rises back to the sky and drops onto the next one.
+         scenes: which place each step stands in (a step id, or the start of one: 'acara' covers acara-1, acara-2 ...).
+         places: where each place lies in the sky picture, as shares of its width and height. */
+      scenes: { salam: 'pond', mempelai: 'pond', 'mempelai-pria': 'pond', cerita: 'pond', acara: 'treetops', busana: 'branches', galeri: 'branches', rsvp: 'boulder', ucapan: 'boulder', hadiah: 'boulder', penutup: 'boulder' },
+      places: { pond: [.5, .566], treetops: [.257, .527], branches: [.764, .605], boulder: [.5, .736] },
+      tones: { sky: 'light', pond: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' } }
   };
   var D = window.NAWALA_INVITE || {}, want = '';
   try { want = (new URLSearchParams(location.search).get('tema') || '').toLowerCase(); } catch (e) {}
   var id = (D.sample && KITS[want]) ? want : (KITS[D.theme] ? D.theme : 'umum'), kit = KITS[id];
   kit.id = id; window.NAWALA_KITS = KITS; window.NAWALA_KIT = kit;
   var el = document.documentElement; el.className = 'js'; el.setAttribute('data-kit', id);
+  if (kit.open) el.setAttribute('data-open', kit.open); if (kit.close) el.setAttribute('data-close', kit.close);
   document.write('<link rel="preload" as="image" href="' + kit.gate + '"><link rel="stylesheet" href="theme-' + id + '.css">');
   var bar = document.querySelector('meta[name="theme-color"]'); if (bar) bar.content = kit.bar;
 })();
@@ -125,6 +122,7 @@
       </div>
     </div>
     <div class="world fit" data-scene="treetops"></div>
+    <div class="world fit" data-scene="pond"></div>
     <div class="world fit" data-scene="branches">
       <div class="critters">
         <i class="k-fly" style="--x:22%;--y:34%;--t:5.5s"></i>
@@ -362,6 +360,7 @@
   <div class="fronts" aria-hidden="true">
     <i class="front fit" data-scene="sky"></i>
     <i class="front fit" data-scene="treetops"></i>
+    <i class="front fit" data-scene="pond"></i>
     <i class="front fit" data-scene="branches"></i>
     <i class="front fit" data-scene="boulder"></i>
   </div>
@@ -436,5 +435,7 @@
 
 <script src="../assets/js/db.js"></script>
 <script src="invite.js"></script>
+<!-- opened from the home page's theme list: save or pass with a sideways swipe, then the next theme (jelajah.js) -->
+<script>if (/[?&]jelajah=/.test(location.search)) document.write('<script src="../assets/js/simpan.js"><\/script><script src="jelajah.js"><\/script>');</script>
 </body>
 </html>

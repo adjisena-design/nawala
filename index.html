@@ -392,6 +392,7 @@ d.classList.add('js');})();
           <button type="button" role="tab" data-tier="premium" aria-selected="true">Premium</button>
           <button type="button" role="tab" data-tier="eksklusif" aria-selected="false" data-en="Exclusive">Eksklusif</button>
           <button type="button" role="tab" data-tier="kustom" aria-selected="false" data-en="Custom">Kustom</button>
+          <button type="button" role="tab" data-tier="tersimpan" aria-selected="false" data-en="Saved">Tersimpan</button>
         </div>
         <p id="tier-note"></p>
       </div>
@@ -412,7 +413,7 @@ d.classList.add('js');})();
       </div>
       <div class="pop__more">
         <h3 data-en="This is only the beginning.">Ini baru permulaan.</h3>
-        <p data-en="Register your WhatsApp number and we will send an access code that opens more themes, and the Exclusive films, as they are finished.">Daftarkan nomor WhatsApp Anda, lalu kami kirimkan kode akses untuk membuka lebih banyak tema, juga film tema Eksklusif, begitu selesai dikerjakan.</p>
+        <p data-en="Register your WhatsApp number and we will send an access code. With it, the themes you save are kept in your own room with Nawala, not only in this browser.">Daftarkan nomor WhatsApp Anda, lalu kami kirimkan kode akses. Dengan kode itu, tema yang kalian simpan tersimpan di ruang kalian di Nawala, bukan hanya di browser ini.</p>
         <div class="pop__actions">
           <button class="btn btn--glow" type="button" data-goto="kontak" data-en="Register my WhatsApp">Daftarkan WhatsApp saya</button>
           <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
@@ -422,7 +423,6 @@ d.classList.add('js');})();
     <div class="pop__body pop__detail" id="pop-detail" hidden tabindex="-1">
       <div class="detail">
         <div class="detail__cover" id="detail-cover">
-          <button class="detail__play" id="detail-play" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg><span data-en="Play the film">Putar film</span></button>
           <div class="detail__couple"><img src="assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy"><img src="assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy"></div>
         </div>
         <div class="detail__text">
@@ -430,11 +430,12 @@ d.classList.add('js');})();
           <h3 id="detail-name"></h3>
           <p id="detail-desc"></p>
           <p class="detail__one" id="detail-one" hidden></p>
-          <p class="detail__lock" id="detail-lock" hidden><span data-en="Exclusive films open with an access code. Ask us for one on WhatsApp.">Film tema Eksklusif dibuka dengan kode akses. Minta kodenya lewat WhatsApp.</span> <button type="button" data-open="login" data-en="Enter a code">Masukkan kode</button></p>
           <p class="detail__note" data-en="The bride and groom shown here are Nawala. Your own photos take their place.">Pengantin di contoh ini adalah Nawala. Foto kalian sendiri yang nanti menggantikannya.</p>
+          <p class="detail__msg" id="detail-msg" hidden></p>
           <div class="pop__actions">
-            <a class="btn btn--line" id="detail-open" href="undangan/dasar.html" hidden data-en="Open the sample invitation">Buka undangan contoh</a>
-            <button class="btn btn--glow" type="button" id="detail-use" data-en="Use this theme">Gunakan tema ini</button>
+            <a class="btn btn--glow" id="detail-open" href="undangan/" hidden data-en="Open the invitation">Buka undangan</a>
+            <button class="btn btn--quiet" type="button" id="detail-save" aria-pressed="false" data-en="Save">Simpan</button>
+            <button class="btn btn--quiet" type="button" id="detail-use" data-en="Use this theme">Gunakan tema ini</button>
             <button class="btn btn--quiet" type="button" id="detail-back" data-en="Back to all themes">Kembali ke semua tema</button>
           </div>
         </div>
@@ -465,6 +466,8 @@ d.classList.add('js');})();
   </div>
 </dialog>
 
+<script src="assets/js/db.js" defer></script>
+<script src="assets/js/simpan.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 </body>
 </html>

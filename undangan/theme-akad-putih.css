@@ -8,6 +8,8 @@
    Pictures: Higgsfield, 21 Nov 2026 (job numbers in CLAUDE.md). Needs the owner's cultural review. */
 
 :root{
+  /* the panel glass, tinted to this world (pearl, with a warm blush on the dim scene) */
+  --glass:255,250,244; --glass-d:255,236,214; --glass-rim:255,244,232;
   --ink:#2B2A26; --deep:#1E1D1A; --main:#3A372F; --soft:#7C8A6A;
   --paper:#FCFAF5; --mist:#F4F1EA;
   --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6; --light:#E3C27A;

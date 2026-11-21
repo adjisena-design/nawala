@@ -58,3 +58,12 @@
 .is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-istana-awan-balkon.webp");background-position:50% 55%}
 .is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-istana-awan-taman.webp");background-position:50% 62%}
 .is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-istana-awan-taman.webp");background-position:50% 100%;background-size:210%}
+
+/* ---------- The panel is not glass in an Exclusive world ---------- */
+.js .step .pane{border-radius:0;border-style:solid;border-color:transparent;box-shadow:none;background:none;border-width:46px 40px;border-image:url("../assets/img/panel-istana-awan-awan.webp") 130 120 fill / 46px 40px stretch;padding:.4rem .5rem calc(.9rem + var(--sink,0px));color:#2B3154;text-shadow:0 1px 8px rgba(255,255,255,.8)}
+.js .step .pane::before{display:none}
+/* the writing rests on a cloud with a gold lining of light, drifting slowly */
+.js .step .pane{animation:k-cloud 9s ease-in-out infinite alternate}
+@keyframes k-cloud{from{transform:translate3d(-2px,0,0)}to{transform:translate3d(3px,-4px,0)}}
+@media (prefers-reduced-motion:reduce){.js .step .pane{animation:none}}
+.js .step .pane .pane__seal{color:#D8436B}

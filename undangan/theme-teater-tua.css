@@ -68,3 +68,13 @@
 .is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-teater-tua-foyer.webp");background-position:50% 45%}
 .is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-teater-tua-taman.webp");background-position:50% 55%}
 .is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-teater-tua-taman.webp");background-position:50% 100%;background-size:210%}
+
+/* ---------- The panel is not glass in an Exclusive world ---------- */
+.js .step .pane{border-radius:0;border-style:solid;border-color:transparent;box-shadow:none;background:none;border-width:24px 22px;border-image:url("../assets/img/panel-teater-tua-kayu.webp") 34 30 fill / 24px 22px stretch;padding:1rem 1rem calc(1.2rem + var(--sink,0px));color:#FBF2E2;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+.js .step .pane::before{display:none}
+/* a walnut notice board with a gilded edge, and a swag of red silk over its top right corner */
+.js .step .pane::after{content:"";position:absolute;right:-6px;top:-6px;width:min(34%,128px);aspect-ratio:1;pointer-events:none;
+  background:url("../assets/img/panel-teater-tua-sutra.webp") 0 0/100% auto no-repeat;transform:scaleX(-1);filter:drop-shadow(0 6px 6px rgba(0,0,0,.45))}
+.js .step .pane h2,.js .step .pane h3{color:#F3D9A6}
+.js .step .pane .pane__seal{color:#F4A6C0}
+.js .step .pane h2{padding-right:22%}

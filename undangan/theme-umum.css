@@ -8,6 +8,8 @@
    and the light that brings the scene in: --veil, --rim, --g1, --g2 (the home page's own values). */
 
 :root{
+  /* the panel glass, tinted to this world (the moss of the descent: a faint green) */
+  --glass:236,250,226; --glass-d:214,240,190; --glass-rim:235,255,220;
   --ink:#1D241F; --deep:#0C1D13; --main:#16301F; --soft:#4F7A3A;
   --paper:#FBF6EA; --mist:#F4EFE2;
   --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6; --light:#F6C445;

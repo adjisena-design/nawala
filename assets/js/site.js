@@ -66,7 +66,6 @@
     ['Aurora', 'Aurora', 'Paviliun kaca di atas salju, di bawah cahaya utara.', 'A glass pavilion on snow under the northern lights.'],
     ['Kebun Mawar', 'Secret Rose Garden', 'Taman mawar rahasia; pintunya terbuka untuk tamu.', 'A secret rose garden; its door opens for your guest.']
   ];
-  var FILMS = ' hutan-pagi balairung-merah akad-putih songket-palembang santorini tempo-doeloe air putih-klasik dusty-rose malam-bintang istana-awan taman-kaca perpustakaan-emas kapal-bulan seribu-lentera bawah-laut teater-tua keraton-malam aurora kebun-mawar ';
   var OWNED = '';   // slugs of Exclusive themes a couple has bought, e.g. ' istana-awan '. Empty until there is a real sale.
   var THEMES = [
     ['alam', 'Hutan Pagi', 'Morning Forest'], ['royal', 'Balairung Merah', 'Crimson Hall'], ['religi', 'Akad Putih', 'White Akad'], ['nusa', 'Pendopo Jawa', 'Javanese Pendopo'],
@@ -486,7 +485,9 @@
   var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
     .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
     .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
-  function hasFilm(th) { return FILMS.indexOf(' ' + slug(th) + ' ') > -1; }
+  /* a theme whose sample invitation can really be opened: every Dasar theme, and the worlds in BUILT */
+  function ready(th) { return th[0] === 'dasar' || BUILT.indexOf(' ' + slug(th) + ' ') > -1; }
+  var SAVE = window.NAWALA_SAVE;
   (function () {
     var river = $('#river');
     if (river) nearJobs.push([themes, function () {
@@ -502,60 +503,86 @@
     var pops = { themes: $('#pop-themes'), login: $('#pop-login') };
     var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), viewing = -1, tier = 'premium', builtFor = '';
     var tabs = $$('.tabs [data-tier]'), note = $('#tier-note'), custom = $('#tier-custom'), more = $('.pop__more');
-    var coverEl = $('#detail-cover'), play = $('#detail-play'), lock = $('#detail-lock'), one = $('#detail-one');
-    var conn = navigator.connection || {}, lowData = !!conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '');
-    function unlocked() { try { if (sessionStorage.getItem('nawala-code')) return true; } catch (e) {} return query.get('film') === '1'; }
+    var coverEl = $('#detail-cover'), one = $('#detail-one'), saveBtn = $('#detail-save'), msg2 = $('#detail-msg');
+    function savedNote() {
+      var n = SAVE ? SAVE.list().length : 0;
+      if (SAVE && SAVE.inRoom()) return t(n + ' dari 30 tema tersimpan di ruang kalian di Nawala.', n + ' of 30 themes saved in your room with Nawala.');
+      return t(n + ' dari 10 tema tersimpan di browser ini saja. Jika data browser dihapus atau ponsel direset, simpanan ini hilang. Masuk dengan kode akses agar tersimpan di Nawala.',
+        n + ' of 10 themes saved, in this browser only. If the browser data is cleared or the phone is reset, they are gone. Enter an access code to keep them with Nawala.');
+    }
     function build() {
       builtFor = tier + lang;
       tabs.forEach(function (b) { var on = b.getAttribute('data-tier') === tier; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
-      note.textContent = t(TIERS[tier][2], TIERS[tier][3]);
-      var isCustom = tier === 'kustom';
+      var isSaved = tier === 'tersimpan', isCustom = tier === 'kustom';
+      note.textContent = isSaved ? savedNote() : t(TIERS[tier][2], TIERS[tier][3]);
       custom.hidden = !isCustom; grid.hidden = isCustom; more.hidden = isCustom;
       if (isCustom) return;
-      grid.innerHTML = ALL.map(function (th, i) {
-        if (th[0] !== tier) return '';
-        var tag = OWNED.indexOf(' ' + slug(th) + ' ') > -1 ? t('Sudah dimiliki', 'Owned') : hasFilm(th) ? t('Ada film', 'With film') : '';
-        var sub = th[5] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
-        return '<button class="tc" type="button" data-i="' + i + '"><span class="tc__art' + (th[5] ? ' cf cf--' + th[5] : '') + '"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" width="400" height="500">' +
+      var mine = SAVE ? SAVE.list() : [];
+      var html = ALL.map(function (th, i) {
+        var sl = slug(th), kept = mine.indexOf(sl) > -1;
+        if (isSaved ? !kept : th[0] !== tier) return '';
+        var tag = OWNED.indexOf(' ' + sl + ' ') > -1 ? t('Sudah dimiliki', 'Owned') : ready(th) ? '' : t('Segera', 'Soon');
+        var sub = isSaved ? t(TIERS[th[0]][0], TIERS[th[0]][1]) : th[5] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
+        return '<button class="tc' + (kept ? ' is-kept' : '') + '" type="button" data-i="' + i + '"><span class="tc__art' + (th[5] ? ' cf cf--' + th[5] : '') + '"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" width="400" height="500">' +
           (tag ? '<em>' + tag + '</em>' : '') + '</span><b>' + t(th[1], th[2]) + '</b><small>' + sub + '</small></button>';
       }).join('');
+      grid.innerHTML = html || '<p class="grid__empty">' + t('Belum ada tema yang disimpan. Buka sebuah tema, lalu geser ke kanan untuk menyimpannya.', 'No themes saved yet. Open a theme, then swipe right to save it.') + '</p>';
       list.scrollTop = 0;
     }
-    function stopFilm() { var v = $('video', coverEl); if (v) { v.pause(); v.remove(); } coverEl.classList.remove('is-playing'); }
     function showList(focusCard) {
-      stopFilm(); detail.hidden = true; list.hidden = false;
+      detail.hidden = true; list.hidden = false;
       if (focusCard && viewing > -1) { var c = $('[data-i="' + viewing + '"]', grid); if (c) c.focus({ preventScroll: true }); }
       viewing = -1;
     }
+    /* the themes still to see after this one, for the swipe run: same tier, can be opened, not yet saved or passed */
+    function queueAfter(i) {
+      var th = ALL[i], out = [];
+      for (var k = 1; k < ALL.length; k++) {
+        var o = ALL[(i + k) % ALL.length], sl = slug(o);
+        if (o[0] === th[0] && ready(o) && !(SAVE && (SAVE.isSaved(sl) || SAVE.isPassed(sl))) && OWNED.indexOf(' ' + sl + ' ') < 0) out.push(sl);
+      }
+      return out;
+    }
+    function saveLabel() {
+      var th = ALL[viewing]; if (!th) return;
+      var kept = !!SAVE && SAVE.isSaved(slug(th));
+      saveBtn.setAttribute('aria-pressed', String(kept));
+      saveBtn.textContent = kept ? t('Tersimpan, lepas', 'Saved, let go') : t('Simpan', 'Save');
+    }
+    function tell(text) { msg2.hidden = !text; msg2.textContent = text || ''; }
     function showDetail(i) {
-      stopFilm();
-      viewing = i; var th = ALL[i], isX = th[0] === 'eksklusif', owned = OWNED.indexOf(' ' + slug(th) + ' ') > -1;
+      viewing = i; var th = ALL[i], sl = slug(th), isX = th[0] === 'eksklusif', owned = OWNED.indexOf(' ' + sl + ' ') > -1;
       coverEl.className = 'detail__cover' + (th[5] ? '' : ' is-tall');
-      coverEl.style.backgroundImage = 'url(' + cover(th) + ')';
+      coverEl.style.backgroundImage = 'url(' + cover(th, 't') + ')';   /* toned down like the rest of the page; the invitation itself shows the full colour */
       $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (th[5] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
       $('#detail-name').textContent = t(th[1], th[2]);
-      var world = BUILT.indexOf(' ' + slug(th) + ' ') > -1, ready = th[0] === 'dasar' || world, openEl = $('#detail-open');
-      $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + (ready ? t('Undangan contohnya sudah bisa dibuka.', 'Its sample invitation is ready to open.') : t('Ini adegan pembukanya. Halaman undangan di baliknya masih kami kerjakan.', 'This is its opening scene. The invitation pages behind it are still being built.'));
-      openEl.hidden = !ready; if (ready) openEl.href = (world ? 'undangan/?tema=' : 'undangan/dasar.html?tema=') + slug(th) + '&to=Bapak+dan+Ibu+Santoso';
+      var can = ready(th) && !owned, openEl = $('#detail-open');
+      $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + (ready(th) ? t('Buka undangannya dan jalani seperti seorang tamu: geser naik turun untuk melihat isinya, geser ke kanan untuk menyimpan, ke kiri untuk melewati.', 'Open the invitation and walk it as a guest would: swipe up and down to see inside, right to save it, left to pass.')
+        : t('Undangannya segera hadir. Kalian sudah bisa menyimpannya.', 'Its invitation is coming soon. You can already save it.'));
+      openEl.hidden = !can;
+      openEl.href = can ? (th[0] === 'dasar' ? 'undangan/dasar.html' : 'undangan/') + '?tema=' + sl + '&to=Bapak+dan+Ibu+Santoso&jelajah=' + th[0] + '&antre=' + queueAfter(i).join(',') : '#tema';
       one.hidden = !isX;
       one.textContent = owned ? t('Tema ini sudah dimiliki satu pasangan dan tidak dijual lagi.', 'This theme already belongs to a couple and is no longer for sale.')
         : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');
       $('#detail-use').hidden = owned;
-      lock.hidden = true;
-      play.hidden = !hasFilm(th) || lowData;
+      saveBtn.hidden = owned || !SAVE; saveLabel(); tell('');
       list.hidden = true; detail.hidden = false; detail.scrollTop = 0;
       try { detail.focus({ preventScroll: true }); } catch (e) {}
     }
-    /* films are small, silent, and only ever start from a tap */
-    play.addEventListener('click', function () {
-      var th = ALL[viewing]; if (!th) return;
-      if (th[0] === 'eksklusif' && !unlocked()) { lock.hidden = false; lock.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); return; }
-      var v = doc.createElement('video');
-      v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.src = 'assets/video/' + slug(th) + '.mp4';
-      coverEl.insertBefore(v, coverEl.firstChild); coverEl.classList.add('is-playing');
-      var pr = v.play(); if (pr && pr.catch) pr.catch(function () { stopFilm(); });
+    saveBtn.addEventListener('click', function () {
+      var th = ALL[viewing]; if (!th || !SAVE) return;
+      var sl = slug(th);
+      if (SAVE.isSaved(sl)) { SAVE.remove(sl); tell(''); }
+      else {
+        var r = SAVE.save(sl);
+        if (r.full) tell(SAVE.inRoom() ? t('Sudah 30 tema tersimpan. Lepas satu dulu di ruang kalian.', '30 themes are already saved. Let one go in your room first.')
+          : t('Browser ini sudah menyimpan 10 tema. Masuk dengan kode akses untuk menyimpan sampai 30, atau lepas satu di Tersimpan.', 'This browser already keeps 10 themes. Enter an access code to keep up to 30, or let one go under Saved.'));
+        else if (r.first) { SAVE.told(); tell(t('Tersimpan di browser ini saja, paling banyak 10 tema. Jika data browser dihapus atau ponsel direset, simpanan ini hilang. Masuk dengan kode akses agar tersimpan di Nawala.', 'Saved in this browser only, 10 themes at most. If the browser data is cleared or the phone is reset, these saves are gone. Enter an access code to keep them with Nawala.')); }
+        else tell('');
+      }
+      saveLabel(); builtFor = '';
     });
-    function closeAll() { stopFilm(); Object.keys(pops).forEach(function (k) { if (pops[k] && pops[k].open) pops[k].close(); }); }
+    function closeAll() { Object.keys(pops).forEach(function (k) { if (pops[k] && pops[k].open) pops[k].close(); }); }
     function open(name, wantTier) {
       var d = pops[name]; if (!d || !d.showModal) { location.hash = name === 'themes' ? 'tema' : 'kontak'; return; }
       closeAll();
@@ -564,7 +591,6 @@
       d.showModal();
       if (name === 'login') $('#login-code').focus();
     }
-    pops.themes.addEventListener('close', stopFilm);
     tabs.forEach(function (b, k) {
       b.addEventListener('click', function () { tier = b.getAttribute('data-tier'); build(); showList(false); });
       b.addEventListener('keydown', function (e) {
@@ -585,11 +611,19 @@
       if (e.target.classList && e.target.classList.contains('pop')) return closeAll();   // a tap on the dark area around the box
       var card = e.target.closest('.tc'); if (card) return showDetail(Number(card.getAttribute('data-i')));
     });
-    $('#detail-back').addEventListener('click', function () { showList(true); });
+    $('#detail-back').addEventListener('click', function () { if (!builtFor) build(); showList(true); });
     $('#detail-use').addEventListener('click', function () {
       chosen = ALL[viewing]; showChosen(); goTo('kontak');
     });
     afterLang.push(function () { if (builtFor && builtFor !== tier + lang) { var v = viewing; build(); if (v > -1) showDetail(v); } });
+    /* coming back from an invitation (?tema=<tab>) or sent here to log in (?masuk=1): open the right box, then tidy the address */
+    var wantTab = query.get('tema'), wantLogin = query.get('masuk') === '1';
+    if (wantTab || wantLogin) {
+      var start = function () { if (wantLogin) open('login'); else open('themes', /^(dasar|premium|eksklusif|kustom|tersimpan)$/.test(wantTab) ? wantTab : 'premium'); };
+      if (SAVE && !wantLogin) SAVE.ready().then(start); else start();
+      try { history.replaceState(null, '', location.pathname + '#tema'); } catch (e) {}
+    }
+    if (SAVE) SAVE.onChange(function () { if (pops.themes.open && !detail.hidden) saveLabel(); builtFor = ''; });
 
     /* log in with an access code. Codes live in the Nawala database (access_codes); this page may only ask yes or no.
        A good code also opens the couple's room (ruang/), which reads the same key from this browser. */
@@ -611,7 +645,8 @@
         .then(function (ok) {
           if (ok !== true) return say(t('Kode itu tidak kami kenali. Periksa lagi, atau hubungi kami lewat WhatsApp.', 'We do not recognise that code. Check it again, or reach us on WhatsApp.'));
           try { sessionStorage.setItem('nawala-code', c); } catch (err) {}
-          say(t('Kode diterima. Semua film tema kini terbuka, dan ruang kalian siap. ', 'Code accepted. Every theme film is now open, and your room is ready. ') +
+          if (SAVE) SAVE.reopen();   /* what this browser had saved moves into the room */
+          say(t('Kode diterima. Ruang kalian siap, dan tema yang tersimpan di browser ini sudah kami pindahkan ke sana. ', 'Code accepted. Your room is ready, and the themes saved in this browser have moved into it. ') +
             '<a href="ruang/">' + t('Buka ruang kalian', 'Open your room') + '</a>');
         })
         .catch(function () { say(later); });
