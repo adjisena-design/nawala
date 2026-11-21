@@ -603,16 +603,22 @@
     }
     plans(); afterLang.push(plans);
     var current = 0;
+    /* Six screens: the day in one link (the lead), then the opening, guestbook, floor plan, souvenir, gallery.
+       The tab bar belongs to the five wedding pages, so it hides on the first two. A screen plays its little
+       hands-on loop (.play) only while it is the one in the desktop phone, or while its card is on a phone screen. */
     function setActive(i) {
       current = i;
       items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); });
-      screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
-      tabs.forEach(function (tab, k) { tab.classList.toggle('is-on', k === i); });
-      if (frame) frame.classList.toggle('is-cover', i === 0);   /* the opening has no tab bar, like the real thing */
+      screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); if (desktop.matches && !calm) s.classList.toggle('play', k === i); });
+      tabs.forEach(function (tab, k) { tab.classList.toggle('is-on', k === i - 1); });
+      if (frame) frame.classList.toggle('is-cover', i <= 1);
     }
     function place() {
       screens.forEach(function (s, i) {
-        if (desktop.matches) phone.appendChild(s); else items[i].insertBefore(s, items[i].firstChild);
+        s.classList.remove('play');
+        if (desktop.matches) phone.appendChild(s);
+        else if (items[i].classList.contains('svc--lead')) items[i].appendChild(s);
+        else items[i].insertBefore(s, items[i].firstChild);
       });
       setActive(current);
     }
@@ -623,6 +629,12 @@
         entries.forEach(function (en) { if (en.isIntersecting && desktop.matches) setActive(items.indexOf(en.target)); });
       }, { rootMargin: '-48% 0px -48% 0px' });
       items.forEach(function (li) { io.observe(li); });
+      if (!calm) {
+        var seen = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { if (!desktop.matches) screens[items.indexOf(en.target)].classList.toggle('play', en.isIntersecting); });
+        }, { threshold: .45 });
+        items.forEach(function (li) { seen.observe(li); });
+      }
     }
   })();
 
@@ -657,6 +669,7 @@
         a = k * Math.PI / 4 + Math.PI / 8;
         o += dot(c[0] + Math.cos(a) * 14.5, c[1] + Math.sin(a) * 14.5, 2.4, 'fill="' + (you && k === 5 ? '#F6C445' : 'rgba(' + ivory + ',.55)') + '"');
       }
+      if (you) o += dot(c[0], c[1], 19, 'class="seat__ring" fill="none" stroke="#F4A6C0" stroke-width="2.5"');
       o += dot(c[0], c[1], 10.5, you ? 'fill="#F4A6C0"' : 'fill="rgba(' + ivory + ',.18)" stroke="rgba(' + ivory + ',.5)" stroke-width="1.2"');
       o += label(c[0], c[1], i + 1, 9.5, you ? '#16301F' : 'rgba(' + ivory + ',.92)');
     });
