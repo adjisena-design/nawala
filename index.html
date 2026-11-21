@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261121m">
+<link rel="stylesheet" href="assets/css/site.css?v=20261121n">
 </head>
 <body>
 
@@ -123,7 +123,7 @@ d.classList.add('js');})();
     <p class="hero__lead" data-en="A wedding invitation that arrives for every guest, greets them by name, then leads them into your world.">Undangan pernikahan yang datang kepada setiap tamu, menyapa namanya, lalu membawanya masuk ke dunia kalian.</p>
     <div class="hero__actions">
       <a class="btn btn--glow" href="#kontak" data-en="Start your invitation">Mulai undangan kalian</a>
-      <button class="btn btn--line" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
+      <a class="btn btn--line" href="tema/" data-en="See the themes">Lihat tema</a>
     </div>
   </div>
   <a class="hero__next" href="#tentang" aria-label="Gulir ke bagian berikutnya"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg></a>
@@ -276,14 +276,13 @@ d.classList.add('js');})();
     <h2 data-en="Four ways to begin your invitation.">Empat cara memulai undangan kalian.</h2>
     <p data-en="From simple and safe to made only for you. Every one is a real scene in motion, never a flat paper template. These are opening scenes; the full invitations are ready in January 2027.">Dari yang sederhana dan aman sampai yang dibuat hanya untuk kalian. Semuanya adegan nyata yang bergerak, bukan templat kertas tempel. Ini adegan pembukanya; undangan lengkapnya siap Januari 2027.</p>
     <div class="tiers">
-      <button type="button" data-open="themes" data-tier="dasar"><b data-en="Basic">Dasar</b><span data-count="dasar" data-en="84 themes">84 tema</span></button>
-      <button type="button" data-open="themes" data-tier="premium"><b>Premium</b><span data-count="premium" data-en="28 themes">28 tema</span></button>
-      <button type="button" data-open="themes" data-tier="eksklusif"><b data-en="Exclusive">Eksklusif</b><span data-en="10, one couple each">10, satu pasangan</span></button>
-      <button type="button" data-open="themes" data-tier="kustom"><b data-en="Custom">Kustom</b><span data-en="made for you">dibuat untuk kalian</span></button>
+      <a href="tema/?tier=dasar"><b data-en="Basic">Dasar</b><span data-count="dasar" data-en="84 themes">84 tema</span></a>
+      <a href="tema/?tier=premium"><b>Premium</b><span data-count="premium" data-en="28 themes">28 tema</span></a>
+      <a href="tema/?tier=eksklusif"><b data-en="Exclusive">Eksklusif</b><span data-en="10, one couple each">10, satu pasangan</span></a>
+      <a href="tema/?tier=kustom"><b data-en="Custom">Kustom</b><span data-en="made for you">dibuat untuk kalian</span></a>
     </div>
     <div class="themes__actions">
-      <button class="btn btn--glow" type="button" data-open="themes" data-en="See the themes">Lihat tema</button>
-      <button class="btn btn--quiet" type="button" data-open="login" data-en="I have an access code">Saya punya kode akses</button>
+      <a class="btn btn--glow" href="tema/" data-en="See the Nawala theme collection">Lihat koleksi tema Nawala</a>
     </div>
   </div>
 </section>
@@ -466,8 +465,8 @@ d.classList.add('js');})();
   </div>
 </dialog>
 
-<script src="assets/js/db.js?v=20261121m" defer></script>
-<script src="assets/js/simpan.js?v=20261121m" defer></script>
-<script src="assets/js/site.js?v=20261121m" defer></script>
+<script src="assets/js/db.js?v=20261121n" defer></script>
+<script src="assets/js/simpan.js?v=20261121n" defer></script>
+<script src="assets/js/site.js?v=20261121n" defer></script>
 </body>
 </html>

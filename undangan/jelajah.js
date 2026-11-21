@@ -46,7 +46,7 @@
     if (b.tagName === 'BUTTON') b.type = 'button';
     return b;
   }
-  function home(tab) { return '../?tema=' + (tab || tier) + '#tema'; }
+  function home(tab) { return '../tema/?tier=' + (tab || tier); }
   var group = document.querySelector('#tools .tools__group');
   if (!group) return;
   var back = tool('back', 'a'), no = tool('pass'), yes = tool('save');
@@ -97,7 +97,7 @@
           S.inRoom() ? t('Lepas satu dulu di ruang kalian, lalu simpan yang ini.', 'Let one go in your room first, then save this one.')
             : t('Tanpa kode akses, browser ini menyimpan paling banyak 10 tema. Masuk dengan kode akses untuk menyimpan sampai 30, atau lepas satu dari daftar Tersimpan.', 'Without an access code this browser keeps 10 themes at most. Enter an access code to keep up to 30, or let one go from your Saved list.'),
           [{ label: t('Lihat yang tersimpan', 'See what is saved'), href: home('tersimpan'), main: true },
-            { label: t('Masuk dengan kode', 'Enter a code'), href: '../?masuk=1' },
+            { label: t('Masuk dengan kode', 'Enter a code'), href: '../tema/?masuk=1' },
             { label: t('Tutup', 'Close') }]);
       }
       if (!r.ok) return;
@@ -107,7 +107,7 @@
         return sheet(t('Tersimpan di browser ini', 'Saved in this browser'),
           t('Kalian belum masuk, jadi tema ini kami simpan di browser ini saja, paling banyak 10 tema. Jika data browser dihapus atau ponsel direset, simpanan ini hilang. Masuk dengan kode akses agar pilihan kalian tersimpan di Nawala.', 'You are not logged in, so this theme is kept in this browser only, 10 themes at most. If the browser data is cleared or the phone is reset, these saves are gone. Enter an access code to keep your choices with Nawala.'),
           [{ label: t('Lanjut ke tema berikutnya', 'On to the next theme'), main: true, then: function () { leaving = true; next(); } },
-            { label: t('Masuk dengan kode', 'Enter a code'), href: '../?masuk=1' }]);
+            { label: t('Masuk dengan kode', 'Enter a code'), href: '../tema/?masuk=1' }]);
       }
       leaving = true; wash('save', next);
     });

@@ -734,7 +734,19 @@
     });
     afterLang.push(function () { if (builtFor && builtFor !== tier + lang) { var v = viewing; build(); if (v > -1) showDetail(v); } });
     /* coming back from an invitation (?tema=<tab>) or sent here to log in (?masuk=1): open the right box, then tidy the address */
-    var wantTab = query.get('tema'), wantLogin = query.get('masuk') === '1';
+    var wantTab = query.get('tema'), wantLogin = query.get('masuk') === '1', wantPick = query.get('pilih');
+    /* the theme list has its own page now (tema/); old links to a tab here go there */
+    if (wantTab) { location.replace('tema/?tier=' + (/^(dasar|premium|eksklusif|kustom|tersimpan)$/.test(wantTab) ? wantTab : 'semua')); return; }
+    /* "Gunakan tema ini" on the themes page: carry the choice into the contact box */
+    if (wantPick) {
+      var pickIt = function () {
+        var th = ALL.filter(function (x) { return slug(x) === wantPick; })[0];
+        if (th) { chosen = th; showChosen(); }
+        setTimeout(function () { goTo('kontak'); }, 300);
+      };
+      setTimeout(pickIt, 0); themeWatchers.push(function () { if (!chosen) pickIt(); });
+      try { history.replaceState(null, '', location.pathname + '#kontak'); } catch (e) {}
+    }
     if (wantTab || wantLogin) {
       var start = function () { if (wantLogin) open('login'); else open('themes', /^(dasar|premium|eksklusif|kustom|tersimpan)$/.test(wantTab) ? wantTab : 'premium'); };
       if (SAVE && !wantLogin) SAVE.ready().then(start); else start();
