@@ -12,10 +12,37 @@
 <meta property="og:image" content="https://adjisena-design.github.io/nawala/assets/img/og.jpg">
 <link rel="icon" href="../assets/img/icon-64.png">
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/fraunces.woff2" crossorigin>
-<link rel="preload" as="image" href="../assets/img/plate-arch-mobile-sm.webp">
 <link rel="stylesheet" href="skeleton.css">
-<link rel="stylesheet" href="theme-umum.css">
-<script>document.documentElement.className = 'js';</script>
+<script src="couple-laras-bima.js"></script>
+<script>
+/* The theme kit (the world this invitation lives in). The couple file names it; on a sample, ?tema= shows another one.
+   A kit is: theme-<id>.css with its pictures, plus this entry (its name, the picture behind the opening, its opening film,
+   whether the writing in each of the four scenes is light on dim scenery ("dark") or dark on bright scenery ("light"),
+   and, if the picture needs it, another place for Nawala on a step).
+   The four scenes keep the names of the first kit: sky (cover), treetops (greeting and couple), branches (events and gallery),
+   boulder (RSVP to closing). */
+(function () {
+  var KITS = {
+    'umum': { name: ['Tema Umum Nawala', 'General Nawala theme'], gate: '../assets/img/plate-arch-mobile-sm.webp', bar: '#16301F',
+      film: { src: '../assets/video/umum-opening.mp4', rate: 1.2 } },
+    'pendopo-jawa': { name: ['Pendopo Jawa', 'Pendopo Jawa'], gate: '../assets/img/plate-pendopo-jawa-gate.webp', bar: '#2A1A0E',
+      film: { src: '../assets/video/pendopo-jawa-opening.mp4', rate: 1.2 },
+      tones: { sky: 'light', treetops: 'dark', branches: 'dark', boulder: 'light' },
+      nw: { sampul: 'fly:.5,.44,1.25' } },
+    'akad-putih': { name: ['Akad Putih', 'Akad Putih'], gate: '../assets/img/plate-akad-putih-gate.webp', bar: '#3A372F',
+      film: { src: '../assets/video/akad-putih-opening.mp4', rate: 1.2 },
+      tones: { sky: 'light', treetops: 'light', branches: 'dark', boulder: 'light' } }
+  };
+  var D = window.NAWALA_INVITE || {}, want = '';
+  try { want = (new URLSearchParams(location.search).get('tema') || '').toLowerCase(); } catch (e) {}
+  var id = (D.sample && KITS[want]) ? want : (KITS[D.theme] ? D.theme : 'umum'), kit = KITS[id];
+  kit.id = id; window.NAWALA_KITS = KITS; window.NAWALA_KIT = kit;
+  var el = document.documentElement; el.className = 'js'; el.setAttribute('data-kit', id);
+  document.write('<link rel="preload" as="image" href="' + kit.gate + '"><link rel="stylesheet" href="theme-' + id + '.css">');
+  var bar = document.querySelector('meta[name="theme-color"]'); if (bar) bar.content = kit.bar;
+})();
+</script>
+<noscript><link rel="stylesheet" href="theme-umum.css"></noscript>
 </head>
 <body>
 
@@ -352,6 +379,13 @@
       <button type="button" data-v="3" data-en="Max">Maksimal</button>
     </div>
   </div>
+  <div class="field"><span data-en="World">Dunia</span>
+    <div class="seg" id="seg-kit">
+      <button type="button" data-v="umum">Nawala</button>
+      <button type="button" data-v="pendopo-jawa">Pendopo Jawa</button>
+      <button type="button" data-v="akad-putih">Akad Putih</button>
+    </div>
+  </div>
   <div class="field"><span data-en="Wording">Kata-kata</span>
     <div class="seg" id="seg-word">
       <button type="button" data-v="umum" data-en="General">Umum</button>
@@ -369,7 +403,6 @@
 
 <audio id="audio" loop preload="none"></audio>
 
-<script src="couple-laras-bima.js"></script>
 <script src="invite.js"></script>
 </body>
 </html>

@@ -1,0 +1,62 @@
+/* Theme kit: Akad Putih.
+   A white house for the ceremony: through the draped arch into the marble courtyard and its pool, along the hall of arches,
+   to the ceremony setting among lanterns at dusk, and out to the white rose garden.
+   Same contract as theme-umum.css: tokens, the picture behind the opening, four scenes (their pictures, front layers,
+   tones, shade and the light that brings each one in) and the ornaments. The four scene slots keep the first kit's names:
+   sky = cover, treetops = greeting and couple, branches = events and gallery, boulder = RSVP to closing.
+   Front layers here are the lower part of each picture with a soft fade at the top, so nothing ends in a hard line.
+   Pictures: Higgsfield, 21 Nov 2026 (job numbers in CLAUDE.md). Needs the owner's cultural review. */
+
+:root{
+  --ink:#2B2A26; --deep:#1E1D1A; --main:#3A372F; --soft:#7C8A6A;
+  --paper:#FCFAF5; --mist:#F4F1EA;
+  --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6; --light:#E3C27A;
+  --plate-gate:url("../assets/img/plate-akad-putih-gate.webp");
+  --gate-shade:linear-gradient(180deg,rgba(252,250,245,.72) 0,rgba(252,250,245,.3) 22%,rgba(252,250,245,0) 36%,rgba(46,42,36,0) 60%,rgba(46,42,36,.82) 100%);
+  --nw-flap:url("../assets/img/nw-flap.webp");
+  --backdrop:url("../assets/img/plate-akad-putih-aula.webp"); --bar-rgb:46,44,38; --backdrop-veil:rgba(30,29,26,.68);
+}
+
+[data-scene="sky"]{--plate:url("../assets/img/plate-akad-putih-halaman.webp");--fg:url("../assets/img/fg-akad-putih-halaman.webp");--tone:#CFDAE9;
+  --veil:#EEF1F4;--rim:rgba(170,205,235,.85);--g1:rgba(255,236,200,.78);--g2:rgba(190,215,235,.3)}
+[data-scene="treetops"]{--plate:url("../assets/img/plate-akad-putih-aula.webp");--fg:url("../assets/img/fg-akad-putih-aula.webp");--tone:#CDC8C1;
+  --shade:linear-gradient(180deg,rgba(58,55,47,.08) 0,rgba(58,55,47,.2) 45%,rgba(58,55,47,.18));
+  --veil:#F6F3EC;--rim:#FFF3D6;--g1:rgba(255,232,190,.82);--g2:rgba(230,220,200,.4)}
+[data-scene="branches"]{--plate:url("../assets/img/plate-akad-putih-akad.webp");--fg:url("../assets/img/fg-akad-putih-akad.webp");--tone:#605B57;
+  --shade:linear-gradient(180deg,rgba(24,22,20,.42) 0,rgba(24,22,20,.4) 50%,rgba(24,22,20,.3));
+  --veil:#1D1B1A;--rim:#FFDFA6;--g1:rgba(246,190,100,.8);--g2:rgba(120,110,100,.45)}
+[data-scene="boulder"]{--plate:url("../assets/img/plate-akad-putih-taman.webp");--fg:url("../assets/img/fg-akad-putih-taman.webp");--tone:#EFEDEC;
+  --veil:#F3F3EC;--rim:#EAF3D8;--g1:rgba(215,232,190,.85);--g2:rgba(255,228,170,.45)}
+
+/* where each front layer has become solid (share of the picture's height) */
+.world{--fg-line:.79}
+/* a front layer here is the picture itself, so it moves exactly with the picture (no separate depth) and can never show a double edge */
+.front{transform-origin:50% 62%;transform:scale(var(--cam,1))}
+
+/* the doves keep to the open sky above the courtyard */
+.k-dove{margin-top:-57%}
+
+/* doves cross the sky */
+.k-dove{left:0;top:var(--y);width:calc(52px * var(--s,1));aspect-ratio:160/150;overflow:hidden;animation:k-cross var(--t,34s) linear var(--d,0s) infinite;will-change:transform}
+.k-dove::before{content:"";position:absolute;left:0;top:0;width:400%;height:100%;background:url("../assets/img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:k-wing .44s steps(4) infinite}
+@keyframes k-wing{to{transform:translate3d(-100%,0,0)}}
+@keyframes k-cross{from{transform:translate3d(-90px,0,0)}to{transform:translate3d(620px,-70px,0)}}
+
+/* fireflies among the branches */
+.k-fly{left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 10px 3px rgba(246,196,69,.55);opacity:0;animation:k-glow var(--t,5s) ease-in-out var(--d,0s) infinite}
+@keyframes k-glow{0%,100%{opacity:0;transform:translate3d(0,0,0)}40%{opacity:.95}70%{opacity:.5;transform:translate3d(14px,-26px,0)}}
+
+/* butterflies over the flower hill */
+.k-bfly{left:var(--x);top:var(--y);width:calc(30px * var(--s,1));aspect-ratio:1;animation:k-wander var(--t,15s) ease-in-out var(--d,0s) infinite alternate;will-change:transform}
+.k-bfly::before{content:"";position:absolute;inset:0;background:url("../assets/img/fx-butterflies.webp") calc(var(--n,0) * 100% / 7) 0/800% 100% no-repeat;animation:k-flutter .26s ease-in-out infinite alternate}
+@keyframes k-flutter{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+@keyframes k-wander{0%{transform:translate3d(0,0,0) rotate(-8deg)}25%{transform:translate3d(26px,-34px,0) rotate(12deg)}50%{transform:translate3d(-14px,-62px,0) rotate(-5deg)}75%{transform:translate3d(30px,-20px,0) rotate(14deg)}100%{transform:translate3d(-20px,18px,0) rotate(-10deg)}}
+
+/* gallery frames: Nawala as bride and groom, set into this world's own scenery */
+.is-near .shot[data-plate="sky"]{background-image:url("../assets/img/plate-akad-putih-halaman.webp");background-position:50% 55%}
+.is-near .shot[data-plate="arch"]{background-image:url("../assets/img/plate-akad-putih-gate.webp");background-position:50% 45%}
+.is-near .shot[data-plate="treetops"]{background-image:url("../assets/img/plate-akad-putih-aula.webp");background-position:50% 40%}
+.is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-akad-putih-akad.webp");background-position:50% 60%}
+.is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-akad-putih-taman.webp");background-position:50% 70%}
+.is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-akad-putih-taman.webp");background-position:50% 100%;background-size:210%}
+.shot[data-plate="branches"]{--shot-veil:radial-gradient(60% 50% at 50% 55%,rgba(246,196,69,.2),rgba(246,196,69,0))}

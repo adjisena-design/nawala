@@ -3,7 +3,7 @@
    Laras & Bima are Nawala's sample couple: every name, date, place and number here is an illustration. */
 window.NAWALA_INVITE = {
   sample: true,                 // shows the "Contoh" review button and the note at the end
-  theme: 'umum',                // theme kit: theme-umum.css
+  theme: 'umum',                // theme kit: umum, pendopo-jawa or akad-putih (theme-<id>.css; the kit brings its own opening film)
   level: 3,                     // 1 Dasar, 2 Menengah, 3 Maksimal
   wording: 'umum',              // 'umum' (neutral) or 'islam'
   whatsapp: '6281379211628',    // RSVP answers are sent here until the database exists
@@ -46,10 +46,6 @@ window.NAWALA_INVITE = {
     { name: 'Keluarga Santoso', text: ['Turut berbahagia. Sampai bertemu di hari bahagia.', 'So happy for you. See you on the happy day.'] },
     { name: 'Raka dan Tia', text: ['Akhirnya. Kami menunggu undangan ini sejak 2019.', 'At last. We have been waiting for this invitation since 2019.'] }
   ],
-
-  /* the kit's opening film: through the arch into the sky (720 px wide, about 0.75 MB, silent).
-     Played after the seal opens, only if it is ready by then; otherwise the still arch zooms. */
-  film: { src: '../assets/video/umum-opening.mp4', rate: 1.2 },
 
   /* the kit's own instrumental (60 s, loops, about 0.7 MB) */
   music: { src: '../assets/audio/nawala-umum.mp3' }

@@ -8,6 +8,8 @@
   'use strict';
 
   var D = window.NAWALA_INVITE;
+  var KIT = window.NAWALA_KIT || {};          /* the theme kit chosen in the head of the page */
+  var FILM = KIT.film || D.film || null;      /* the kit's opening film */
   if (!D) return;
 
   var root = document.documentElement;
@@ -334,6 +336,15 @@
      The walk: one swipe, one step
      ===================================================================== */
   var stage = $('#stage'), stepsBox = $('#steps'), nw = $('#nw'), sweepEl = $('#sweep'), nextBtn = $('#next');
+  /* a kit may say, per scene, whether the writing is light or dark; without that the page's own tones stay */
+  function tones() {
+    if (!KIT.tones) return;
+    var set = function (el) { var t = KIT.tones[el.getAttribute('data-scene')]; if (t) el.setAttribute('data-tone', t); };
+    $$('.step[data-scene]').forEach(set);
+    var tpl = $('#event-step'); if (tpl && tpl.content) $$('.step[data-scene]', tpl.content).forEach(set);
+  }
+  tones();
+  Object.keys(KIT.nw || {}).forEach(function (id) { var el = document.getElementById(id); if (el) el.setAttribute('data-nw', KIT.nw[id]); });
   var worlds = {}, fronts = {};
   $$('.world').forEach(function (w) { worlds[w.getAttribute('data-scene')] = w; });
   $$('.front').forEach(function (f) { fronts[f.getAttribute('data-scene')] = f; });
@@ -565,7 +576,7 @@
   /* =====================================================================
      The opening
      ===================================================================== */
-  var gate = $('#gate'), film = $('#film'), opening = false, entered = false, filmDead = !D.film, filmTried = false;
+  var gate = $('#gate'), film = $('#film'), opening = false, entered = false, filmDead = !FILM, filmTried = false;
   var HEART = 'M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z';
   function hearts(box) {
     for (var i = 0; i < 9; i++) {
@@ -583,10 +594,10 @@
   /* the film is fetched quietly once the first screen is complete; it is only played if it is ready at the tap */
   function primeFilm() {
     if (filmDead || thrifty || reduced) return;
-    film.preload = 'auto'; film.src = D.film.src; film.load();
+    film.preload = 'auto'; film.src = FILM.src; film.load();
   }
   film.addEventListener('error', function () {
-    if (!filmTried && D.film && D.film.fallback) { filmTried = true; film.src = D.film.fallback; film.load(); }
+    if (!filmTried && FILM && FILM.fallback) { filmTried = true; film.src = FILM.fallback; film.load(); }
     else filmDead = true;
   });
 
@@ -609,7 +620,7 @@
     gate.classList.add('is-turn');
     setTimeout(function () { gate.classList.add('is-open'); }, 900);
     setTimeout(function () {
-      var rate = (D.film && D.film.rate) || 1.2;
+      var rate = (FILM && FILM.rate) || 1.2;
       if (!filmDead && film.readyState >= 3) {
         gate.classList.add('is-film');
         film.playbackRate = rate;
@@ -651,6 +662,12 @@
   $('#seg-word').addEventListener('click', function (e) {
     var v = e.target.getAttribute('data-v'); if (!v) return;
     state.wording = v; wording(); relabel(); press(); settle();
+  });
+  $$('#seg-kit button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === (KIT.id || 'umum'))); });
+  $('#seg-kit').addEventListener('click', function (e) {
+    var v = e.target.getAttribute('data-v'); if (!v || v === KIT.id) return;
+    var q; try { q = new URLSearchParams(location.search); } catch (err) { return; }
+    q.set('tema', v); q.delete('step'); location.search = '?' + q.toString();
   });
   $('#sheet-guest').addEventListener('input', function (e) { setGuest(e.target.value); if (!nameIn.value || nameIn.dataset.auto) { nameIn.value = state.guest; nameIn.dataset.auto = '1'; refresh(); } });
   $('#sheet-x').addEventListener('click', function () { sheet.close(); });

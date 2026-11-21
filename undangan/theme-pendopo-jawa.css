@@ -1,0 +1,72 @@
+/* Theme kit: Pendopo Jawa.
+   A Javanese house at dusk: through the carved teak gate into the courtyard, under the pendopo and its brass lamps,
+   past the carved wall and its oil lamps, out to the garden and its lily pond in the morning mist.
+   Same contract as theme-umum.css: tokens, the picture behind the opening, four scenes (their pictures, front layers,
+   tones, shade and the light that brings each one in) and the ornaments. The four scene slots keep the first kit's names:
+   sky = cover, treetops = greeting and couple, branches = events and gallery, boulder = RSVP to closing.
+   Front layers here are the lower part of each picture with a soft fade at the top, so nothing ends in a hard line.
+   Pictures: Higgsfield, 21 Nov 2026 (job numbers in CLAUDE.md). Needs the owner's cultural review. */
+
+:root{
+  --ink:#2A1C12; --deep:#160D07; --main:#3B2413; --soft:#9A6B2F;
+  --paper:#FBF3E4; --mist:#F3E8D6;
+  --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6; --light:#F2B84B;
+  --plate-gate:url("../assets/img/plate-pendopo-jawa-gate.webp");
+  --gate-ink:#FBF3E4;
+  --gate-shade:linear-gradient(180deg,rgba(22,13,7,.78) 0,rgba(22,13,7,.3) 24%,rgba(22,13,7,0) 40%,rgba(22,13,7,0) 60%,rgba(22,13,7,.88) 100%);
+  --nw-flap:url("../assets/img/nw-flap.webp");
+  --backdrop:url("../assets/img/plate-pendopo-jawa-pendopo.webp"); --bar-rgb:34,21,12; --backdrop-veil:rgba(22,13,7,.72);
+}
+
+[data-scene="sky"]{--plate:url("../assets/img/plate-pendopo-jawa-halaman.webp");--fg:url("../assets/img/fg-pendopo-jawa-halaman.webp");--tone:#DAC8B1;
+  --veil:#F1E3CF;--rim:rgba(255,214,150,.85);--g1:rgba(248,190,90,.72);--g2:rgba(255,140,84,.26)}
+[data-scene="treetops"]{--plate:url("../assets/img/plate-pendopo-jawa-pendopo.webp");--fg:url("../assets/img/fg-pendopo-jawa-pendopo.webp");--tone:#52371F;
+  --shade:linear-gradient(180deg,rgba(22,13,7,.2) 0,rgba(22,13,7,.5) 45%,rgba(22,13,7,.5));
+  --veil:#1C120A;--rim:#FFE2A8;--g1:rgba(240,170,70,.85);--g2:rgba(170,90,40,.4)}
+[data-scene="branches"]{--plate:url("../assets/img/plate-pendopo-jawa-ukiran.webp");--fg:url("../assets/img/fg-pendopo-jawa-ukiran.webp");--tone:#28190D;
+  --shade:rgba(22,13,7,.24);
+  --veil:#160E08;--rim:#FFD98A;--g1:rgba(246,180,69,.8);--g2:rgba(150,70,40,.5)}
+[data-scene="boulder"]{--plate:url("../assets/img/plate-pendopo-jawa-taman.webp");--fg:url("../assets/img/fg-pendopo-jawa-taman.webp");--tone:#E9ECE6;
+  --veil:#EEF0EA;--rim:#E4F2D0;--g1:rgba(200,225,170,.85);--g2:rgba(246,196,69,.4)}
+
+/* where each front layer has become solid (share of the picture's height) */
+.world{--fg-line:.79}
+/* a front layer here is the picture itself, so it moves exactly with the picture (no separate depth) and can never show a double edge */
+.front{transform-origin:50% 62%;transform:scale(var(--cam,1))}
+
+/* the names on the opening stand on the dark roof */
+.gate__head h1 i{color:var(--accent-soft)}
+/* the cover's names stay on one line, so the date is read on the sky and not on the roof */
+.cover h1{font-size:clamp(2.2rem,11.5vw,3.1rem);line-height:1.05;text-wrap:balance}
+.cover h1 span,.cover h1 i{display:inline}
+.cover h1 i{font-size:.8em;margin:0 .2em}
+.cover__date{margin-top:.55rem}
+/* the guest's name on the cover stands on the courtyard stones, clear of the frangipani in front */
+.cover__to{margin-bottom:calc(var(--sh,100vh) * .055)}
+/* the doves keep to the open sky above the roof */
+.k-dove{margin-top:-57%}
+
+/* doves cross the sky */
+.k-dove{left:0;top:var(--y);width:calc(52px * var(--s,1));aspect-ratio:160/150;overflow:hidden;animation:k-cross var(--t,34s) linear var(--d,0s) infinite;will-change:transform}
+.k-dove::before{content:"";position:absolute;left:0;top:0;width:400%;height:100%;background:url("../assets/img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:k-wing .44s steps(4) infinite}
+@keyframes k-wing{to{transform:translate3d(-100%,0,0)}}
+@keyframes k-cross{from{transform:translate3d(-90px,0,0)}to{transform:translate3d(620px,-70px,0)}}
+
+/* fireflies among the branches */
+.k-fly{left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 10px 3px rgba(246,196,69,.55);opacity:0;animation:k-glow var(--t,5s) ease-in-out var(--d,0s) infinite}
+@keyframes k-glow{0%,100%{opacity:0;transform:translate3d(0,0,0)}40%{opacity:.95}70%{opacity:.5;transform:translate3d(14px,-26px,0)}}
+
+/* butterflies over the flower hill */
+.k-bfly{left:var(--x);top:var(--y);width:calc(30px * var(--s,1));aspect-ratio:1;animation:k-wander var(--t,15s) ease-in-out var(--d,0s) infinite alternate;will-change:transform}
+.k-bfly::before{content:"";position:absolute;inset:0;background:url("../assets/img/fx-butterflies.webp") calc(var(--n,0) * 100% / 7) 0/800% 100% no-repeat;animation:k-flutter .26s ease-in-out infinite alternate}
+@keyframes k-flutter{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+@keyframes k-wander{0%{transform:translate3d(0,0,0) rotate(-8deg)}25%{transform:translate3d(26px,-34px,0) rotate(12deg)}50%{transform:translate3d(-14px,-62px,0) rotate(-5deg)}75%{transform:translate3d(30px,-20px,0) rotate(14deg)}100%{transform:translate3d(-20px,18px,0) rotate(-10deg)}}
+
+/* gallery frames: Nawala as bride and groom, set into this world's own scenery */
+.is-near .shot[data-plate="sky"]{background-image:url("../assets/img/plate-pendopo-jawa-halaman.webp");background-position:50% 38%}
+.is-near .shot[data-plate="arch"]{background-image:url("../assets/img/plate-pendopo-jawa-gate.webp");background-position:50% 42%}
+.is-near .shot[data-plate="treetops"]{background-image:url("../assets/img/plate-pendopo-jawa-pendopo.webp");background-position:50% 30%}
+.is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-pendopo-jawa-ukiran.webp");background-position:50% 48%}
+.is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-pendopo-jawa-taman.webp");background-position:50% 80%}
+.is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-pendopo-jawa-taman.webp");background-position:50% 100%;background-size:210%}
+.shot[data-plate="branches"]{--shot-veil:radial-gradient(60% 50% at 50% 55%,rgba(246,196,69,.26),rgba(246,196,69,0))}

@@ -32,9 +32,11 @@
   /* Four tiers (owner, 21 Nov 2026). Dasar: the familiar scroll invitation: one real picture, readable cards, frames
      for the couple's photos. Premium: an immersive world: opening film, glass panels standing in the scenery, one swipe
      one step. Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
+  /* Premium worlds that already have a working sample invitation (undangan/?tema=<slug>). Add a slug when its kit is built. */
+  var BUILT = ' pendopo-jawa akad-putih ';
   var TIERS = {
     dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar nyata, kartu yang mudah dibaca, dan bingkai untuk foto kalian. Kedua belas contohnya sudah bisa dibuka.', 'The familiar scroll invitation: one real picture, cards that read easily, and frames for your photos. All twelve samples can be opened.'],
-    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala sudah bisa dibuka; 28 dunia ini kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme can be opened now; these 28 worlds are being built one by one.'],
+    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, dan Akad Putih sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa and Akad Putih can be opened now; the other worlds are being built one by one.'],
     eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
   };
@@ -532,9 +534,9 @@
       coverEl.style.backgroundImage = 'url(' + cover(th) + ')';
       $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (th[5] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
       $('#detail-name').textContent = t(th[1], th[2]);
-      var ready = th[0] === 'dasar', openEl = $('#detail-open');
+      var world = BUILT.indexOf(' ' + slug(th) + ' ') > -1, ready = th[0] === 'dasar' || world, openEl = $('#detail-open');
       $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + (ready ? t('Undangan contohnya sudah bisa dibuka.', 'Its sample invitation is ready to open.') : t('Ini adegan pembukanya. Halaman undangan di baliknya masih kami kerjakan.', 'This is its opening scene. The invitation pages behind it are still being built.'));
-      openEl.hidden = !ready; if (ready) openEl.href = 'undangan/dasar.html?tema=' + slug(th) + '&to=Bapak+dan+Ibu+Santoso';
+      openEl.hidden = !ready; if (ready) openEl.href = (world ? 'undangan/?tema=' : 'undangan/dasar.html?tema=') + slug(th) + '&to=Bapak+dan+Ibu+Santoso';
       one.hidden = !isX;
       one.textContent = owned ? t('Tema ini sudah dimiliki satu pasangan dan tidak dijual lagi.', 'This theme already belongs to a couple and is no longer for sale.')
         : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');
