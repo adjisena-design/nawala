@@ -47,18 +47,10 @@ window.NAWALA_INVITE = {
     { name: 'Raka dan Tia', text: ['Akhirnya. Kami menunggu undangan ini sejak 2019.', 'At last. We have been waiting for this invitation since 2019.'] }
   ],
 
-  /* the kit's opening film: through the arch into the sky. Played after the seal opens, only if it is ready by then.
-     Until the 720 px file is in the repository, the opening falls back to the still zoom; the second address is the
-     10.8 MB original on Higgsfield, used only with ?film=1 for the owner's review. */
-  film: {
-    src: '../assets/video/umum-opening.mp4',
-    fallback: 'https://d8j0ntlcm91z4.cloudfront.net/user_3DF57pZt4ISNBty2LK7mc8uNf0y/hf_20261121_031720_0e8abc71-5e02-4b65-ab66-900a5c3eda24.mp4',
-    rate: 1.2
-  },
+  /* the kit's opening film: through the arch into the sky (720 px wide, about 0.75 MB, silent).
+     Played after the seal opens, only if it is ready by then; otherwise the still arch zooms. */
+  film: { src: '../assets/video/umum-opening.mp4', rate: 1.2 },
 
-  /* the kit's own instrumental; the second address is used until the file is in the repository */
-  music: {
-    src: '../assets/audio/nawala-umum.mp3',
-    fallback: 'https://d8j0ntlcm91z4.cloudfront.net/user_3DF57pZt4ISNBty2LK7mc8uNf0y/hf_20261121_024349_baeb642f-d452-4ef1-a05e-34c308d5f950.mp3'
-  }
+  /* the kit's own instrumental (60 s, loops, about 0.7 MB) */
+  music: { src: '../assets/audio/nawala-umum.mp3' }
 };

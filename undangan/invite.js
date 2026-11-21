@@ -3,7 +3,7 @@
    the opening with the guest's name and its film, then a guided walk of steps (one swipe, one step) with a
    travelling Nawala and a band of light between scenes; wording sets, events, countdown, calendar, gallery,
    RSVP by WhatsApp, wishes, digital envelope, music, language and the three levels.
-   Link options: ?to=Nama+Tamu  ?lang=en  ?level=1|2|3  ?salam=umum|islam  ?step=<id>  ?film=1 (owner's review of the film) */
+   Link options: ?to=Nama+Tamu  ?lang=en  ?level=1|2|3  ?salam=umum|islam  ?step=<id> */
 (function () {
   'use strict';
 
@@ -586,8 +586,7 @@
     film.preload = 'auto'; film.src = D.film.src; film.load();
   }
   film.addEventListener('error', function () {
-    /* the stand-in address is the 10.8 MB original: only for the owner's review (?film=1), never for guests */
-    if (!filmTried && D.film && D.film.fallback && params.film === '1') { filmTried = true; film.src = D.film.fallback; film.load(); }
+    if (!filmTried && D.film && D.film.fallback) { filmTried = true; film.src = D.film.fallback; film.load(); }
     else filmDead = true;
   });
 
