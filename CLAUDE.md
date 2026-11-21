@@ -9,7 +9,7 @@ Home page for Nawala, a digital wedding invitation business in Indonesia. Static
 - No emojis anywhere. No real or generated human faces: Nawala (the winged letter) stands in for the couple.
 - Site copy is Indonesian first with an English toggle. Every visible string carries `data-en`; the script swaps it. Strings built in `site.js` go through `t(id, en)`.
 - Nothing thin and nothing tiny: body text 17px or larger, touch targets 44px or larger.
-- Do not invent evidence. There are no customers, testimonials or prices yet. The 50 theme covers and 20 sample films are real. Working invitations exist for the General Nawala theme (Premium) and the 12 Dasar themes; the 28 Premium and 10 Eksklusif covers still have no invitation behind them, and the page says so. No theme is marked as owned until a couple has really bought it. The log-in box says plainly that codes cannot be checked yet.
+- Do not invent evidence. There are no customers, testimonials or prices yet. The 50 theme covers and 20 sample films are real. Working invitations exist for the General Nawala theme (Premium) and the 12 Dasar themes; the 28 Premium and 10 Eksklusif covers still have no invitation behind them, and the page says so. No theme is marked as owned until a couple has really bought it. The log-in box checks codes against the database; if the check cannot be reached it says so and offers WhatsApp.
 - Higgsfield credits (owner, 21 Nov 2026): spend down to 500 remaining, then stop and ask; after his yes, down to 200 remaining, then stop.
 
 ## Look
@@ -39,10 +39,10 @@ Parts:
 - `.themes`: `.river` is built by script from every theme (covers drift diagonally, cannot be touched). The panel has four tier doors; each opens `dialog#pop-themes` on that tab.
   - Tiers (data at the top of `site.js`): `BASIC` (Dasar, 12), `THEMES` (Premium, 28 in seven families), `EXCLUSIVE` (Eksklusif, 10), and Kustom, which is a four-step process with its own WhatsApp message. `ALL` is the combined list.
   - Detail view: cover, "Putar film" when the slug is in `FILMS` (`assets/video/<slug>.mp4`, 720 px wide, silent, about 0.1 to 1 MB), the sample couple, "Gunakan tema ini".
-  - Films only ever start from a tap, and are not offered on Save-Data or 2G/3G. Exclusive films need an access code; `?film=1` unlocks them for the owner's review (remove when log-in is connected).
+  - Films only ever start from a tap, and are not offered on Save-Data or 2G/3G. Exclusive films need an access code; `?film=1` still unlocks them for the owner's review: log-in is connected since 21 Nov 2026, but there is no console yet to issue him a code, so remove the switch once he has one.
   - Exclusive themes are sold to one couple. Add the slug to `OWNED` after a real sale: the card is marked "Sudah dimiliki" and can no longer be chosen. It is empty on purpose.
   - "Gunakan tema ini" carries the choice into the contact box; the end of each list asks for a WhatsApp registration.
-- `dialog#pop-login`: access code only. Not connected until the Nawala database exists.
+- `dialog#pop-login`: access code only. Connected since 21 Nov 2026: it calls `check_access_code` and, on yes, keeps the code in `sessionStorage` (`nawala-code`), which opens the Exclusive films.
 - `.contact`: one box, three questions (name, wedding month and year, WhatsApp number), then an animated tick. `.pair` is bride and groom Nawala: they hop toward each other, then keep playing on an 8 second loop (blush, jump, turn white, circle each other, blush again).
 - Sections get `.is-live` while on or near the screen (creatures and light only move then) and `.is-near` once close (background pictures, masks and the river load then).
 
@@ -50,9 +50,11 @@ Scroll effects read two CSS variables that `site.js` sets on every `[data-scroll
 
 ## Contact box and data
 - `CONFIG` at the top of `site.js` holds the WhatsApp number and the Supabase URL and publishable key.
-- While the Supabase values are empty, the box hands the three answers (and the chosen theme) to WhatsApp as a pre-filled message. Once they are filled, it inserts a row into `public.leads` and falls back to WhatsApp only if that fails. The chosen theme travels in `source` (40 characters at most).
-- `supabase/migrations/20261120_leads.sql` creates the table: visitors may insert, nobody outside the team may read. It must go into a Nawala-owned Supabase organization, never the IEEF one. The owner will create it under a new dedicated Nawala email, as a separate batch of work.
-- Log-in will need an RPC `check_access_code(code text) returns boolean`; `site.js` already calls it when the config is filled.
+- The values are filled since 21 Nov 2026 (project `erwddnobnagpglkpvdfm`, Singapore, free plan, in the organization owned by adjisena@nawalainvite.com). The box inserts a row into `public.leads` and falls back to WhatsApp (the three answers and the chosen theme as a pre-filled message) only if that fails or the values are emptied. The chosen theme travels in `source` (40 characters at most).
+- `supabase/migrations/20261120_leads.sql` creates the table: visitors may insert, nobody outside the team may read. Both migrations were run by hand in the dashboard's SQL editor on 21 Nov 2026 (there is no CLI link or connector to this project yet), then checked from a browser with the publishable key: insert 201, read refused, a made-up code false, a real code true; the test rows were removed. It lives in a Nawala-owned Supabase organization, never the IEEF one.
+- Only the publishable key belongs in this repository. The secret key and the database password never do.
+- `supabase/migrations/20261121_access_codes.sql` adds `check_access_code(code text) returns boolean` (security definer; visitors get yes or no and can never list codes). A code is `leads.access_token`: capitals, digits and dashes, 4 to 24 characters in the database, but the log-in box only takes 16, so keep codes to 16 or fewer. Until a console exists, a code is issued by writing `access_token` on the lead's row in the dashboard. Nothing limits guessing yet, so codes should be long and random, not `NAWALA-0001`.
+- Not connected yet: invitation RSVP and wishes (still WhatsApp), and any console. No console exists in this repository.
 
 ## Assets
 - `assets/img/plate-<scene>-<format>[-sm].webp`: scenery without Nawala (sky, arch, treetops, branches, boulder; desktop 2400 and 1440 wide, mobile 1080 and 720 wide).

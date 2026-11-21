@@ -5,11 +5,12 @@
 
   var CONFIG = {
     whatsapp: '6281379211628',
-    // Fill these two in once the Nawala Supabase project exists (see supabase/migrations).
-    // While they are empty, the contact box hands the three answers to WhatsApp instead,
-    // and the log-in box says plainly that codes cannot be checked here yet.
-    supabaseUrl: '',
-    supabaseKey: ''
+    // The Nawala Supabase project (organization under adjisena@nawalainvite.com, Singapore), connected 21 Nov 2026.
+    // The key is the publishable one: it is meant to be public, and row level security decides what it may do
+    // (add a lead, ask whether an access code exists; nothing can be read). See supabase/migrations.
+    // If either value is emptied, or a request fails, the contact box and the log-in box fall back to WhatsApp.
+    supabaseUrl: 'https://erwddnobnagpglkpvdfm.supabase.co',
+    supabaseKey: 'sb_publishable_S1QUgptDBKUYn_yn0lPc0A_9hVsKwQe'
   };
 
   /* The first themes: seven families, four directions each. Covers are colour fields until they are painted. */
@@ -588,7 +589,7 @@
     });
     afterLang.push(function () { if (builtFor && builtFor !== tier + lang) { var v = viewing; build(); if (v > -1) showDetail(v); } });
 
-    /* log in with an access code. Codes live in the Nawala database, which is not connected yet. */
+    /* log in with an access code. Codes live in the Nawala database (leads.access_token); the page may only ask yes or no. */
     var form = $('#login-form'), code = $('#login-code'), msg = $('#login-msg');
     function say(html) { msg.innerHTML = html; msg.hidden = false; }
     form.addEventListener('submit', function (e) {
