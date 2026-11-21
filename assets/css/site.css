@@ -195,9 +195,9 @@ main{overflow-x:clip}
 
 /* ---------- The sweep: a soft band of light that carries one section into the next ---------- */
 .sweep{position:absolute;z-index:6;left:0;right:0;bottom:calc(100% - 1px);height:58vh;pointer-events:none;transform-origin:50% 100%;
-  transform:translate3d(0,15vh,0) scaleY(.3);transition:transform 1.25s cubic-bezier(.22,.8,.25,1);will-change:transform;
+  transform:scaleY(.24);transition:transform 1.25s cubic-bezier(.22,.8,.25,1);will-change:transform;
   --r2:rgba(176,255,226,.26);--r3:rgba(255,170,214,.2)}
-/* the light no longer follows the finger: it rises in one movement once its section starts to come in */
+/* the light no longer follows the finger. At rest a low band of it already lies on the seam, so no picture ever ends in a hard edge; it rises in one movement once its section starts to come in */
 .is-rise > .sweep{transform:none}
 /* Not one perfect arch: four swells of different widths lean and breathe on their own clocks, like a lava lamp
    made of light. The glows (i) are drawn first and the fills (s) on top, in step with them, so only the outer
