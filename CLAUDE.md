@@ -63,3 +63,24 @@ Scroll effects read two CSS variables that `site.js` sets on every `[data-scroll
 
 ## Check before pushing
 Open `index.html` through any static server and look at 1440x900 and 390x844: hero and the menu morph, each sweep, each about step, the services swap, the theme river and both pop-ups, the full contact flow in both languages, and reduced motion.
+
+## The invitation (`undangan/`), since 21 Nov 2026
+The first working invitation: Laras & Bima in the General Nawala theme, at `undangan/` (live path `/nawala/undangan/?to=Nama+Tamu`). The home page links to it from the first service card. The 50 theme covers still have no invitation pages of their own.
+
+Four parts, so that a new theme or a new couple is one new file each:
+- `skeleton.css`: the structure shared by every theme. Opening (`.gate`), scenes with scenery that stays while content travels over it (`.scene__plate` is sticky, `.scene__body` is pulled up over it), ivory cards, countdown, gallery, RSVP form, wishes, digital envelope, bottom bar, floating buttons.
+- `theme-umum.css`: one theme kit. Only tokens, scenery (`--plate` per scene, `--plate-gate`) and ornaments (doves, fireflies, butterflies, gallery frames). A new theme is a new `theme-<name>.css`.
+- `couple-laras-bima.js`: one invitation. Names, date, events, story, gifts, sample wishes, `theme`, `level`, `wording`, `whatsapp`, `music`. Guest-facing text is `[Indonesian, English]`.
+- `invite.js`: the engine. Fills the page from the couple file, runs the opening, countdown, calendar link, lightbox, RSVP, music, language and levels.
+
+Rules specific to the invitation:
+- Opening: Nawala arrives showing the address side with the guest's name on a label (`?to=`), turns over to the seal, opens, and the page passes through the arch into the sky. Music starts on that same tap (never before), and not at all on Save-Data or 2G.
+- Levels (the owner's three-level skeleton; names and contents are drafts): 1 Dasar = opening, cover, greeting, couple, events, countdown, map, RSVP, closing. 2 Menengah adds music, calendar button, gallery, wishes, digital envelope. 3 Maksimal adds story, dress colours, live stream. Blocks carry `data-level`; `html[data-lv]` hides what is above the chosen level. One build, sections switched off.
+- Wording sets live in `WORDING` in `invite.js`: `umum` (neutral) and `islam` (salam, Ar-Rum 21, akad nikah). Chosen per couple. The religious wording still needs the owner's review.
+- RSVP has no database yet: the send button is a plain WhatsApp link whose message is rewritten as the guest types. The page never says an answer was sent, only that it is written out in WhatsApp. A guest's own wish is kept on their phone and shown as "dari Anda". Sample wishes are tagged "contoh".
+- No human faces: bride and groom Nawala stand in for the couple, and the six gallery frames are the cut-outs set into the scenery with CSS. Real couples' photos replace them later.
+- Sample invitations (`sample: true`) show a "Contoh" button that opens a review sheet (level, wording, guest name, replay the opening) and a note at the end saying everything is an illustration. Real invitations show neither.
+- Review links: `?to=`, `?lang=en`, `?level=1|2|3`, `?salam=umum|islam`.
+- Music: `assets/audio/nawala-umum.mp3` is the kit's instrumental (generated on Higgsfield with ElevenLabs Music v2.5, job `baeb642f-d452-4ef1-a05e-34c308d5f950`, 60 s). The file is not in the repository yet; until it is, the page falls back to the Higgsfield address in the couple file. Put the file in and remove the fallback.
+- Weight (measured 21 Nov 2026, phone size, before server compression): about 580 KB when the opening is ready, about 910 KB for the whole invitation, 22 files. The scenery below the cover starts loading only after the first screen is complete, and gallery pictures only when their scene is near.
+- Not built: saving RSVP and wishes to the database, a per-couple address (`/undangan/<nama>`), the wedding-day tabs (guestbook QR, seating, souvenir, photos), couples' own photos.
