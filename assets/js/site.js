@@ -526,12 +526,15 @@
     } else { fromS = null; rStart = now; }
     rLastT = -1;
   }
+  /* the phone's status bar takes the colour of the section under it, so the top of the screen is seamless */
+  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#F2F1E9', about: '#F1F1EE', services: '#14261A', themes: '#121A10', contact: '#F3F0EA' };
+  function barTone(name) { if (barMeta && BAR[name] && barMeta.content !== BAR[name]) barMeta.content = BAR[name]; }
   var running = false;
   function frame(now) {
     if (!travel || document.hidden) { running = false; return; }
     var y = window.scrollY, vh = window.innerHeight;
     var name = sectionAt(vh);
-    if (name !== secNow) { enter(name, now); root.setAttribute('data-sec', name); }
+    if (name !== secNow) { enter(name, now); root.setAttribute('data-sec', name); barTone(name); }
     if (!routine) { requestAnimationFrame(frame); return; }
     var o, done = false;
     if (fromS && now < rStart) {
