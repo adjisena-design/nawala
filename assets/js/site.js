@@ -255,10 +255,34 @@
       f.dx = x - r.left; f.dy = (isLang ? 28 : 24) - r.top; f.bx = x; f.w = w;
     }
   }
+  /* The morph no longer follows the finger. Scrolling past a small threshold decides bar or rail
+     (with a little room either side so it cannot flicker); the change then plays on its own clock,
+     so it can never stop half-way. A round glass orb swells over the corner at the hand-over. */
+  var orbSide = null, navGoal = -1, navM = 0, navFrom = 0, navT0 = 0, navDur = 0, navRun = false, orb = $('.nav__orb');
   function navMorph(y, vh) {
     var D = desktop.matches;
-    var m = calm ? 1 : clamp(y / (vh * (D ? .5 : .28)));
-    if (m === lastM) return;
+    if (calm) { navGoal = 1; navM = 1; drawNav(1, D); return; }
+    var goal = navGoal === 1 ? (y > vh * .02 ? 1 : 0) : (y > vh * (D ? .08 : .05) ? 1 : 0);
+    if (navGoal === -1) { navGoal = goal; navM = goal; drawNav(goal, D); return; }
+    if (goal !== navGoal) {
+      navGoal = goal; navFrom = navM; navT0 = performance.now();
+      navDur = (D ? 820 : 560) * Math.max(.35, Math.abs(goal - navM));
+      if (!navRun) { navRun = true; requestAnimationFrame(navStep); }
+    }
+    if (!navRun) drawNav(navM, D);   // after a resize the links are laid out again
+  }
+  function navStep(now) {
+    var q = clamp((now - navT0) / navDur), e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+    navM = navFrom + (navGoal - navFrom) * e;
+    drawNav(navM, desktop.matches);
+    if (q < 1) requestAnimationFrame(navStep); else navRun = false;
+  }
+  function drawNav(m, D) {
+    if (orb && !calm) {   // the orb swells once, on its own short clock, as the morph passes the hand-over
+      var side = m >= (D ? .42 : .78);
+      if (orbSide !== null && side !== orbSide) { orb.classList.remove('is-on'); void orb.offsetWidth; orb.classList.add('is-on'); }
+      orbSide = side;
+    }
     lastM = m;
     var a = clamp(m / .55), b = clamp((m - .4) / .6);
     root.style.setProperty('--na', D ? a.toFixed(4) : m.toFixed(3));
@@ -296,6 +320,9 @@
       var span = r.height > vh * 1.4 ? r.height - vh : r.height;
       var p = Math.round(clamp(-r.top / Math.max(1, span)) * 1000) / 1000;
       if (e !== s.e) { s.e = e; s.el.style.setProperty('--e', e); }
+      /* the light between sections rises once the section is a little way in, and sinks again only when it has left */
+      var rise = s.el.classList.contains('is-rise') ? e > .02 : e > .14;
+      if (rise !== s.el.classList.contains('is-rise')) s.el.classList.toggle('is-rise', rise);
       if (p !== s.p) { s.p = p; s.el.style.setProperty('--p', p); }
       if (s.el === about && p !== lastAboutP) {
         /* the scroll only picks the message; each one glides in and out on its own clock */
