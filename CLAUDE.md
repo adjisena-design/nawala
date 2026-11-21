@@ -9,7 +9,7 @@ Home page for Nawala, a digital wedding invitation business in Indonesia. Static
 - No emojis anywhere. No real or generated human faces: Nawala (the winged letter) stands in for the couple.
 - Site copy is Indonesian first with an English toggle. Every visible string carries `data-en`; the script swaps it. Strings built in `site.js` go through `t(id, en)`.
 - Nothing thin and nothing tiny: body text 17px or larger, touch targets 44px or larger.
-- Do not invent evidence. There are no customers, testimonials, prices or finished themes yet. The 50 theme covers and 20 sample films are real, but the invitation pages behind them are not built, and the page says so. No theme is marked as owned until a couple has really bought it. The log-in box says plainly that codes cannot be checked yet.
+- Do not invent evidence. There are no customers, testimonials or prices yet. The 50 theme covers and 20 sample films are real. Working invitations exist for the General Nawala theme (Premium) and the 12 Dasar themes; the 28 Premium and 10 Eksklusif covers still have no invitation behind them, and the page says so. No theme is marked as owned until a couple has really bought it. The log-in box says plainly that codes cannot be checked yet.
 - Higgsfield credits (owner, 21 Nov 2026): spend down to 500 remaining, then stop and ask; after his yes, down to 200 remaining, then stop.
 
 ## Look
@@ -64,7 +64,23 @@ Scroll effects read two CSS variables that `site.js` sets on every `[data-scroll
 ## Check before pushing
 Open `index.html` through any static server and look at 1440x900 and 390x844: hero and the menu morph, each sweep, each about step, the services swap, the theme river and both pop-ups, the full contact flow in both languages, and reduced motion.
 
-## The invitation (`undangan/`), since 21 Nov 2026
+## Tiers (owner's decision, 21 Nov 2026, replaces the earlier "Dasar is also video-style" rule)
+| Tier | What it is | Where |
+| --- | --- | --- |
+| Dasar | The familiar scroll invitation, the kind that already works in Indonesia (he pointed at a Viding invitation): one picture, readable cards, frames for the couple's photos, free scrolling. Two families wanted: photographic (built, 12 themes) and illustrated like Viding (not started, needs new art). | `undangan/dasar.html?tema=<slug>` |
+| Premium | An immersive world: opening film, glass panels standing in the scenery, one swipe one step, travelling Nawala, light between scenes. The General Nawala theme is the first; Pendopo Jawa and Akad Putih have their pictures generated but are not assembled. | `undangan/` |
+| Eksklusif | Sold to one couple only, then marked as owned. None built. | |
+| Kustom | Built from the couple's own inspiration after a video call. None built. | |
+Levels (1 Dasar, 2 Menengah, 3 Maksimal inside an invitation) are a different thing: they say which sections are on. The level called "Dasar" and the tier called "Dasar" share a word only; rename one of them when the owner decides.
+
+## The Dasar scroll invitation (`undangan/dasar.html`), since 21 Nov 2026
+- Three files beside the Premium ones: `dasar.html`, `dasar.css`, `dasar.js`. Same couple file (`couple-laras-bima.js`). They started as this morning's first scrolling version (commit `e41ad76`).
+- One fixed picture (`.backdrop`) behind everything; solid paper cards scroll over it; a soft oval of mist (`--halo`) sits behind the names so they read on any picture; the couple appear in oval frames (Nawala stands in on samples); the gallery crops the theme's own picture.
+- A theme is one `[data-theme="<slug>"]` block at the end of `dasar.css`: the picture (`--plate`, the existing `assets/img/cover-<slug>.webp`, 640 wide), a palette (`--main`, `--accent`, `--paper` and their `-rgb` twins) and, in `THEMES` in `dasar.js`, its name and whether writing on the picture is dark or light. The 12: putih-klasik, sage, dusty-rose, emas-lembut, biru-langit, lavender, terakota, daun-tropis, marun, melati, senja, malam-bintang.
+- The sample's review sheet ("Contoh") has a theme picker, so one address shows all 12. The home page's theme pop-up links each Dasar theme to its sample ("Buka undangan contoh").
+- Opening, wording sets, levels, RSVP by WhatsApp, wishes, digital envelope, music and languages behave as in the Premium engine, without film, guided steps, glass or travelling Nawala.
+
+## The Premium invitation (`undangan/`), since 21 Nov 2026
 The first working invitation: Laras & Bima in the General Nawala theme, at `undangan/` (live path `/nawala/undangan/?to=Nama+Tamu`). The home page links to it from the first service card. The 50 theme covers still have no invitation pages of their own. The owner's instruction: get this one right, then replicate it to the others.
 
 It was rebuilt the same day after the owner's review (ivory cards, free scrolling and no light between scenes read as less premium than his reference reels). What his 11 reference reels share, and what this build follows: a camera journey; the writing stands inside the world on a clear sheet with flowers over its base; one composed beat at a time; the practical parts after the film.
@@ -77,7 +93,7 @@ Four parts, so that a new theme or a new couple is one new file each:
 
 How it works:
 - **Guided walk, not a scrolling page.** `.stage` is fixed; each `.step` fills it; `go()` moves exactly one step for any swipe (short or hard), wheel notch, arrow key, the round next button or a bottom-bar jump, and ignores input until the move has finished. There is no native page scroll. A panel taller than a very short screen scrolls inside itself, and a swipe only changes step once that panel is at its end. One step per event is built from the couple file (`#event-step` template).
-- **Panels are clear acrylic sheets** (`.pane`): a light gradient, bright edge and sheen, no blur on phones (blur only at 900px and wider). `data-tone="dark"` on a step gives light writing on dim scenery, `light` gives dark writing.
+- **Panels are clear acrylic sheets** (`.pane`): a light gradient, bright edge and sheen, no blur on phones (blur only at 900px and wider). A panel has no bottom edge: a still mask fades the glass, its border and sheen out before the front layer begins, because the owner noticed the hard line where a panel's base met the flowers (RSVP, digital envelope, closing). Watch for any box or motion that ends in a sharp cut; he notices them. `data-tone="dark"` on a step gives light writing on dim scenery, `light` gives dark writing.
 - **Scenery and its front layer.** `.world` (plate) and `.front` (the plate's own moss, ferns, flowers or peaks, cut out as `assets/img/fg-<scene>-mobile-sm.webp`) share one box (`.fit`: covers the stage, stands on the bottom edge), so they line up. Order: world, steps, fronts, light, Nawala. `sinks()` gives every panel bottom padding (`--sink`) so writing stays above the front layer; it is never under 46px because the next button sits there. The camera pushes in a little at every step inside a scene (`--cam`, `--camf`).
 - **Light between scenes** (`.sweep`): the home page's lava-lamp swells and spectrum rim, run on a clock instead of scroll. It rises (or comes down when going back), the scenery is swapped while the screen is covered, and the next panel arrives as it leaves. Only on a change of scene.
 - **Nawala travels** (`.nw`): `data-nw` on a step says where it goes: `fly:x,y,size`, `perch:x` (sits on the panel's top edge, folded wings), `hover:x`, `hide`. It always finishes its flight because steps cannot be half-way. After an RSVP is written out it opens and lets hearts out.
@@ -94,4 +110,8 @@ Rules specific to the invitation:
 - **Two files are not in the repository yet** (the workspace cannot download from Higgsfield): the film (job `0e8abc71-5e02-4b65-ab66-900a5c3eda24`, Kling 3.0 pro, 5 s, 1072 x 1928, 10.8 MB original; it must be cut down to 720 px wide and about 1 MB as `assets/video/umum-opening.mp4`) and the instrumental (job `baeb642f-d452-4ef1-a05e-34c308d5f950`, ElevenLabs Music v2.5, 60 s, wanted as `assets/audio/nawala-umum.mp3`). Until then guests get the still zoom; `?film=1` plays the original from Higgsfield for the owner's review only; music plays from Higgsfield's address. Remove both fallbacks once the files are in.
 - Weight (measured 21 Nov 2026 at 390x844, before server compression, without film or music): about 680 KB when the opening is ready, about 1.1 MB for the whole walk, 26 files.
 - Checked in a test browser only (360x640, 390x844, 1440x900; both languages, both wordings, levels 1 and 3, reduced motion, no script). Not yet tried on a real low-end Android phone.
+- **Next Premium worlds (pictures generated 21 Nov 2026, not downloaded, not assembled; both need the owner's cultural review):**
+  - Pendopo Jawa: gate `df5da743-b922-4467-ba5c-6035e08158ec`, courtyard `d1b94299-11e0-477c-8b3b-7797baf6a0bc`, inside the pendopo `1980ed01-e944-4721-bd2e-bf162369d3ca`, carved wall (second try) `0f1f6cc5-c2e1-4231-a72b-3e31a5b8215c`, garden (second try) `c5eab2cf-e611-4656-a037-a4e2cc219abb`, opening film `d136bda4-fd52-4c27-9454-b76077a0e2e7`. Rejected: `584ff4f5` (black smudges), `75d7b01a` (a temple spire in the background).
+  - Akad Putih: gate `791907da-5398-4acb-9378-bc9bd91744f2`, courtyard `7be4c224-8699-4754-b818-68dc78bb2dc4`, hall `3e419d31-f638-4b5f-9975-8baf8c3fc085`, ceremony setting `58ef8c87-fa44-4698-b9fc-60d253761b2f`, garden `8c9376c7-d77d-4cc7-b289-a2a70c2b93b2`, opening film `900b652f-3d7f-41e6-a30f-d18907819ab4`.
+  - To assemble a world: bring the five pictures in at 720 x 1290 as `plate-<world>-<scene>.webp`, cut front layers, write `theme-<world>.css`, and let the page choose its kit from the couple file.
 - Not built: saving RSVP and wishes to the database, a per-couple address (`/undangan/<nama>`), the wedding-day tabs (guestbook QR, seating, souvenir, photos), couples' own photos, desktop-size scenery (desktop shows the phone column).

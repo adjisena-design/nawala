@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="id" data-lv="3" data-theme="putih-klasik" data-tone="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Undangan pernikahan Laras &amp; Bima</title>
+<meta name="description" content="Laras dan Bima mengundang Anda ke pernikahan mereka, Sabtu, 12 Juni 2027. Undangan contoh tingkat Dasar dari Nawala.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#16301F">
+<meta property="og:title" content="Undangan pernikahan Laras &amp; Bima">
+<meta property="og:description" content="Sabtu, 12 Juni 2027. Ketuk untuk membuka undangan.">
+<meta property="og:image" content="https://adjisena-design.github.io/nawala/assets/img/og.jpg">
+<link rel="icon" href="../assets/img/icon-64.png">
+<link rel="preload" as="font" type="font/woff2" href="../assets/fonts/fraunces.woff2" crossorigin>
+<link rel="stylesheet" href="dasar.css">
+<script>document.documentElement.className = 'js';</script>
+</head>
+<body>
+
+<!-- Dasar: the scroll invitation. One picture per theme behind everything; cards scroll over it.
+     Opening: Nawala arrives with the letter; the guest's name is on the envelope (link: ?to=Nama+Tamu&tema=<slug>). -->
+<div class="gate" id="gate">
+  <div class="gate__plate"></div>
+  <div class="gate__shade"></div>
+  <div class="gate__head">
+    <h1><span data-f="bride.short">Laras</span> <i>&amp;</i> <span data-f="groom.short">Bima</span></h1>
+    <p data-f="date">Sabtu, 12 Juni 2027</p>
+  </div>
+  <div class="gate__nw" aria-hidden="true">
+    <div class="gate__glow"></div>
+    <div class="env">
+      <div class="env__face env__face--addr">
+        <img src="../assets/img/nw-back.webp" width="720" height="395" alt="">
+        <div class="env__label"><span data-en="To">Kepada Yth.</span><b data-f="guest">Tamu undangan</b></div>
+      </div>
+      <div class="env__face env__face--seal"><img src="../assets/img/nw-front.webp" width="720" height="387" alt=""></div>
+    </div>
+    <img class="gate__open" src="../assets/img/nawala-open-720.webp" width="720" height="619" alt="">
+    <div class="gate__hearts" id="hearts"></div>
+  </div>
+  <div class="gate__foot">
+    <p><span data-en="A letter for">Sepucuk surat untuk</span> <b data-f="guest">Tamu undangan</b></p>
+    <button class="btn btn--seal" type="button" id="open" data-en="Open the invitation">Buka undangan</button>
+  </div>
+</div>
+
+<div class="tools" id="tools">
+  <div class="tools__group">
+    <button class="tool" type="button" id="review" hidden data-en="Sample">Contoh</button>
+  </div>
+  <div class="tools__group">
+    <button class="tool tool--round" type="button" id="lang" aria-label="Switch to English">EN</button>
+    <button class="tool tool--round tool--music" type="button" id="music" aria-pressed="false" aria-label="Musik" data-level="2" hidden>
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
+  </div>
+</div>
+
+<div class="backdrop" aria-hidden="true"></div>
+
+<main class="page" id="page">
+
+  <!-- Cover -->
+  <section class="scene scene--cover scene--first is-near" id="sampul">
+    <div class="scene__body">
+      <div class="cover">
+        <h1><span data-f="bride.short">Laras</span><i>&amp;</i><span data-f="groom.short">Bima</span></h1>
+        <p class="cover__date" data-f="date">Sabtu, 12 Juni 2027</p>
+        <div class="flap-wrap" aria-hidden="true"><div class="flap"><b></b></div></div>
+        <p class="cover__to"><span data-en="To">Kepada Yth.</span><b data-f="guest">Tamu undangan</b></p>
+        <p class="cover__cue"><span data-en="Scroll down">Gulir ke bawah</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Greeting, the couple, their story -->
+  <section class="scene scene--pair" id="adegan-mempelai">
+    <div class="scene__body">
+      <div class="block" id="salam">
+        <div class="card card--center rv">
+          <svg class="card__seal" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z"/></svg>
+          <h2 data-w="hello">Salam bahagia</h2>
+          <p data-w="intro">Dengan penuh syukur, kami mengundang Bapak, Ibu, dan Saudara sekalian untuk hadir dan memberi restu pada hari pernikahan kami.</p>
+          <p class="verse" data-w="verse" hidden></p>
+          <p class="verse-ref" data-w="verseRef" hidden></p>
+        </div>
+      </div>
+
+      <div class="block" id="mempelai">
+        <div class="pairup">
+          <div class="person rv">
+            <img src="../assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy">
+            <div class="card card--center">
+              <h3 data-f="bride.full">Laras Ayuningtyas</h3>
+              <p class="quiet" data-f="bride.parents">Putri pertama Bapak Hendra Wijaya dan Ibu Sari Wulandari</p>
+            </div>
+          </div>
+          <p class="pairup__and" aria-hidden="true">&amp;</p>
+          <div class="person rv">
+            <img src="../assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy">
+            <div class="card card--center">
+              <h3 data-f="groom.full">Bima Pradipta</h3>
+              <p class="quiet" data-f="groom.parents">Putra kedua Bapak Agus Pradipta dan Ibu Ratna Dewi</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="cerita" data-level="3">
+        <div class="card rv">
+          <h2 data-en="Our story">Cerita kami</h2>
+          <ol class="story" id="story"></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The day, and the gallery -->
+  <section class="scene scene--day" id="adegan-acara">
+    <div class="scene__body">
+      <div class="block" id="acara">
+        <div class="on-plate rv">
+          <h2 data-en="The day">Hari bahagia</h2>
+          <p data-f="date">Sabtu, 12 Juni 2027</p>
+        </div>
+        <div class="count rv" id="count" aria-live="off">
+          <div><b id="c-d">0</b><span data-en="days">hari</span></div>
+          <div><b id="c-h">0</b><span data-en="hours">jam</span></div>
+          <div><b id="c-m">0</b><span data-en="minutes">menit</span></div>
+          <div><b id="c-s">0</b><span data-en="seconds">detik</span></div>
+        </div>
+        <div class="card rv" id="events">
+          <!-- filled from the couple's file; this is what shows without script -->
+          <div class="event">
+            <h3>Upacara pernikahan dan resepsi</h3>
+            <p>Sabtu, 12 Juni 2027, mulai 09.00 WIB di Taman Nawala, Jalan Contoh No. 1, Bandung.</p>
+          </div>
+        </div>
+        <a class="btn btn--seal btn--wide rv" id="cal" href="#" target="_blank" rel="noopener" data-level="2">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.500" y="5" width="17" height="15" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+          <span data-en="Save to my calendar">Simpan ke kalender</span>
+        </a>
+        <div class="card rv" data-level="3" id="dress">
+          <h3 data-en="What to wear">Busana</h3>
+          <p id="dress-note"></p>
+          <ul class="swatches" id="swatches"></ul>
+        </div>
+        <div class="card rv" data-level="3" id="stream">
+          <h3 data-en="Watch from afar">Menyaksikan dari jauh</h3>
+          <p data-en="For family and friends who cannot come, the ceremony is streamed live.">Untuk keluarga dan sahabat yang tidak dapat hadir, upacara disiarkan langsung.</p>
+          <p class="quiet small" id="stream-note"></p>
+          <a class="btn btn--main btn--wide" id="stream-link" href="#" target="_blank" rel="noopener" hidden data-en="Watch the live stream">Tonton siaran langsung</a>
+        </div>
+      </div>
+
+      <div class="block" id="galeri" data-level="2">
+        <div class="on-plate rv">
+          <h2 data-en="Gallery">Galeri</h2>
+          <p data-en="Tap a picture to see it larger.">Ketuk gambar untuk melihat lebih besar.</p>
+        </div>
+        <div class="shots rv" id="shots">
+          <button class="shot shot--wide" type="button" aria-label="Foto 1">
+            <img src="../assets/img/nawala-bride-640.webp" alt="" loading="lazy" style="width:30%;left:17%;top:14%">
+            <img src="../assets/img/nawala-groom-640.webp" alt="" loading="lazy" style="width:33%;left:49%;top:20%">
+          </button>
+          <button class="shot" type="button" aria-label="Foto 2">
+            <img src="../assets/img/nawala-groom-640.webp" alt="" loading="lazy" style="width:66%;left:17%;top:30%">
+          </button>
+          <button class="shot" type="button" aria-label="Foto 3">
+            <img src="../assets/img/nawala-bride-640.webp" alt="" loading="lazy" style="width:62%;left:19%;top:22%">
+          </button>
+          <button class="shot" type="button" aria-label="Foto 4">
+            <img src="../assets/img/nawala-bride-640.webp" alt="" loading="lazy" style="width:27%;left:23%;top:40%">
+            <img src="../assets/img/nawala-groom-640.webp" alt="" loading="lazy" style="width:29%;left:49%;top:43%">
+          </button>
+          <button class="shot" type="button" aria-label="Foto 5">
+            <img src="../assets/img/nawala-bride-640.webp" alt="" loading="lazy" style="width:42%;left:9%;top:44%">
+            <img src="../assets/img/nawala-groom-640.webp" alt="" loading="lazy" style="width:45%;left:49%;top:49%">
+          </button>
+          <button class="shot shot--wide" type="button" aria-label="Foto 6">
+            <img src="../assets/img/nawala-bride-640.webp" alt="" loading="lazy" style="width:33%;left:16%;top:10%">
+            <img src="../assets/img/nawala-groom-640.webp" alt="" loading="lazy" style="width:36%;left:49%;top:17%">
+          </button>
+        </div>
+        <p class="on-plate small rv" data-en="In this sample, Nawala stands in for the bride and groom. Your own photos take its place.">Di contoh ini, Nawala menggantikan pengantin. Foto kalian sendiri yang nanti mengisinya.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reply, wishes, gift, thank you -->
+  <section class="scene scene--reply" id="adegan-balas">
+    <div class="scene__body">
+      <div class="block" id="rsvp">
+        <div class="card rv">
+          <h2 data-en="Will you come?">Konfirmasi kehadiran</h2>
+          <p class="quiet" data-en="Your answer helps us prepare your seat.">Jawaban Anda membantu kami menyiapkan tempat.</p>
+          <form class="form" id="form" novalidate>
+            <label class="field"><span data-en="Your name">Nama</span>
+              <input type="text" id="f-name" name="nama" autocomplete="name" maxlength="60" required>
+            </label>
+            <fieldset class="field">
+              <legend data-en="Attendance">Kehadiran</legend>
+              <div class="chips">
+                <label><input type="radio" name="hadir" value="ya" checked><span data-en="I will come">Saya akan hadir</span></label>
+                <label><input type="radio" name="hadir" value="tidak"><span data-en="I cannot come">Maaf, saya tidak dapat hadir</span></label>
+                <label><input type="radio" name="hadir" value="ragu"><span data-en="Not sure yet">Belum pasti</span></label>
+              </div>
+            </fieldset>
+            <div class="field" id="f-count-wrap">
+              <span id="f-count-label" data-en="How many people, including you">Jumlah orang, termasuk Anda</span>
+              <div class="stepper">
+                <button type="button" id="f-less" aria-label="Kurangi">&minus;</button>
+                <output id="f-count" aria-labelledby="f-count-label">1</output>
+                <button type="button" id="f-more" aria-label="Tambah">+</button>
+              </div>
+            </div>
+            <label class="field" data-level="2"><span data-en="A wish for the couple (optional)">Ucapan untuk pengantin (boleh dikosongkan)</span>
+              <textarea id="f-wish" name="ucapan" maxlength="300"></textarea>
+            </label>
+            <p class="form__err" id="f-err" role="alert" hidden data-en="Please write your name first.">Mohon isi nama terlebih dahulu.</p>
+            <a class="btn btn--main btn--wide" id="send" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.300-4.200A8 8 0 1 1 8.400 19z"/><path d="M9 9.500c0 3 2.500 5.500 5.500 5.500"/></svg>
+              <span data-en="Send by WhatsApp">Kirim lewat WhatsApp</span>
+            </a>
+            <p class="quiet small" data-en="WhatsApp opens with your answer written out. Press send there.">WhatsApp akan terbuka dengan jawaban Anda sudah tertulis. Tekan kirim di sana.</p>
+          </form>
+          <div class="done" id="done" hidden>
+            <svg class="tick" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30"/><path d="m20 33 8.500 8.500L45 24"/></svg>
+            <h3 data-en="Thank you">Terima kasih</h3>
+            <p data-en="Your answer is written out in WhatsApp. It reaches us once you press send there.">Jawaban Anda sudah tertulis di WhatsApp. Jawaban sampai kepada kami setelah Anda menekan kirim di sana.</p>
+            <button class="btn btn--line" type="button" id="again" data-en="Change my answer">Ubah jawaban</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="ucapan" data-level="2">
+        <div class="card rv">
+          <h2 data-en="Wishes">Ucapan</h2>
+          <ul class="wishes" id="wishes"></ul>
+        </div>
+      </div>
+
+      <div class="block" id="hadiah" data-level="2">
+        <div class="card rv">
+          <h2 data-en="Digital envelope">Amplop digital</h2>
+          <p class="quiet" data-en="Your presence is the gift. If you would still like to send something, these are the ways.">Kehadiran Anda adalah hadiah. Bila tetap ingin mengirim tanda kasih, berikut caranya.</p>
+          <div class="stack" id="gifts"></div>
+          <div id="gift-addr-wrap" hidden>
+            <h3 data-en="Send a parcel">Kirim bingkisan</h3>
+            <p id="gift-addr"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block closing" id="penutup">
+        <div class="card card--center rv">
+          <p data-w="bye">Kehadiran dan doa restu Bapak, Ibu, dan Saudara adalah hadiah terindah bagi kami.</p>
+          <p class="verse" data-w="sign">Dengan hormat, kami yang berbahagia</p>
+          <h2><span data-f="bride.short">Laras</span> &amp; <span data-f="groom.short">Bima</span></h2>
+        </div>
+        <div class="duo rv" aria-hidden="true">
+          <img src="../assets/img/nawala-bride-640.webp" width="623" height="640" alt="" loading="lazy">
+          <img src="../assets/img/nawala-groom-640.webp" width="640" height="549" alt="" loading="lazy">
+        </div>
+        <p class="sample-note" id="sample-note" hidden data-en="This is a sample invitation. The names, date, place and numbers are illustrations.">Ini undangan contoh. Nama, tanggal, tempat, dan nomor di dalamnya hanya ilustrasi.</p>
+        <a class="madeby" id="madeby" href="../">
+          <img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt="" loading="lazy">
+          <span data-en="An invitation by Nawala">Undangan oleh Nawala</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="bar" id="bar" aria-label="Bagian undangan">
+  <a href="#mempelai"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20c-4.500-3.200-7.500-5.900-7.500-9.300A4 4 0 0 1 12 8.500a4 4 0 0 1 7.500 2.200c0 3.400-3 6.100-7.500 9.300z"/></svg><span data-en="Couple">Mempelai</span></a>
+  <a href="#acara"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.500" y="5" width="17" height="15" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/></svg><span data-en="Events">Acara</span></a>
+  <a href="#galeri" data-level="2"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.600"/><path d="m4 17 5-4 4 3 3-2 4 3"/></svg><span data-en="Gallery">Galeri</span></a>
+  <a href="#rsvp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><span>RSVP</span></a>
+  <a href="#hadiah" data-level="2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7c-1-3-5-4-5-1.500 0 2 3 1.500 5 1.500zm0 0c1-3 5-4 5-1.500 0 2-3 1.500-5 1.500z"/></svg><span data-en="Gift">Hadiah</span></a>
+</nav>
+
+<dialog class="lightbox" id="lightbox" aria-label="Foto">
+  <div id="lightbox-slot"></div>
+  <button class="btn btn--seal lightbox__x" type="button" id="lightbox-x" data-en="Close">Tutup</button>
+</dialog>
+
+<!-- Only on sample invitations: lets Nawala's team (and a couple being shown around) try the levels and wordings. -->
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-h">
+  <h2 id="sheet-h" data-en="Try this sample">Coba contoh ini</h2>
+  <div class="field"><span data-en="Theme (Dasar)">Tema (Dasar)</span>
+    <div class="seg seg--themes" id="seg-theme"></div>
+  </div>
+  <div class="field"><span data-en="Level">Tingkat</span>
+    <div class="seg" id="seg-level">
+      <button type="button" data-v="1" data-en="Basic">Dasar</button>
+      <button type="button" data-v="2" data-en="Medium">Menengah</button>
+      <button type="button" data-v="3" data-en="Max">Maksimal</button>
+    </div>
+  </div>
+  <div class="field"><span data-en="Wording">Kata-kata</span>
+    <div class="seg" id="seg-word">
+      <button type="button" data-v="umum" data-en="General">Umum</button>
+      <button type="button" data-v="islam" data-en="Islamic">Islami</button>
+    </div>
+  </div>
+  <label class="field"><span data-en="Guest name on the envelope">Nama tamu di amplop</span>
+    <input type="text" id="sheet-guest" maxlength="60">
+  </label>
+  <div class="seg">
+    <button type="button" id="sheet-replay" data-en="Play the opening again">Putar pembuka lagi</button>
+    <button type="button" id="sheet-x" aria-pressed="true" data-en="Done">Selesai</button>
+  </div>
+</dialog>
+
+<audio id="audio" loop preload="none"></audio>
+
+<script src="couple-laras-bima.js"></script>
+<script src="dasar.js"></script>
+</body>
+</html>
