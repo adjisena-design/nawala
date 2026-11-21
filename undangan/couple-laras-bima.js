@@ -3,10 +3,12 @@
    Laras & Bima are Nawala's sample couple: every name, date, place and number here is an illustration. */
 window.NAWALA_INVITE = {
   sample: true,                 // shows the "Contoh" review button and the note at the end
+  // slug: 'laras-bima',        // real invitations only: the name registered in the team console (tim/, Undangan).
+                                //   With it and sample: false, answers and wishes are saved to the database.
   theme: 'umum',                // theme kit: umum, pendopo-jawa or akad-putih (theme-<id>.css; the kit brings its own opening film)
   level: 3,                     // 1 Dasar, 2 Menengah, 3 Maksimal
   wording: 'umum',              // 'umum' (neutral) or 'islam'
-  whatsapp: '6281379211628',    // RSVP answers are sent here until the database exists
+  whatsapp: '6281379211628',    // RSVP answers are written out for this number on samples, or when saving fails
   sampleGuest: 'Bapak dan Ibu Santoso', // shown on the envelope when the link carries no ?to= name (samples only)
 
   bride: {

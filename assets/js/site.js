@@ -591,7 +591,8 @@
     });
     afterLang.push(function () { if (builtFor && builtFor !== tier + lang) { var v = viewing; build(); if (v > -1) showDetail(v); } });
 
-    /* log in with an access code. Codes live in the Nawala database (leads.access_token); the page may only ask yes or no. */
+    /* log in with an access code. Codes live in the Nawala database (access_codes); this page may only ask yes or no.
+       A good code also opens the couple's room (ruang/), which reads the same key from this browser. */
     var form = $('#login-form'), code = $('#login-code'), msg = $('#login-msg');
     function say(html) { msg.innerHTML = html; msg.hidden = false; }
     form.addEventListener('submit', function (e) {
@@ -610,7 +611,8 @@
         .then(function (ok) {
           if (ok !== true) return say(t('Kode itu tidak kami kenali. Periksa lagi, atau hubungi kami lewat WhatsApp.', 'We do not recognise that code. Check it again, or reach us on WhatsApp.'));
           try { sessionStorage.setItem('nawala-code', c); } catch (err) {}
-          say(t('Kode diterima. Tema tambahan akan muncul di sini begitu selesai dilukis.', 'Code accepted. More themes will appear here as soon as they are painted.'));
+          say(t('Kode diterima. Semua film tema kini terbuka, dan ruang kalian siap. ', 'Code accepted. Every theme film is now open, and your room is ready. ') +
+            '<a href="ruang/">' + t('Buka ruang kalian', 'Open your room') + '</a>');
         })
         .catch(function () { say(later); });
     });
@@ -685,7 +687,8 @@
         wedding_year: tbd.checked ? null : Number(yearS.value),
         whatsapp: phone(),
         lang: lang,
-        source: chosen ? 'home, tema: ' + chosen[1] : 'home'
+        source: chosen ? 'home, tema: ' + chosen[1] : 'home',
+        theme: chosen ? slug(chosen) : null   /* the slug, for the team console's counts */
       };
     }
     function finish(viaWhatsApp) {

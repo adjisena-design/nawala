@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Nawala, konsol tim</title>
+<link rel="icon" href="../assets/img/icon-64.png">
+<link rel="stylesheet" href="../assets/css/console.css">
+</head>
+<body class="k k--tim is-locked">
+
+<!-- The team console. Nothing here is a sample: every list is read from the Nawala database with the team token. -->
+<div class="k__bg" aria-hidden="true">
+  <picture>
+    <source media="(max-width:700px)" srcset="../assets/img/plate-treetops-mobile-sm.webp">
+    <source media="(max-width:1500px)" srcset="../assets/img/plate-treetops-desktop-sm.webp">
+    <img src="../assets/img/plate-treetops-desktop.webp" alt="">
+  </picture>
+</div>
+
+<!-- The door: a team token, nothing else. It is checked by the database on every call. -->
+<section class="gate" id="gate">
+  <form class="gate__box g" id="gate-form" novalidate>
+    <img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt="">
+    <h1 data-en="Nawala team console">Konsol tim Nawala</h1>
+    <p data-en="Enter your team token. It is never shown on screen.">Masukkan token tim Anda. Token tidak pernah ditampilkan di layar.</p>
+    <label class="field"><span class="sr" data-en="Team token">Token tim</span>
+      <input id="gate-token" type="password" autocomplete="current-password" spellcheck="false" placeholder="Token tim" data-en-placeholder="Team token">
+    </label>
+    <label class="check"><input type="checkbox" id="gate-keep"><span data-en="Remember me on this device">Ingat saya di perangkat ini</span></label>
+    <p class="gate__msg" id="gate-msg" role="alert" hidden></p>
+    <button class="btn btn--main" type="submit" id="gate-go" data-en="Log in">Masuk</button>
+    <a class="link" href="../" data-en="Back to the home page">Kembali ke halaman utama</a>
+    <div class="k__lang" role="group" aria-label="Bahasa">
+      <button type="button" data-lang="id" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </form>
+</section>
+
+<header class="k__top">
+  <a class="k__brand g" href="../"><img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt=""><b>nawala</b><em data-en="Team">Tim</em><span class="sr" data-en="Back to the home page">Kembali ke halaman utama</span></a>
+  <div class="k__title g"><b data-en="Team console">Konsol tim</b></div>
+  <label class="k__search g" data-ic="search"><span class="sr" data-en="Search">Cari</span><input id="search" type="search" placeholder="Cari nama, tema, atau kode" data-en-placeholder="Search a name, theme or code" autocomplete="off"></label>
+  <div class="k__me">
+    <div class="k__lang g" role="group" aria-label="Bahasa">
+      <button type="button" data-lang="id" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <span class="k__user g"><i class="ava" id="me-ava"></i><span><b id="me-name"></b><small id="me-role"></small></span></span>
+  </div>
+</header>
+
+<nav class="k__rail g" aria-label="Konsol tim">
+  <a href="#ringkasan" data-ic="home"><span data-en="Overview">Ringkasan</span></a>
+  <a href="#permintaan" data-ic="inbox"><span data-en="Requests">Permintaan</span><i id="badge-new" hidden></i></a>
+  <a href="#undangan" data-ic="letter"><span data-en="Invitations">Undangan</span></a>
+  <a href="#tema" data-ic="themes"><span data-en="Themes">Tema</span></a>
+  <a href="#kode" data-ic="key"><span data-en="Codes">Kode</span></a>
+</nav>
+
+<main class="k__main" id="isi">
+
+  <!-- 1. Overview: the greeting sits on the scenery, the numbers on glass -->
+  <section class="view" data-view="ringkasan">
+    <div class="over">
+      <div class="hero">
+        <div class="fly" aria-hidden="true"><div class="fly__bob"><div class="fly__glow"></div><div class="fly__wing"><img src="../assets/img/nw-flap.webp" width="4800" height="167" alt=""></div></div></div>
+        <h1 id="hello"></h1>
+        <p class="hero__sub" id="hello-sub"></p>
+        <div class="hero__go">
+          <button class="btn btn--main" type="button" data-go="permintaan" data-en="Reply to requests">Balas permintaan</button>
+          <button class="btn btn--line" type="button" data-go="kode" data-en="Make a code">Buat kode</button>
+        </div>
+      </div>
+
+      <div class="over__side">
+        <section class="card g" aria-labelledby="h-week">
+          <div class="card__h"><div><h2 id="h-week" data-en="This week">Minggu ini</h2><p id="week-range"></p></div></div>
+          <div class="stats" id="stats"></div>
+        </section>
+        <section class="card g" aria-labelledby="h-flow">
+          <div class="card__h"><div><h2 id="h-flow" data-en="From request to live">Dari permintaan sampai tayang</h2><p data-en="Couples at each stage right now">Jumlah pasangan di tiap tahap saat ini</p></div></div>
+          <ol class="flow" id="flow"></ol>
+        </section>
+        <section class="card g" aria-labelledby="h-today">
+          <div class="card__h"><div><h2 id="h-today" data-en="Video calls asked for">Panggilan video diminta</h2><p data-en="Times couples picked in their room">Jadwal yang dipilih pasangan di ruang mereka</p></div><a href="#kode" data-en="All codes">Semua kode</a></div>
+          <div class="rows rows--fit" id="today"></div>
+        </section>
+      </div>
+
+      <div class="over__low">
+        <section class="card g" aria-labelledby="h-bars">
+          <div class="card__h"><div><h2 id="h-bars" data-en="Requests per week">Permintaan per minggu</h2><p data-en="From the contact box, last 12 weeks">Dari kotak kontak, 12 minggu terakhir</p></div></div>
+          <div class="bars" id="bars"></div>
+        </section>
+        <section class="card g" aria-labelledby="h-rank">
+          <div class="card__h"><div><h2 id="h-rank" data-en="Most chosen themes">Tema paling dipilih</h2><p data-en="Times carried into the contact box">Berapa kali dibawa ke kotak kontak</p></div><a href="#tema" data-en="All themes">Semua tema</a></div>
+          <div class="rows rank rows--fit" id="rank"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Requests from the contact box -->
+  <section class="view" data-view="permintaan">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Requests">Permintaan</h1><p data-en="Everyone who answered the three questions on the home page. Reply on WhatsApp, then move them along.">Semua yang menjawab tiga pertanyaan di halaman utama. Balas lewat WhatsApp, lalu pindahkan tahapnya.</p></div>
+        <div class="panel__tools chips" id="lead-filter" role="group"></div>
+      </div>
+      <div class="leads" id="leads"></div>
+    </div>
+  </section>
+
+  <!-- 3. Live invitations: answers and wishes from guests -->
+  <section class="view" data-view="undangan">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Invitations">Undangan</h1><p data-en="A couple's invitation saves answers and wishes once it is registered here. Sample invitations never save anything.">Undangan pasangan menyimpan jawaban dan ucapan setelah didaftarkan di sini. Undangan contoh tidak pernah menyimpan apa pun.</p></div>
+      </div>
+      <div class="codes">
+        <form class="make" id="reg" novalidate>
+          <h2 data-en="Register an invitation">Daftarkan undangan</h2>
+          <label><span data-en="The couple">Nama pasangan</span>
+            <span class="field"><input id="reg-couple" type="text" placeholder="Laras &amp; Bima" autocomplete="off" maxlength="80"></span>
+          </label>
+          <label><span data-en="Address name (small letters and dashes)">Nama alamat (huruf kecil dan tanda hubung)</span>
+            <span class="field"><input id="reg-slug" type="text" placeholder="laras-bima" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60"></span>
+          </label>
+          <p class="small muted" data-en="Use the same name as slug in the couple's file.">Pakai nama yang sama dengan slug di berkas pasangan.</p>
+          <button class="btn btn--main" type="submit" data-en="Register">Daftarkan</button>
+        </form>
+        <div>
+          <div class="rows" id="invites"></div>
+          <h2 class="sub" data-en="Latest wishes">Ucapan terbaru</h2>
+          <div class="rows" id="wishes"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Themes -->
+  <section class="view" data-view="tema">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Themes">Tema</h1><p data-en="What each theme has today, and how often couples chose it. A theme is marked as owned in site.js, only after a real sale.">Apa yang sudah ada di tiap tema, dan seberapa sering dipilih pasangan. Tema ditandai sudah dimiliki di site.js, hanya setelah benar-benar terjual.</p></div>
+        <div class="panel__tools chips" id="tier-filter" role="group"></div>
+      </div>
+      <div class="grid" id="theme-grid"></div>
+    </div>
+  </section>
+
+  <!-- 5. Access codes -->
+  <section class="view" data-view="kode">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Access codes">Kode akses</h1><p data-en="A code opens the couple's room: every theme, every film, matching and saving. When a couple asks for more time, extend it here.">Kode membuka ruang pasangan: semua tema, semua film, pencocokan, dan pilihan tersimpan. Kalau pasangan meminta waktu lebih, perpanjang di sini.</p></div>
+        <div class="panel__tools chips" id="code-stats"></div>
+      </div>
+      <div class="codes">
+        <form class="make" id="make" novalidate>
+          <h2 data-en="Make a code">Buat kode</h2>
+          <label><span data-en="For whom">Untuk siapa</span>
+            <span class="field"><input id="make-name" type="text" placeholder="Nama pasangan" data-en-placeholder="The couple's names" autocomplete="off" maxlength="40"></span>
+          </label>
+          <p class="small muted" id="make-lead" hidden></p>
+          <div>
+            <span class="small" style="font-weight:600" data-en="Valid for">Berlaku selama</span>
+            <div class="chips" id="make-days" role="group" style="margin-top:.4rem"></div>
+          </div>
+          <button class="btn btn--main" type="submit" data-en="Make the code">Buat kode</button>
+          <div class="fresh" id="fresh" hidden></div>
+        </form>
+        <div>
+          <div class="chips" id="code-filter" role="group" style="margin-bottom:.6rem"></div>
+          <div class="rows" id="codes"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="k__sample g"><span id="foot-who"></span> <button type="button" class="link" id="reload" data-en="Reload the data">Muat ulang data</button> <button type="button" class="link" id="logout" data-en="Log out">Keluar</button></p>
+</main>
+
+<script>window.NAWALA_BASE = '../';</script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/themes.js"></script>
+<script src="../assets/js/console.js"></script>
+<script src="../assets/js/tim.js"></script>
+</body>
+</html>

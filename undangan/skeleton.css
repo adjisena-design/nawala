@@ -399,3 +399,5 @@ dialog::backdrop{background:rgba(8,18,12,.8)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
 }
+
+#send[aria-busy="true"]{opacity:.6;pointer-events:none}

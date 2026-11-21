@@ -241,7 +241,10 @@
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, old); else old();
   }
 
-  /* ---------- Wishes ---------- */
+  /* ---------- Wishes ----------
+     A real couple's invitation (not a sample, and with a slug the team registered in the console) keeps answers and
+     wishes in the Nawala database; guests read the wishes the team has not hidden. Samples never save anything. */
+  var DB = window.NAWALA_DB, live = !!(DB && window.fetch && window.Promise && !D.sample && D.slug), guests = null;
   var wishKey = 'nawala-wish-' + (D.bride.short + '-' + D.groom.short).toLowerCase();
   function mine() { try { return JSON.parse(store(wishKey) || 'null'); } catch (e) { return null; } }
   function wall() {
@@ -252,7 +255,8 @@
       b.appendChild(make('span', 'tag', ['dari Anda', 'from you']));
       li.appendChild(b); var p = make('p'); p.textContent = m.text; li.appendChild(p); ul.appendChild(li);
     }
-    (D.wishes || []).forEach(function (w) {
+    (guests || D.wishes || []).forEach(function (w) {
+      if (guests && m && w.name === m.name && w.text === m.text) return;   /* already shown as "from you" */
       var li = make('li', 'wish'); var b = make('b'); b.textContent = w.name + ' ';
       if (D.sample) b.appendChild(make('span', 'tag', ['contoh', 'sample']));
       li.appendChild(b); li.appendChild(make('p', '', w.text)); ul.appendChild(li);
@@ -260,7 +264,21 @@
     $('#ucapan').hidden = !ul.children.length;
   }
 
-  /* ---------- RSVP: written out for WhatsApp until the database exists ---------- */
+  if (live) DB.rpc('guest_wishes', { p_invitation: D.slug }).then(function (list) { if (Array.isArray(list)) { guests = list; wall(); relabel(); } }, function () {});
+
+  /* ---------- RSVP: saved to the database on a live invitation; written out for WhatsApp on a sample, or if saving fails ---------- */
+  var busy = false, viaWa = !live, keptKey = 'nawala-rsvp-' + (D.slug || 'contoh');
+  function kept() { try { return JSON.parse(store(keptKey) || '{}') || {}; } catch (e) { return {}; } }
+  function sendLabel() {
+    say($('span', send), viaWa ? ['Kirim lewat WhatsApp', 'Send by WhatsApp'] : ['Kirim jawaban', 'Send my answer']);
+    var mark = $('svg', send); if (mark) mark.style.display = viaWa ? '' : 'none';   /* the WhatsApp mark only when it goes there */
+  }
+  function finish(saved) {
+    say($('#done p'), saved ? ['Jawaban Anda sudah tersimpan dan sampai kepada kami.', 'Your answer is saved and has reached us.']
+      : ['Jawaban Anda sudah tertulis di WhatsApp. Jawaban sampai kepada kami setelah Anda menekan kirim di sana.', 'Your answer is written out in WhatsApp. It reaches us once you press send there.']);
+    form.hidden = true; var d = $('#done'); d.hidden = false;
+    requestAnimationFrame(function () { d.classList.add('is-on'); });
+  }
   var form = $('#form'), nameIn = $('#f-name'), wishIn = $('#f-wish'), countOut = $('#f-count'), send = $('#send');
   var count = 1;
   function answer() { var r = $('input[name="hadir"]:checked', form); return r ? r.value : 'ya'; }
@@ -286,15 +304,32 @@
   $('#f-more').addEventListener('click', function () { count = Math.min(5, count + 1); refresh(); });
   send.addEventListener('click', function (e) {
     var n = nameIn.value.trim();
-    if (!n) { e.preventDefault(); $('#f-err').hidden = false; nameIn.focus(); return; }
+    if (!n) { e.preventDefault(); say($('#f-err'), ['Mohon isi nama terlebih dahulu.', 'Please write your name first.']); $('#f-err').hidden = false; nameIn.focus(); return; }
     refresh();
     var w = state.level >= 2 ? wishIn.value.trim() : '';
     if (w) { store(wishKey, JSON.stringify({ name: n, text: w })); wall(); relabel(); }
-    setTimeout(function () {
-      form.hidden = true; var d = $('#done'); d.hidden = false;
-      requestAnimationFrame(function () { d.classList.add('is-on'); });
-    }, 500);
+    if (!viaWa) {
+      e.preventDefault();
+      if (busy) return;
+      busy = true; send.setAttribute('aria-busy', 'true');
+      var a = answer(), had = kept();
+      Promise.all([
+        DB.rpc('guest_rsvp', { p_invitation: D.slug, p_guest: n, p_attending: a === 'ya' ? 'hadir' : a === 'tidak' ? 'tidak' : 'ragu', p_headcount: count, p_replace: had.rsvp || null }),
+        w ? DB.rpc('guest_wish', { p_invitation: D.slug, p_guest: n, p_body: w, p_replace: had.wish || null }) : (had.wish || null)
+      ]).then(function (r) {
+        if (!r[0]) throw new Error('not kept');
+        store(keptKey, JSON.stringify({ rsvp: r[0], wish: r[1] || null }));
+        finish(true);
+      }).catch(function () {   /* the way out: the same answer, written out for WhatsApp */
+        viaWa = true; sendLabel();
+        say($('#f-err'), ['Jawaban belum bisa disimpan. Ketuk sekali lagi untuk mengirimnya lewat WhatsApp.', 'Your answer could not be saved. Tap once more to send it by WhatsApp.']);
+        $('#f-err').hidden = false;
+      }).then(function () { busy = false; send.removeAttribute('aria-busy'); });
+      return;
+    }
+    setTimeout(function () { finish(false); }, 500);
   });
+  sendLabel();
   $('#again').addEventListener('click', function () { var d = $('#done'); d.hidden = true; d.classList.remove('is-on'); form.hidden = false; nameIn.focus(); });
 
   /* ---------- Gallery ---------- */

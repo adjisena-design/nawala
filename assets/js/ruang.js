@@ -1,0 +1,400 @@
+/* The couple's room (ruang/): what an access code opens.
+   The idea from the brand brief: answer five tag questions, swipe (left to pass, right to save, with undo),
+   save up to 30, then narrow 30, 15, 10, 5, 1.
+   The door is the access code: the database checks it and its end date (room_open), hands back the couple's
+   saved choices, and takes every change (room_save), so the team console sees them and a second phone finds them.
+   Two phones on one code: the last change wins. */
+(function () {
+  'use strict';
+  var K = window.K, N = window.NAWALA, DB = window.NAWALA_DB, $ = K.$, $$ = K.$$, t = K.t, esc = K.esc;
+  var CAP = 30, RUNGS = [30, 15, 10, 5, 1];
+  var bySlug = {};
+  N.ALL.forEach(function (th) { bySlug[N.slug(th)] = th; });
+
+  /* ---------- State ---------- */
+  function blank() { return { saved: [], no: [], answers: [[], [], [], [], []], final: '', call: null }; }
+  /* what the database hands back is checked again here: only themes that exist, only shapes this page draws */
+  function clean(s) {
+    var o = blank(); s = s || {};
+    if (Array.isArray(s.saved)) s.saved.forEach(function (x) { if (bySlug[x] && o.saved.indexOf(x) < 0 && o.saved.length < CAP) o.saved.push(x); });
+    if (Array.isArray(s.no)) s.no.forEach(function (x) { if (bySlug[x] && o.saved.indexOf(x) < 0 && o.no.indexOf(x) < 0) o.no.push(x); });
+    if (Array.isArray(s.answers) && s.answers.length === 5) o.answers = s.answers.map(function (a) { return Array.isArray(a) ? a.filter(function (n) { return typeof n === 'number'; }) : []; });
+    if (typeof s.final === 'string' && o.saved.indexOf(s.final) > -1) o.final = s.final;
+    if (s.call && s.call.d && s.call.time && s.call.via) o.call = { d: String(s.call.d), time: String(s.call.time), via: String(s.call.via) };
+    return o;
+  }
+  var state = blank(), room = null, skew = 0, saveTimer = 0, dirty = false, failed = false;
+  function now() { return Date.now() + skew; }
+  function push(keep) {
+    if (!room) return;
+    dirty = false;
+    DB.rpc('room_save', { p_code: room.code, p_state: state }, keep).then(function (ok) {
+      failed = false;
+      if (ok === false) lock(['Masa berlaku kode ini sudah habis. Hubungi kami lewat WhatsApp dan kami perpanjang.', 'This code has reached its end date. Tell us on WhatsApp and we will extend it.']);
+    }, function () {
+      dirty = true;
+      if (!failed) { failed = true; K.toast(t('Belum tersimpan ke Nawala. Kami coba lagi saat kalian melanjutkan.', 'Not saved to Nawala yet. We try again as you carry on.')); }
+    });
+  }
+  /* every change is sent a moment after the last tap, and once more if the page is being closed */
+  function persist() { if (!room) return; dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(push, 900); }
+  window.addEventListener('pagehide', function () { if (dirty && room) { clearTimeout(saveTimer); push(true); } });
+  var hist = [], mode = 'deck', tier = 'semua', q = '', warned = false;
+  function isSaved(s) { return state.saved.indexOf(s) > -1; }
+  function drop(list, s) { var i = list.indexOf(s); if (i > -1) list.splice(i, 1); }
+
+  /* ---------- The five questions. Each tag is tested against a theme's tier, family, names and description. ---------- */
+  var QS = [
+    ['Suasana apa yang kalian bayangkan?', 'What mood do you picture?', [
+      ['Hangat', 'Warm', /hangat|lilin|keemasan|senja|terakota|sampanye|lentera/], ['Megah', 'Grand', /fam-royal|istana|balairung|keraton|marmer|opera|perpustakaan/],
+      ['Tenang', 'Calm', /tenang|pagi|putih|sage|kaca|awan|salju|linen/], ['Ceria', 'Bright', /bunga|tropis|taman|biru|padang|mawar/], ['Khidmat', 'Solemn', /fam-religi|akad|pemberkatan|pelita|melati/]]],
+    ['Warna mana yang terasa seperti kalian?', 'Which colours feel like you?', [
+      ['Putih dan gading', 'White and ivory', /putih|gading|melati|mutiara|salju/], ['Hijau', 'Green', /hijau|daun|hutan|sage|zamrud|taman/], ['Emas', 'Gold', /emas|keemasan|sampanye/],
+      ['Merah muda', 'Pink', /merah muda|rose|peony|mawar/], ['Biru', 'Blue', /biru|laut|fam-elemen|langit|santorini/], ['Gelap dan dalam', 'Dark and deep', /malam|noir|marun|lentera|bintang|merah tua/]]],
+    ['Di mana kalian ingin tamu merasa berada?', 'Where should your guests feel they are?', [
+      ['Alam terbuka', 'Out in nature', /fam-alam|pantai|taman|hutan|padang|kebun/], ['Istana', 'A palace', /fam-royal|istana|keraton|balairung/], ['Rumah ibadah', 'A place of worship', /fam-religi/],
+      ['Kota dan gedung tua', 'Old towns and halls', /fam-dunia|fam-era|opera|perpustakaan/], ['Laut', 'The sea', /laut|pantai|kapal|santorini/]]],
+    ['Gaya apa yang paling dekat?', 'Which style is closest?', [
+      ['Nusantara', 'Nusantara', /fam-nusa|keraton|melati|songket/], ['Mancanegara', 'From abroad', /fam-dunia/], ['Klasik', 'Classic', /klasik|fam-era|fam-royal|opera/], ['Sederhana', 'Simple', /tier-dasar/]]],
+    ['Kapan cahayanya paling indah?', 'When is the light most beautiful?', [
+      ['Pagi', 'Morning', /pagi|fajar|awan|putih/], ['Senja', 'Sunset', /senja|keemasan|terbenam|lilin/], ['Malam', 'Night', /malam|bintang|lentera|bulan|pelita|aurora|utara/]]]
+  ];
+  function hay(th) { return ('tier-' + th[0] + ' fam-' + (th[5] || '') + ' ' + th[1] + ' ' + th[3]).toLowerCase(); }
+  function answered() { return state.answers.some(function (a) { return a.length; }); }
+  function score(th) {
+    var h = hay(th), n = 0;
+    state.answers.forEach(function (picks, qi) { picks.forEach(function (oi) { if (QS[qi][2][oi] && QS[qi][2][oi][2].test(h)) n++; }); });
+    return n;
+  }
+  function pool() { return N.ALL.filter(function (th) { return tier === 'semua' || th[0] === tier; }); }
+  /* what is left to decide, closest match first (the original order breaks ties) */
+  function queue() {
+    var list = pool().filter(function (th) { var s = N.slug(th); return !isSaved(s) && state.no.indexOf(s) < 0; });
+    if (answered()) list = list.map(function (th, i) { return [score(th), i, th]; }).sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; }).map(function (r) { return r[2]; });
+    return list;
+  }
+
+  /* ---------- Small pieces ---------- */
+  function tags(th) {
+    return '<span class="pill pill--jalan">' + K.tierName(th[0]) + '</span>' +
+      (th[0] === 'eksklusif' ? '<span class="pill pill--pink">' + t('Untuk satu pasangan', 'One couple only') + '</span>' : '') +
+      (answered() && score(th) ? '<span class="pill pill--tayang">' + t('Cocok', 'A match') + '</span>' : '');
+  }
+  function desc(th) { return K.lang() === 'en' ? th[4] : th[3]; }
+  function bigCard(th, extra) {
+    return '<div class="deck__card ' + (extra || '') + '" data-slug="' + N.slug(th) + '"><img src="' + N.cover(th) + '" alt="" draggable="false">' +
+      '<div class="deck__tags">' + tags(th) + '</div>' +
+      (N.hasFilm(th) ? '<button type="button" class="deck__play" data-film="' + N.slug(th) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.500v13l11-6.500z"/></svg>' + t('Putar film', 'Play the film') + '</button>' : '') +
+      '<span class="deck__stamp deck__stamp--yes">' + t('Simpan', 'Save') + '</span><span class="deck__stamp deck__stamp--no">' + t('Lewati', 'Pass') + '</span>' +
+      '<div class="deck__cap"><b>' + esc(K.themeName(th)) + '</b><span>' + esc(desc(th)) + '</span></div></div>';
+  }
+  /* films only ever start from a tap, and are not offered on Save-Data or slow connections (same rule as the home page) */
+  function playFilm(btn) {
+    var th = bySlug[btn.getAttribute('data-film')], card = btn.closest('.deck__card'), c = navigator.connection;
+    if (c && (c.saveData || /2g|3g/.test(c.effectiveType || ''))) { K.toast(t('Film dilewati untuk menghemat kuota.', 'The film is skipped to save your data.')); return; }
+    var v = document.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.src = N.film(th);
+    card.insertBefore(v, card.children[1]);
+    var p = v.play(); if (p && p.catch) p.catch(function () {});
+    btn.remove();
+  }
+  document.addEventListener('click', function (e) { var b = e.target.closest('[data-film]'); if (b) playFilm(b); });
+  function ladder(el) {
+    var n = state.saved.length, on = 0;
+    RUNGS.forEach(function (r) { if (n && n <= r) on = r; });
+    el.innerHTML = RUNGS.map(function (r) { return '<span class="' + (r === on ? 'is-on' : '') + '">' + r + '</span>'; }).join('<i></i>');
+  }
+  function save(s) {
+    if (isSaved(s)) return true;
+    if (state.saved.length >= CAP) { K.toast(t('Sudah 30 tersimpan. Lepas satu dulu di Pilihan.', 'You have 30 saved. Let one go in Saved first.')); return false; }
+    state.saved.push(s); drop(state.no, s); return true;
+  }
+  function unsave(s) { drop(state.saved, s); if (state.final === s) state.final = ''; }
+
+  /* ---------- Home ---------- */
+  function home() {
+    var n = state.saved.length, done2 = !!state.final, done3 = !!state.call;
+    var steps = [
+      [t('Masuk dengan kode', 'Log in with your code'), t('Kode diterima lewat WhatsApp', 'The code arrived on WhatsApp'), 'done'],
+      [t('Pilih tema', 'Choose a theme'), done2 ? K.themeName(bySlug[state.final]) : n + ' ' + t('tersimpan, saring sampai satu', 'saved, narrow them to one'), done2 ? 'done' : 'now'],
+      [t('Panggilan video', 'Video call'), done3 ? callText() : t('Tiga puluh menit bersama tim', 'Thirty minutes with the team'), done3 ? 'done' : done2 ? 'now' : ''],
+      [t('Isi data undangan', 'Fill in your details'), t('Nama, tanggal, foto, dan daftar tamu', 'Names, dates, photos and the guest list'), done2 && done3 ? 'now' : ''],
+      [t('Tinjau, lalu tayang', 'Review, then go live'), t('Tautan pribadi untuk tiap tamu', 'A personal link for every guest'), '']
+    ];
+    $('#todo').innerHTML = steps.map(function (s, i) {
+      return '<li class="' + (s[2] ? 'is-' + s[2] : '') + '"><i>' + (s[2] === 'done' ? K.ic('check') : i + 1) + '</i><div><b>' + s[0] + '</b><span>' + esc(s[1]) + '</span></div></li>';
+    }).join('');
+    var R = room || {}, exp = R.expires_at ? new Date(R.expires_at).getTime() : 0, made = R.created_at ? new Date(R.created_at).getTime() : 0;
+    var left = exp ? Math.max(1, Math.ceil((exp - now()) / 864e5)) : 0;
+    $('#hello').textContent = t('Selamat datang', 'Welcome') + (R.label ? ', ' + R.label : '') + '.';
+    $('#me-name').textContent = R.label || ''; $('#me-code').textContent = R.code || ''; $('#key-code').textContent = R.code || '';
+    $('#me-ava').textContent = (R.label || '').split(/[^A-Za-z0-9]+/).filter(Boolean).map(function (w) { return w.charAt(0); }).slice(0, 2).join('').toUpperCase();
+    $('#key-until').textContent = !room ? '' : exp ? t('Berlaku sampai ', 'Valid until ') + K.date(new Date(exp)) + ', ' + left + t(' hari lagi', left === 1 ? ' day left' : ' days left') : t('Berlaku tanpa batas waktu.', 'Valid with no end date.');
+    $('#key-meter').style.setProperty('--v', exp && exp > made ? Math.max(.03, Math.min(1, (exp - now()) / (exp - made))).toFixed(2) : 1);
+    $('#key-wa').href = DB.wa(t('Halo Nawala, kami ' + (R.label || '') + ' (kode ' + (R.code || '') + '). Kami ingin memperpanjang masa berlaku kode kami.', 'Hello Nawala, we are ' + (R.label || '') + ' (code ' + (R.code || '') + '). We would like to extend our code.'));
+    $('#gate-wa').href = DB.wa(t('Halo Nawala, saya ingin meminta kode akses atau memperpanjangnya.', 'Hello Nawala, I would like an access code, or to extend mine.'));
+    $('#picks-note').textContent = n ? n + ' ' + t('dari 30 tersimpan', 'of 30 saved') : t('Belum ada yang tersimpan', 'Nothing saved yet');
+    var first = state.saved.slice(0, 4);
+    $('#picks').innerHTML = n ? first.map(function (s) { return '<img src="' + N.cover(bySlug[s], 'm') + '" alt="' + esc(K.themeName(bySlug[s])) + '" loading="lazy">'; }).join('') +
+      (n > 4 ? '<i>+' + (n - 4) + '</i>' : '') : '<div class="empty" style="flex:1;padding:1.2rem"><b>' + t('Belum ada pilihan.', 'No saved themes yet.') + '</b>' + t('Mulai dari Jelajah.', 'Start in Browse.') + '</div>';
+    $('#call-btn').textContent = done3 ? t('Ubah jadwal', 'Change the time') : t('Atur panggilan video', 'Book a video call');
+    var b = $('#badge-saved'); b.textContent = n; b.hidden = !n;
+  }
+
+  /* ---------- Browse ---------- */
+  function browse() {
+    $('#mode').innerHTML = [['deck', 'cards', t('Geser', 'Swipe')], ['all', 'grid', t('Semua tema', 'All themes')]].map(function (m) {
+      return '<button type="button" class="chip" data-mode="' + m[0] + '" aria-pressed="' + (mode === m[0]) + '">' + K.ic(m[1]) + m[2] + '</button>';
+    }).join('');
+    $('#browse-note').textContent = mode === 'deck'
+      ? t('Geser ke kanan untuk menyimpan, ke kiri untuk melewati. Tombol panah di papan ketik juga bisa.', 'Swipe right to save, left to pass. The arrow keys work too.')
+      : t('Semua tema dalam satu halaman. Ketuk gambarnya untuk melihat warna penuh dan filmnya.', 'Every theme on one page. Tap a picture to see it in full colour, with its film.');
+    $('#tier-filter').innerHTML = [['semua', t('Semua', 'All'), N.ALL.length], ['dasar', K.tierName('dasar'), N.BASIC.length], ['premium', K.tierName('premium'), N.THEMES.length], ['eksklusif', K.tierName('eksklusif'), N.EXCLUSIVE.length]].map(function (k) {
+      return '<button type="button" class="chip" data-tier="' + k[0] + '" aria-pressed="' + (tier === k[0]) + '">' + k[1] + ' <b>' + k[2] + '</b></button>';
+    }).join('');
+    $('#deck').hidden = mode !== 'deck'; $('#all').hidden = mode !== 'all';
+    if (mode === 'deck') deck(); else grid();
+    side();
+  }
+  function side() {
+    var m = $('#match');
+    if (answered()) {
+      var chips = '', fit = N.ALL.filter(function (th) { return score(th); }).length;
+      state.answers.forEach(function (picks, qi) { picks.forEach(function (oi) { var o = QS[qi][2][oi]; chips += '<span class="chip">' + t(o[0], o[1]) + '</span>'; }); });
+      m.innerHTML = '<div class="chips">' + chips + '</div><p class="small muted"><b style="color:var(--text)">' + fit + '</b> ' + t('tema cocok dan tampil lebih dulu.', 'themes match and come first.') + '</p>' +
+        '<div class="chips"><button type="button" class="btn btn--line btn--sm" data-match>' + t('Ubah', 'Change') + '</button><button type="button" class="btn btn--line btn--sm" data-unmatch>' + t('Hapus', 'Clear') + '</button></div>';
+    } else {
+      m.innerHTML = '<p class="small muted">' + t('Belum diatur. Tema tampil menurut urutan biasa.', 'Not set yet. Themes come in their usual order.') + '</p><div><button type="button" class="btn btn--main btn--sm" data-match>' + t('Jawab lima pertanyaan', 'Answer five questions') + '</button></div>';
+    }
+    $('#saved-note').textContent = state.saved.length + ' ' + t('dari 30', 'of 30');
+    ladder($('#ladder-mini'));
+  }
+  function deck() {
+    var list = queue(), total = pool().length, el = $('#deck');
+    if (!list.length) {
+      el.innerHTML = '<div class="deck__done"><img src="' + N.BASE + 'assets/img/nawala-open-720.webp" width="200" alt=""><h2>' + t('Semua sudah kalian lihat.', 'You have seen them all.') + '</h2>' +
+        '<p class="muted">' + state.saved.length + ' ' + t('tema tersimpan. Saatnya menyaring.', 'themes saved. Time to narrow them down.') + '</p>' +
+        '<div class="chips" style="justify-content:center"><button type="button" class="btn btn--main" data-go="pilihan">' + t('Buka pilihan', 'Open saved') + '</button>' +
+        (hist.length ? '<button type="button" class="btn btn--line" data-act="undo">' + t('Urungkan yang terakhir', 'Undo the last one') + '</button>' : '') + '</div></div>';
+      return;
+    }
+    if (answered() && !warned && !score(list[0]) && N.ALL.some(function (th) { return score(th); })) {
+      warned = true;
+      K.toast(t('Tema yang cocok sudah habis. Berikutnya di luar kecocokan kalian.', 'The matching themes have run out. The next ones are outside your match.'));
+    }
+    el.innerHTML = '<div class="deck__stage" id="stage">' + (list[1] ? bigCard(list[1], 'is-back') : '') + bigCard(list[0]) + '</div>' +
+      '<div class="deck__acts"><button type="button" class="round" data-act="no" aria-label="' + t('Lewati', 'Pass') + '">' + K.ic('x') + '</button>' +
+      '<button type="button" class="round round--undo" data-act="undo" aria-label="' + t('Urungkan', 'Undo') + '"' + (hist.length ? '' : ' disabled style="opacity:.4"') + '>' + K.ic('undo') + '</button>' +
+      '<button type="button" class="round round--yes" data-act="yes" aria-label="' + t('Simpan', 'Save') + '">' + K.ic('heart') + '</button></div>' +
+      '<p class="deck__count">' + (total - list.length + 1) + ' ' + t('dari', 'of') + ' ' + total + ', ' + state.saved.length + ' ' + t('tersimpan', 'saved') + '</p>';
+    drag($('#stage').lastElementChild);
+  }
+  function fling(card, dx) {
+    card.classList.add('is-moving');
+    card.style.transform = 'translate3d(' + (dx > 0 ? 150 : -150) + '%,0,0) rotate(' + (dx > 0 ? 18 : -18) + 'deg)';
+    card.style.opacity = '0';
+  }
+  var busy = false;
+  function decide(kind) {
+    var list = queue(), th = list[0], card = $('#stage') && $('#stage').lastElementChild;
+    if (!th || busy) return;
+    var s = N.slug(th);
+    if (kind === 'yes') { if (!save(s)) { if (card) { card.classList.add('is-moving'); card.style.transform = ''; } return; } }
+    else state.no.push(s);
+    hist.push(s); persist();
+    busy = true;
+    if (card) fling(card, kind === 'yes' ? 1 : -1);
+    setTimeout(function () { busy = false; browse(); home(); }, 260);
+  }
+  function undo() {
+    var s = hist.pop(); if (!s) return;
+    drop(state.saved, s); drop(state.no, s); persist(); browse(); home();
+  }
+  function drag(card) {
+    if (!card) return;
+    var x0 = 0, dx = 0, on = false, yes = $('.deck__stamp--yes', card), no = $('.deck__stamp--no', card);
+    card.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button') || busy) return;
+      on = true; x0 = e.clientX; dx = 0; card.classList.remove('is-moving');
+      try { card.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    card.addEventListener('pointermove', function (e) {
+      if (!on) return;
+      dx = e.clientX - x0;
+      card.style.transform = 'translate3d(' + dx + 'px,0,0) rotate(' + (dx / 22) + 'deg)';
+      yes.style.setProperty('--s', Math.max(0, Math.min(1, dx / 90)));
+      no.style.setProperty('--s', Math.max(0, Math.min(1, -dx / 90)));
+    });
+    function end() {
+      if (!on) return; on = false;
+      if (Math.abs(dx) > 90) decide(dx > 0 ? 'yes' : 'no');
+      else { card.classList.add('is-moving'); card.style.transform = ''; yes.style.setProperty('--s', 0); no.style.setProperty('--s', 0); }
+    }
+    card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end);
+  }
+  function tcard(th, acts) {
+    var s = N.slug(th);
+    return '<article class="tc"><button type="button" class="tc__open" data-peek="' + s + '" aria-label="' + esc(K.themeName(th)) + '"><span class="tc__art"><img src="' + N.cover(th, 'm') + '" alt="" loading="lazy">' +
+      '<span class="tc__tags">' + (N.hasFilm(th) ? '<span class="pill pill--jalan">Film</span>' : '') + (th[0] === 'eksklusif' ? '<span class="pill pill--pink">' + t('Satu pasangan', 'One couple') + '</span>' : '') + '</span></span></button>' +
+      (acts ? '' : '<button type="button" class="heart" data-heart="' + s + '" aria-pressed="' + isSaved(s) + '" aria-label="' + t('Simpan ', 'Save ') + esc(K.themeName(th)) + '">' + K.ic('heart') + '</button>') +
+      '<div class="tc__in"><b>' + esc(K.themeName(th)) + '</b><span>' + K.tierName(th[0]) + (answered() && score(th) ? ', ' + t('cocok', 'a match') : '') + '</span>' + (acts || '') + '</div></article>';
+  }
+  function grid() {
+    var list = pool().filter(function (th) { return !q || (th[1] + ' ' + th[2]).toLowerCase().indexOf(q) > -1; });
+    if (answered()) list = list.map(function (th, i) { return [score(th), i, th]; }).sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; }).map(function (r) { return r[2]; });
+    $('#theme-grid').innerHTML = list.length ? list.map(function (th) { return tcard(th); }).join('')
+      : '<div class="empty" style="grid-column:1 / -1"><b>' + t('Tidak ada tema dengan nama itu.', 'No theme has that name.') + '</b>' + t('Coba kata lain.', 'Try another word.') + '</div>';
+  }
+
+  /* ---------- Saved ---------- */
+  function saved() {
+    ladder($('#ladder'));
+    var f = $('#final'), n = state.saved.length;
+    f.hidden = !state.final;
+    if (state.final) {
+      f.innerHTML = '<img src="' + N.BASE + 'assets/img/nawala-open-720.webp" width="720" height="619" alt=""><div><b>' + t('Tema pilihan kalian: ', 'Your chosen theme: ') + esc(K.themeName(bySlug[state.final])) + '</b>' +
+        '<span class="small">' + t('Tim Nawala bisa melihat pilihan ini. Kalian masih boleh menggantinya.', 'The Nawala team can see this choice. You may still change it.') + '</span></div>' +
+        '<button type="button" class="btn btn--line btn--sm" style="margin-left:auto" data-unfinal>' + t('Ganti', 'Change') + '</button>';
+    }
+    $('#saved-grid').innerHTML = n ? state.saved.map(function (s) {
+      return tcard(bySlug[s], '<div class="tc__acts"><button type="button" class="btn btn--line btn--sm" data-unsave="' + s + '">' + t('Lepas', 'Let go') + '</button>' +
+        '<button type="button" class="btn btn--main btn--sm" data-final="' + s + '"' + (state.final === s ? ' disabled' : '') + '>' + (state.final === s ? t('Terpilih', 'Chosen') : t('Pilih ini', 'Choose')) + '</button></div>');
+    }).join('') : '<div class="empty" style="grid-column:1 / -1"><b>' + t('Belum ada yang tersimpan.', 'Nothing saved yet.') + '</b>' + t('Simpan tema dari Jelajah, lalu saring di sini.', 'Save themes in Browse, then narrow them here.') +
+      '<div style="margin-top:1rem"><button type="button" class="btn btn--main" data-go="jelajah">' + t('Mulai menjelajah', 'Start browsing') + '</button></div></div>';
+  }
+
+  /* ---------- Video call ---------- */
+  var pick = { d: 0, time: '16.00', via: 'Google Meet' };
+  function slotDays() { var out = [], i = 1; while (out.length < 6) { var d = K.plusDays(i++); if (d.getDay()) out.push(d); } return out; }
+  function callText() {
+    var d = new Date(state.call.d);
+    return K.day(d) + ', ' + K.date(d) + ', ' + state.call.time + ' WIB, ' + state.call.via;
+  }
+  function schedule() {
+    $('#days').innerHTML = slotDays().map(function (d, i) { return '<button type="button" class="chip" data-d="' + i + '" aria-pressed="' + (pick.d === i) + '">' + K.day(d).slice(0, 3) + ' <b>' + K.date(d, true) + '</b></button>'; }).join('');
+    $('#times').innerHTML = ['10.00', '13.00', '16.00', '19.30'].map(function (h) { return '<button type="button" class="chip" data-h="' + h + '" aria-pressed="' + (pick.time === h) + '">' + h + '</button>'; }).join('');
+    $('#via').innerHTML = ['Google Meet', 'WhatsApp'].map(function (v) { return '<button type="button" class="chip" data-v="' + v + '" aria-pressed="' + (pick.via === v) + '">' + K.ic('video') + v + '</button>'; }).join('');
+    var b = $('#booked'); b.hidden = !state.call;
+    $('#book').textContent = state.call ? t('Ubah ke jadwal ini', 'Change to this time') : t('Pesan jadwal ini', 'Book this time');
+    if (state.call) b.innerHTML = '<img src="' + N.BASE + 'assets/img/nawala-open-720.webp" width="720" height="619" alt=""><div><b>' + esc(callText()) + '</b>' +
+      '<span class="small">' + t('Permintaan jadwal ini tercatat di tim. Kabari kami lewat WhatsApp supaya cepat dikonfirmasi.', 'The team has this requested time. Tell us on WhatsApp so we confirm it quickly.') + '</span></div>' +
+      '<a class="btn btn--main btn--sm" target="_blank" rel="noopener" href="' + esc(DB.wa(t('Halo Nawala, kami ' + ((room || {}).label || '') + '. Kami meminta panggilan video pada ' + callText() + '.', 'Hello Nawala, we are ' + ((room || {}).label || '') + '. We would like a video call on ' + callText() + '.'))) + '">' + t('Kabari lewat WhatsApp', 'Tell us on WhatsApp') + '</a>';
+  }
+
+  /* ---------- Pop-ups ---------- */
+  function openPop(d) { if (d.showModal) { if (!d.open) d.showModal(); } else d.setAttribute('open', ''); }
+  function closePop(d) { if (d.close) d.close(); else d.removeAttribute('open'); }
+  $$('dialog').forEach(function (d) { d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-close]')) closePop(d); }); });
+  var step = 0, peeked = '';
+  function match() {
+    var Q = QS[step];
+    $('#match-dots').innerHTML = QS.map(function (x, i) { return '<i class="' + (i <= step ? 'is-on' : '') + '"></i>'; }).join('');
+    $('#match-h').textContent = t(Q[0], Q[1]);
+    $('#match-p').textContent = (step + 1) + ' ' + t('dari 5. Boleh pilih lebih dari satu, atau lewati.', 'of 5. Pick more than one, or skip it.');
+    $('#match-opts').innerHTML = Q[2].map(function (o, i) { return '<button type="button" class="chip" data-o="' + i + '" aria-pressed="' + (state.answers[step].indexOf(i) > -1) + '">' + t(o[0], o[1]) + '</button>'; }).join('');
+    $('#match-photo').hidden = step !== 0;
+    $('#match-back').textContent = step ? t('Kembali', 'Back') : t('Tutup', 'Close');
+    $('#match-next').textContent = step < 4 ? t('Lanjut', 'Next') : t('Lihat hasilnya', 'See the result');
+  }
+  $('#match-opts').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-o]'); if (!b) return;
+    var i = +b.getAttribute('data-o'), a = state.answers[step], at = a.indexOf(i);
+    if (at > -1) a.splice(at, 1); else a.push(i);
+    match();
+  });
+  $('#match-back').addEventListener('click', function () { if (step) { step--; match(); } else closePop($('#pop-match')); });
+  $('#match-next').addEventListener('click', function () {
+    if (step < 4) { step++; match(); return; }
+    closePop($('#pop-match')); warned = false; persist(); mode = 'deck'; K.go('jelajah'); browse();
+    var fit = N.ALL.filter(function (th) { return score(th); }).length;
+    K.toast(answered() ? fit + ' ' + t('tema cocok kami taruh di depan.', 'matching themes now come first.') : t('Tidak ada jawaban, urutan tetap seperti biasa.', 'No answers, so the order stays as it was.'));
+  });
+  function peek(s) {
+    var th = bySlug[s]; peeked = s;
+    $('#peek-stage').innerHTML = bigCard(th);
+    $('#peek-tier').textContent = K.tierName(th[0]) + (th[0] === 'eksklusif' ? ', ' + t('untuk satu pasangan saja', 'for one couple only') : '');
+    $('#peek-name').textContent = K.themeName(th);
+    $('#peek-desc').textContent = desc(th);
+    $('#peek-save').textContent = isSaved(s) ? t('Lepas dari pilihan', 'Remove from saved') : t('Simpan ke pilihan', 'Save this theme');
+    openPop($('#pop-theme'));
+  }
+  $('#peek-save').addEventListener('click', function () {
+    if (isSaved(peeked)) unsave(peeked); else if (!save(peeked)) return;
+    persist(); closePop($('#pop-theme')); all();
+  });
+
+  /* ---------- Clicks and keys ---------- */
+  document.addEventListener('click', function (e) {
+    var el;
+    if ((el = e.target.closest('[data-match]'))) { step = 0; match(); openPop($('#pop-match')); }
+    else if (e.target.closest('[data-unmatch]')) { state.answers = [[], [], [], [], []]; persist(); browse(); }
+    else if ((el = e.target.closest('[data-mode]'))) { mode = el.getAttribute('data-mode'); browse(); }
+    else if ((el = e.target.closest('[data-tier]'))) { tier = el.getAttribute('data-tier'); browse(); }
+    else if ((el = e.target.closest('[data-act]'))) { var a = el.getAttribute('data-act'); if (a === 'undo') undo(); else decide(a); }
+    else if ((el = e.target.closest('[data-heart]'))) { var s = el.getAttribute('data-heart'); if (isSaved(s)) unsave(s); else if (!save(s)) return; persist(); el.setAttribute('aria-pressed', isSaved(s)); side(); home(); }
+    else if ((el = e.target.closest('[data-peek]'))) peek(el.getAttribute('data-peek'));
+    else if ((el = e.target.closest('[data-unsave]'))) { unsave(el.getAttribute('data-unsave')); persist(); all(); }
+    else if ((el = e.target.closest('[data-final]'))) { state.final = el.getAttribute('data-final'); persist(); all(); window.scrollTo(0, 0); }
+    else if (e.target.closest('[data-unfinal]')) { state.final = ''; persist(); all(); }
+    else if ((el = e.target.closest('[data-d]'))) { pick.d = +el.getAttribute('data-d'); schedule(); }
+    else if ((el = e.target.closest('[data-h]'))) { pick.time = el.getAttribute('data-h'); schedule(); }
+    else if ((el = e.target.closest('[data-v]'))) { pick.via = el.getAttribute('data-v'); schedule(); }
+  });
+  $('#book').addEventListener('click', function () {
+    state.call = { d: slotDays()[pick.d].toISOString(), time: pick.time, via: pick.via };
+    persist(); schedule(); home();
+  });
+  $('#search').addEventListener('input', function () { q = this.value.trim().toLowerCase(); grid(); });
+  document.addEventListener('keydown', function (e) {
+    if (mode !== 'deck' || !$('.view.is-on') || $('.view.is-on').getAttribute('data-view') !== 'jelajah') return;
+    if ($('dialog[open]') || /input|textarea/i.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight') decide('yes'); else if (e.key === 'ArrowLeft') decide('no'); else if (e.key === 'Backspace') undo();
+  });
+
+  /* ---------- The door ---------- */
+  var STORE = 'nawala-code', gateNote = null;   /* the same key the home page's log-in box writes */
+  function stored() { try { return sessionStorage.getItem(STORE) || localStorage.getItem(STORE) || ''; } catch (e) { return ''; } }
+  function forget() { try { sessionStorage.removeItem(STORE); localStorage.removeItem(STORE); } catch (e) {} }
+  function note(pair) { gateNote = pair || null; var m = $('#gate-msg'); m.hidden = !pair; m.textContent = pair ? t(pair[0], pair[1]) : ''; }
+  function lock(pair) {
+    room = null; dirty = false; clearTimeout(saveTimer); forget();
+    $$('dialog[open]').forEach(closePop);
+    document.body.classList.add('is-locked');
+    $('#gate-code').value = ''; note(pair);
+  }
+  function enter(code) {
+    $('#gate-go').disabled = true; note(null);
+    return DB.rpc('room_open', { p_code: code }).then(function (r) {
+      if (!r) {
+        forget();
+        note(['Kode ini tidak dikenali, atau masa berlakunya sudah habis. Hubungi kami lewat WhatsApp dan kami perpanjang.', 'This code is not recognised, or it has reached its end date. Tell us on WhatsApp and we will extend it.']);
+        return;
+      }
+      room = r; skew = new Date(r.now).getTime() - Date.now(); state = clean(r.state); hist = []; warned = false;
+      try { sessionStorage.setItem(STORE, r.code); localStorage.setItem(STORE, r.code); } catch (e) {}
+      $('#gate-code').value = '';
+      document.body.classList.remove('is-locked');
+      all(); K.show(location.hash.slice(1));
+    }, function () {
+      note(['Kode belum bisa diperiksa karena database Nawala tidak terhubung. Coba lagi sebentar lagi, atau hubungi kami lewat WhatsApp.', 'The code cannot be checked because the Nawala database is out of reach. Try again in a moment, or ask us on WhatsApp.']);
+    }).then(function () { $('#gate-go').disabled = false; });
+  }
+  $('#gate-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = $('#gate-code').value.replace(/[^A-Za-z0-9-]/g, '').toUpperCase() || stored();
+    if (code.length < 4) { note(['Tulis kode akses kalian di sini.', 'Write your access code here.']); $('#gate-code').focus(); return; }
+    enter(code);
+  });
+  $('#logout').addEventListener('click', function () { if (dirty) { clearTimeout(saveTimer); push(true); } lock(null); });
+
+  function all() {
+    home(); browse(); saved(); schedule();
+    if (gateNote) note(gateNote);
+    document.title = t('Nawala, ruang pasangan', 'Nawala, the couple\'s room');
+  }
+  /* a view is drawn again each time it is opened, so it never shows what was true a few taps ago */
+  K.onShow.beranda = home; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule;
+  K.onLang(all);
+  K.start();
+  if (stored()) enter(stored()); else $('#gate-code').focus();
+})();

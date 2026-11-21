@@ -350,3 +350,5 @@ fieldset.field{border:0;margin:0;padding:0;min-width:0}
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
   .js .rv{opacity:1;transform:none}
 }
+
+#send[aria-busy="true"]{opacity:.6;pointer-events:none}

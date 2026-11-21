@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Nawala, ruang pasangan</title>
+<link rel="icon" href="../assets/img/icon-64.png">
+<link rel="stylesheet" href="../assets/css/console.css">
+</head>
+<body class="k k--ruang is-locked">
+
+<!-- The couple's room: what an access code opens. Names, dates and choices come from the Nawala database. -->
+<div class="k__bg" aria-hidden="true">
+  <picture>
+    <source media="(max-width:700px)" srcset="../assets/img/plate-sky-mobile-sm.webp">
+    <source media="(max-width:1500px)" srcset="../assets/img/plate-sky-desktop-sm.webp">
+    <img src="../assets/img/plate-sky-desktop.webp" alt="">
+  </picture>
+</div>
+
+<!-- The door: the access code the team sent on WhatsApp. The database checks it and its end date. -->
+<section class="gate" id="gate">
+  <form class="gate__box g" id="gate-form" novalidate>
+    <img src="../assets/img/nawala-open-720.webp" width="720" height="619" alt="">
+    <h1 data-en="Your room at Nawala">Ruang kalian di Nawala</h1>
+    <p data-en="Enter the access code we sent on WhatsApp. It opens every theme and every film.">Masukkan kode akses yang kami kirim lewat WhatsApp. Kode itu membuka semua tema dan semua film.</p>
+    <label class="field"><span class="sr" data-en="Access code">Kode akses</span>
+      <input id="gate-code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" placeholder="NAWALA-XXXXXXXX">
+    </label>
+    <p class="gate__msg" id="gate-msg" role="alert" hidden></p>
+    <button class="btn btn--main" type="submit" id="gate-go" data-en="Open the room">Buka ruang</button>
+    <a class="btn btn--line" id="gate-wa" target="_blank" rel="noopener" href="#" data-en="Ask us on WhatsApp">Hubungi kami lewat WhatsApp</a>
+    <a class="link" href="../" data-en="Back to the home page">Kembali ke halaman utama</a>
+    <div class="k__lang" role="group" aria-label="Bahasa">
+      <button type="button" data-lang="id" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </form>
+</section>
+
+<header class="k__top">
+  <a class="k__brand g" href="../"><img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt=""><b>nawala</b><span class="sr" data-en="Back to the home page">Kembali ke halaman utama</span></a>
+  <div class="k__title g"><b data-en="The couple's room">Ruang pasangan</b></div>
+  <div class="k__me">
+    <div class="k__lang g" role="group" aria-label="Bahasa">
+      <button type="button" data-lang="id" aria-pressed="true">ID</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <span class="k__user g"><i class="ava ava--pink" id="me-ava"></i><span><b id="me-name"></b><small class="code" id="me-code"></small></span></span>
+  </div>
+</header>
+
+<nav class="k__rail g" aria-label="Ruang pasangan">
+  <a href="#beranda" data-ic="home"><span data-en="Home">Beranda</span></a>
+  <a href="#jelajah" data-ic="cards"><span data-en="Browse">Jelajah</span></a>
+  <a href="#pilihan" data-ic="heart"><span data-en="Saved">Pilihan</span><i id="badge-saved" hidden></i></a>
+  <a href="#jadwal" data-ic="calendar"><span data-en="Call">Jadwal</span></a>
+</nav>
+
+<main class="k__main" id="isi">
+
+  <!-- 1. Home -->
+  <section class="view" data-view="beranda">
+    <div class="over">
+      <div class="hero">
+        <div class="fly" aria-hidden="true"><div class="fly__bob"><div class="fly__glow"></div><div class="fly__wing"><img src="../assets/img/nw-flap.webp" width="4800" height="167" alt=""></div></div></div>
+        <h1 id="hello"></h1>
+        <p class="hero__sub" data-en="Your code opens every theme and every film. Save the ones you love, then narrow them down to one.">Kode kalian membuka semua tema dan semua film. Simpan yang kalian suka, lalu saring sampai tersisa satu.</p>
+        <div class="hero__go">
+          <button class="btn btn--main" type="button" data-go="jelajah" data-en="Start browsing">Mulai menjelajah</button>
+          <button class="btn btn--line" type="button" data-match data-en="Set our match">Atur kecocokan</button>
+        </div>
+      </div>
+
+      <div class="over__side">
+        <section class="card g" aria-labelledby="h-steps">
+          <div class="card__h"><div><h2 id="h-steps" data-en="Your steps">Langkah kalian</h2><p data-en="From this room to the day your invitation goes out">Dari ruang ini sampai undangan kalian tersebar</p></div></div>
+          <ol class="todo" id="todo"></ol>
+        </section>
+        <section class="card g" aria-labelledby="h-key">
+          <div class="card__h"><h2 id="h-key" data-en="Your access code">Kode akses kalian</h2></div>
+          <div class="keycard">
+            <b class="code" id="key-code"></b>
+            <div class="meter meter--pink"><i id="key-meter"></i></div>
+            <p class="small muted" id="key-until"></p>
+            <p class="small"><span data-en="Need more time? Tell us and we will extend it.">Perlu waktu lebih? Kabari kami dan kami perpanjang.</span> <a class="link" id="key-wa" target="_blank" rel="noopener" href="#" data-en="Ask on WhatsApp">Minta lewat WhatsApp</a></p>
+          </div>
+        </section>
+      </div>
+
+      <div class="over__low">
+        <section class="card g" aria-labelledby="h-picks">
+          <div class="card__h"><div><h2 id="h-picks" data-en="Your saved themes">Pilihan kalian</h2><p id="picks-note"></p></div><a href="#pilihan" data-en="See all">Lihat semua</a></div>
+          <div class="picks" id="picks"></div>
+        </section>
+        <section class="card g" aria-labelledby="h-note">
+          <div class="card__h"><h2 id="h-note" data-en="From the Nawala team">Dari tim Nawala</h2></div>
+          <div class="note">
+            <img src="../assets/img/nawala-open-720.webp" width="720" height="619" alt="" loading="lazy">
+            <p data-en="Take your time in here. Once three or four themes feel right, book a video call and we will go through them together.">Silakan berlama-lama di sini. Kalau sudah ada tiga atau empat tema yang terasa pas, atur panggilan video dan kita bahas bersama.</p>
+          </div>
+          <div class="hero__go" style="margin-top:1rem">
+            <button class="btn btn--line btn--sm" type="button" data-go="jadwal" id="call-btn" data-en="Book a video call">Atur panggilan video</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Browse: swipe one at a time, or see everything -->
+  <section class="view" data-view="jelajah">
+    <div class="browse">
+      <div class="panel g">
+        <div class="panel__h">
+          <div><h1 data-en="Browse the themes">Jelajah tema</h1><p id="browse-note"></p></div>
+          <div class="panel__tools chips" id="mode" role="group"></div>
+        </div>
+        <div class="chips chips--scroll" id="tier-filter" role="group" style="margin-bottom:1rem"></div>
+        <div class="deck" id="deck"></div>
+        <div id="all" hidden>
+          <label class="field" data-ic="search" style="margin-bottom:1rem"><span class="sr" data-en="Search">Cari</span><input id="search" type="search" placeholder="Cari nama tema" data-en-placeholder="Search a theme name" autocomplete="off"></label>
+          <div class="grid" id="theme-grid"></div>
+        </div>
+      </div>
+      <div class="over__side">
+        <section class="card g" aria-labelledby="h-match">
+          <div class="card__h"><div><h2 id="h-match" data-en="Your match">Kecocokan kalian</h2><p data-en="Five short questions put the closest themes first">Lima pertanyaan singkat menaruh tema terdekat di depan</p></div></div>
+          <div class="match" id="match"></div>
+        </section>
+        <section class="card g" aria-labelledby="h-saved">
+          <div class="card__h"><div><h2 id="h-saved" data-en="Saved">Tersimpan</h2><p id="saved-note"></p></div><a href="#pilihan" data-en="Open">Buka</a></div>
+          <div class="ladder" id="ladder-mini"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Saved: from thirty down to one -->
+  <section class="view" data-view="pilihan">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Your saved themes">Pilihan kalian</h1><p data-en="Save up to 30, then let go of the ones that feel less like you: 30, 15, 10, 5, until one is left.">Simpan sampai 30, lalu lepas yang kurang terasa seperti kalian: 30, 15, 10, 5, sampai tersisa satu.</p></div>
+        <div class="ladder" id="ladder"></div>
+      </div>
+      <div class="booked" id="final" hidden></div>
+      <div class="grid" id="saved-grid" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- 4. Video call -->
+  <section class="view" data-view="jadwal">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Video call with the team">Panggilan video dengan tim</h1><p data-en="Thirty minutes to go through your saved themes, your families' wishes and the details of the day.">Tiga puluh menit untuk membahas tema pilihan, keinginan keluarga, dan detail hari pernikahan.</p></div>
+      </div>
+      <div class="slots">
+        <div><h2 data-en="Pick a day">Pilih hari</h2><div class="chips" id="days" role="group"></div></div>
+        <div><h2 data-en="Pick a time (WIB)">Pilih jam (WIB)</h2><div class="chips" id="times" role="group"></div></div>
+        <div class="slots__wide"><h2 data-en="Where shall we meet">Lewat apa</h2><div class="chips" id="via" role="group"></div></div>
+        <div class="slots__wide">
+          <button class="btn btn--main" type="button" id="book" data-en="Book this time">Pesan jadwal ini</button>
+          <div class="booked" id="booked" hidden style="margin-top:1rem"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="k__sample g"><span data-en="Your saved themes, your choice and your call time are kept with Nawala, so the team sees them too.">Tema tersimpan, pilihan, dan jadwal panggilan kalian disimpan di Nawala, jadi tim kami ikut melihatnya.</span> <button type="button" class="link" id="logout" data-en="Leave the room">Keluar dari ruang</button></p>
+</main>
+
+<!-- Five tag questions. Answering is optional; every question can be skipped. -->
+<dialog class="pop" id="pop-match" aria-labelledby="match-h">
+  <div class="pop__box">
+    <div class="pop__dots" id="match-dots" aria-hidden="true"></div>
+    <h2 id="match-h"></h2>
+    <p class="muted" id="match-p"></p>
+    <div class="pop__body chips" id="match-opts" role="group"></div>
+    <div class="soon" id="match-photo" hidden><span class="round" style="width:44px;height:44px;flex:none" data-ic="plus"></span><span data-en="Coming later: add a pre-wedding photo and we read its colours and mood. Faces are never stored.">Menyusul: tambahkan foto prewedding, lalu kami membaca warna dan suasananya. Wajah tidak pernah disimpan.</span></div>
+    <div class="pop__acts" style="margin-top:1.2rem">
+      <button class="btn btn--line" type="button" id="match-back" data-en="Back">Kembali</button>
+      <button class="btn btn--main" type="button" id="match-next"></button>
+    </div>
+  </div>
+</dialog>
+
+<!-- One theme, in full colour -->
+<dialog class="pop" id="pop-theme" aria-labelledby="peek-name">
+  <div class="pop__box">
+    <div class="deck__stage" id="peek-stage" style="margin:0 auto 1rem"></div>
+    <p class="muted small" id="peek-tier"></p>
+    <h2 id="peek-name"></h2>
+    <p id="peek-desc"></p>
+    <div class="pop__acts" style="margin-top:1.2rem">
+      <button class="btn btn--line" type="button" data-close data-en="Close">Tutup</button>
+      <button class="btn btn--pink" type="button" id="peek-save"></button>
+    </div>
+  </div>
+</dialog>
+
+<script>window.NAWALA_BASE = '../';</script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/themes.js"></script>
+<script src="../assets/js/console.js"></script>
+<script src="../assets/js/ruang.js"></script>
+</body>
+</html>
