@@ -631,7 +631,7 @@
         var sl = slug(th), kept = mine.indexOf(sl) > -1;
         if (isSaved ? !kept : th[0] !== tier) return '';
         var tag = isOwned(sl) ? t('Sudah dimiliki', 'Owned') : ready(th) ? '' : t('Segera', 'Soon');
-        var sub = isSaved ? t(TIERS[th[0]][0], TIERS[th[0]][1]) : th[5] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
+        var sub = isSaved ? t(TIERS[th[0]][0], TIERS[th[0]][1]) : FAMILIES[th[5]] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
         return '<button class="tc' + (kept ? ' is-kept' : '') + '" type="button" data-i="' + i + '"><span class="tc__art' + (th[5] ? ' cf cf--' + th[5] : '') + '"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" width="400" height="500">' +
           (tag ? '<em>' + tag + '</em>' : '') + '</span><b>' + t(th[1], th[2]) + '</b><small>' + sub + '</small></button>';
       }).join('');
@@ -663,7 +663,7 @@
       viewing = i; var th = ALL[i], sl = slug(th), isX = th[0] === 'eksklusif', owned = isOwned(sl);
       coverEl.className = 'detail__cover' + (th[5] ? '' : ' is-tall');
       coverEl.style.backgroundImage = 'url(' + cover(th, 't') + ')';   /* toned down like the rest of the page; the invitation itself shows the full colour */
-      $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (th[5] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
+      $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (FAMILIES[th[5]] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
       $('#detail-name').textContent = t(th[1], th[2]);
       var can = ready(th) && !owned, openEl = $('#detail-open');
       $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + (ready(th) ? t('Buka undangannya dan jalani seperti seorang tamu: geser naik turun untuk melihat isinya, geser ke kanan untuk menyimpan, ke kiri untuk melewati.', 'Open the invitation and walk it as a guest would: swipe up and down to see inside, right to save it, left to pass.')
