@@ -11,7 +11,7 @@
 
   var STAGES = [['baru', 'Baru', 'New'], ['dihubungi', 'Dihubungi', 'Contacted'], ['konsep', 'Konsep', 'Concept'], ['produksi', 'Produksi', 'Production'], ['tayang', 'Tayang', 'Live']];
   var ORDER = STAGES.map(function (s) { return s[0]; });
-  var D = { me: { name: '', role: '' }, leads: [], codes: [], invitations: [], wishes: [], themes: [] };
+  var D = { me: { name: '', role: '', rank: 0 }, leads: [], codes: [], invitations: [], wishes: [], themes: [], team: [] };
   var token = '', skew = 0, loadedAt = 0, q = '';
 
   function now() { return Date.now() + skew; }
@@ -23,6 +23,14 @@
   function mask(num) { var n = local(num); return n.slice(0, 4) + ' xxxx ' + n.slice(-4); }
   function intl(num) { return String(num || '').replace(/^0/, '62'); }
   function days(n) { return n + ' ' + t('hari', n === 1 ? 'day' : 'days'); }
+  /* ranks: 3 owner, 2 superadmin, 1 admin. The database decides what each may do; the page only hides what would be refused. */
+  function rank() { return (D.me && +D.me.rank) || 0; }
+  function sup() { return rank() >= 2; }
+  function ranked() {
+    K.$$('[data-need="super"]').forEach(function (el) { el.hidden = !sup(); });
+    document.body.classList.toggle('is-admin', !sup());
+    var v = $('.view.is-on'); if (v && v.hidden) K.go('ringkasan');
+  }
 
   /* ---------- The door ---------- */
   var STORE = 'nawala-tim', gateNote = null;
@@ -35,7 +43,7 @@
   var ENDED = ['Token ini tidak berlaku lagi. Masuk kembali.', 'This token no longer works. Please log in again.'];
   /* keep: the token may still be good (the door is only locked for a while), so it is not forgotten */
   function lock(pair, keep) {
-    token = ''; if (!keep) forget();
+    token = ''; if (!keep) forget(); clearInterval(watchTimer);
     document.body.classList.add('is-locked');
     $('#gate-token').value = ''; note(pair);
   }
@@ -52,6 +60,8 @@
       $('#gate-token').value = '';
       document.body.classList.remove('is-locked');
       all(); K.show(location.hash.slice(1));
+      DB.rpc('team_hello', { t: tok, p_login: true }).catch(function () {});
+      watch();
     }, function (e) {
       if (e.status >= 400 && e.status < 500) { forget(); note(['Token tidak dikenali. Periksa lagi, atau minta token baru kepada pemilik.', 'That token is not recognised. Check it, or ask the owner for a new one.']); }
       else note(['Database Nawala belum bisa dihubungi. Tekan Masuk untuk mencoba lagi.', 'The Nawala database cannot be reached. Press Log in to try again.']);
@@ -83,6 +93,19 @@
   }
   function write(name, body, done) {
     return call(name, body).then(function (r) { if (r !== null && done) done(r); return refresh(); }).catch(function () {});
+  }
+  /* Every minute while the page is in view: may this person still be here? A revoked token is sent back to the door
+     at once (and only once, so a closed console does not keep knocking), and a changed rank redraws the page. */
+  var watchTimer = 0;
+  function watch() {
+    clearInterval(watchTimer);
+    watchTimer = setInterval(function () {
+      if (!token || document.hidden) return;
+      DB.rpc('team_hello', { t: token, p_login: false }).then(function (me) {
+        if (!me) { lock(ENDED); return; }
+        if (me.role !== D.me.role) refresh().catch(function () {});
+      }, function (e) { if (e.status === 401 || e.status === 403) lock(ENDED); });
+    }, 60000);
   }
   $('#reload').addEventListener('click', function () { refresh().then(function () { K.toast(t('Data diperbarui.', 'The data is up to date.')); }, function () {}); });
   document.addEventListener('visibilitychange', function () {
@@ -133,8 +156,10 @@
         '<span class="stat__d">' + (oldest ? t('terlama masuk ', 'the oldest came in ') + K.ago(oldest.created_at) : t('tidak ada antrean', 'no queue')) + '</span></div>' +
       '<div class="stat"><span class="stat__l">' + t('Undangan dikerjakan', 'Invitations in work') + '</span><b class="stat__n">' + work + '</b>' +
         '<span class="stat__d">' + t('di tahap konsep dan produksi', 'in concept and production') + '</span></div>' +
-      '<div class="stat"><span class="stat__l">' + t('Kode aktif', 'Active codes') + '</span><b class="stat__n">' + active.length + '</b>' +
-        '<span class="stat__d">' + soon + ' ' + t('habis dalam 7 hari', 'end within 7 days') + '</span></div>';
+      (sup() ? '<div class="stat"><span class="stat__l">' + t('Kode aktif', 'Active codes') + '</span><b class="stat__n">' + active.length + '</b>' +
+        '<span class="stat__d">' + soon + ' ' + t('habis dalam 7 hari', 'end within 7 days') + '</span></div>'
+      : '<div class="stat"><span class="stat__l">' + t('Perlu diperiksa', 'Needs a check') + '</span><b class="stat__n">' + D.invitations.filter(function (o) { return o.status === 'periksa'; }).length + '</b>' +
+        '<span class="stat__d">' + t('pesanan dari pasangan', 'orders sent by couples') + '</span></div>');
 
     var counts = ORDER.map(function (k) { return inStage(k).length; }), top = Math.max.apply(null, counts.concat(1));
     $('#flow').innerHTML = STAGES.map(function (s, i) {
@@ -171,7 +196,7 @@
     $('#me-role').textContent = roleName(me.role);
     $('#foot-who').textContent = t('Masuk sebagai ', 'Logged in as ') + (me.name || '') + ', ' + roleName(me.role).toLowerCase() + '.';
   }
-  function roleName(r) { return r === 'pemilik' ? t('Pemilik', 'Owner') : r === 'operator' ? t('Operator', 'Operator') : ''; }
+  function roleName(r) { return r === 'pemilik' ? t('Pemilik', 'Owner') : r === 'superadmin' ? 'Superadmin' : r === 'admin' || r === 'operator' ? 'Admin' : ''; }
 
   /* ---------- Requests ---------- */
   var leadFilter = 'semua';
@@ -200,7 +225,7 @@
             '<a class="btn btn--sm ' + (l.stage === 'baru' ? 'btn--main' : 'btn--line') + '" target="_blank" rel="noopener" href="' + esc(DB.wa(hello, intl(l.whatsapp))) + '"' + (l.stage === 'baru' ? ' data-reply="' + l.id + '"' : '') + '>' + (l.stage === 'baru' ? t('Balas', 'Reply') : 'WhatsApp') + '</a>' +
             (at > 0 && at < ORDER.length - 1 ? '<button type="button" class="btn btn--line btn--sm" data-stage="' + ORDER[at + 1] + '" data-lead="' + l.id + '">' + t('Tahap berikut', 'Next stage') + '</button>' : '') +
             (at > 0 ? '<button type="button" class="btn btn--line btn--sm" data-stage="' + ORDER[at - 1] + '" data-lead="' + l.id + '">' + t('Mundur', 'Back a stage') + '</button>' : '') +
-            (code ? '' : '<button type="button" class="btn btn--line btn--sm" data-mk="' + l.id + '">' + t('Buat kode', 'Make a code') + '</button>') +
+            (code || !sup() ? '' : '<button type="button" class="btn btn--line btn--sm" data-mk="' + l.id + '">' + t('Buat kode', 'Make a code') + '</button>') +
           '</span>' +
         '</div></article>';
     }).join('') : D.leads.length || q
@@ -324,9 +349,14 @@
   function head(o) {
     var s = OSTAT[o.status], live = o.status === 'tayang';
     $('#o-title').textContent = o.couple;
-    $('#o-sub').innerHTML = '<span class="pill pill--' + s[2] + '">' + t(s[0], s[1]) + '</span> <span class="code">' + esc(o.code || '') + '</span> ' +
+    $('#o-sub').innerHTML = '<span class="pill pill--' + s[2] + '">' + t(s[0], s[1]) + '</span> ' + (o.code ? '<span class="code">' + esc(o.code) + '</span> ' : '') +
       (live ? '<a class="link" target="_blank" rel="noopener" href="https://' + esc(addr(o)) + '">' + esc(addr(o)) + '</a>' : '<span class="muted">' + esc(addr(o)) + ' ' + t('(belum tayang)', '(not live yet)') + '</span>');
     var miss = B.missing(B.norm(o.draft)), r = B.route(o.theme, themeRows());
+    if (!sup()) {
+      $('#o-acts').innerHTML = live ? '<button type="button" class="btn btn--line btn--sm" data-copy="https://' + esc(addr(o)) + '">' + t('Salin tautan', 'Copy the link') + '</button>' : '';
+      $('#o-acts').insertAdjacentHTML('beforeend', '<p class="small muted" style="width:100%">' + (o.pending || !live ? t('Superadmin atau pemilik yang menerbitkan.', 'A superadmin or the owner publishes it.') : '') + '</p>');
+      return;
+    }
     $('#o-acts').innerHTML = (o.status === 'arsip' ? '' :
       (live && !o.pending ? '' : '<button type="button" class="btn btn--main btn--sm" data-publish' + (miss.length || !r.built || !o.theme ? ' disabled' : '') + '>' + (live ? t('Terbitkan perubahan', 'Publish the changes') : t('Terbitkan', 'Publish')) + '</button>') +
       (live ? '<button type="button" class="btn btn--line btn--sm" data-copy="https://' + esc(addr(o)) + '">' + t('Salin tautan', 'Copy the link') + '</button><button type="button" class="btn btn--line btn--sm" data-unpublish>' + t('Turunkan', 'Take offline') + '</button>' : '')) +
@@ -347,19 +377,21 @@
         chosen.concat(opts).map(function (x) { return '<option value="' + esc(x[0]) + '"' + (x[0] === o.theme ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('') + '</select></span></label>' +
         '<span class="small" style="font-weight:600">' + t('Tingkat isi', 'Level') + '</span>' + chipsOf('level', [[1, '1 Dasar'], [2, '2 Menengah'], [3, '3 Maksimal']], o.level) +
         '<span class="small" style="font-weight:600">' + t('Susunan kata', 'Wording') + '</span>' + chipsOf('wording', [['umum', t('Umum', 'Neutral')], ['islam', 'Islami']], o.wording) + '</section>' +
+      (!sup() ? '<section class="card card--tile"><h2>' + t('Pembayaran', 'Payment') + '</h2><p><span class="pill ' + (o.pay_status === 'lunas' ? 'pill--tayang' : o.pay_status === 'dp' ? 'pill--jalan' : 'pill--habis') + '">' + t(PAY[o.pay_status][0], PAY[o.pay_status][1]) + '</span></p>' +
+        '<p class="small muted">' + t('Pembayaran diatur oleh superadmin atau pemilik.', 'Payment is set by a superadmin or the owner.') + '</p></section>' :
       '<section class="card card--tile"><h2>' + t('Pembayaran', 'Payment') + '</h2>' + chipsOf('pay_status', [['belum', t(PAY.belum[0], PAY.belum[1])], ['dp', 'DP'], ['lunas', t('Lunas', 'Paid')]], o.pay_status) +
         '<label class="bf__f"><span>' + t('Jumlah dibayar (Rp)', 'Amount paid (Rp)') + '</span><span class="field"><input id="o-amount" inputmode="numeric" value="' + (o.pay_amount == null ? '' : o.pay_amount) + '"></span><small id="o-amount-say">' + rupiah(o.pay_amount) + '</small></label>' +
-        '<label class="bf__f"><span>' + t('Tanggal bayar', 'Payment date') + '</span><span class="field"><input id="o-paydate" type="date" value="' + (o.pay_date || '') + '"></span></label></section>' +
+        '<label class="bf__f"><span>' + t('Tanggal bayar', 'Payment date') + '</span><span class="field"><input id="o-paydate" type="date" value="' + (o.pay_date || '') + '"></span></label></section>') +
       '<section class="card card--tile"><h2>' + t('Tenggat', 'Deadlines') + '</h2>' +
         '<p class="small">' + t('Hari pernikahan: ', 'Wedding day: ') + '<b>' + (d.date ? K.day(new Date(d.date + 'T12:00:00')) + ', ' + K.date(new Date(d.date + 'T12:00:00')) + ' ' + d.date.slice(0, 4) : t('belum diisi', 'not filled in yet')) + '</b></p>' +
         '<label class="bf__f"><span>' + t('Target tayang', 'Go live by') + '</span><span class="field"><input id="o-liveby" type="date" value="' + (o.live_by || '') + '"></span></label>' +
         '<ul class="checks">' + ck.map(function (c) { return '<li class="' + (c[2] ? 'is-done' : '') + '">' + (c[3] ? '<i>' + (c[2] ? K.ic('check') : '') + '</i>' : '<button type="button" class="tick" data-tick="' + c[0] + '" aria-pressed="' + c[2] + '">' + (c[2] ? K.ic('check') : '') + '</button>') + '<span>' + c[1] + (c[3] ? '' : ' <small class="muted">' + t('(ketuk)', '(tap)') + '</small>') + '</span></li>'; }).join('') + '</ul></section>' +
       '<section class="card card--tile"><h2>' + t('Catatan', 'Notes') + '</h2><span class="field field--area"><textarea id="o-notes" rows="5" maxlength="4000" placeholder="' + t('Yang disepakati di panggilan video', 'What was agreed on the video call') + '"></textarea></span></section>' +
-      '<section class="card card--tile"><h2>' + t('Pasangan', 'The couple') + '</h2><p class="small">' + t('Kode ruang pasangan: ', 'Room code: ') + '<b class="code">' + esc(o.code || '') + '</b></p>' +
+      '<section class="card card--tile"><h2>' + t('Pasangan', 'The couple') + '</h2>' + (sup() ? '<p class="small">' + t('Kode ruang pasangan: ', 'Room code: ') + '<b class="code">' + esc(o.code || '') + '</b></p>' : '') +
         '<p class="small muted">' + (o.submitted_at ? t('Dikirim untuk diperiksa ', 'Sent for a check ') + K.ago(o.submitted_at) : t('Pasangan belum menekan "Kirim untuk diperiksa".', 'The couple has not pressed "Send for a check" yet.')) + '</p>' +
-        '<span class="chips"><button type="button" class="btn btn--line btn--sm" data-copy="' + esc(o.code || '') + '">' + t('Salin kode', 'Copy the code') + '</button>' +
+        (!sup() ? '' : '<span class="chips"><button type="button" class="btn btn--line btn--sm" data-copy="' + esc(o.code || '') + '">' + t('Salin kode', 'Copy the code') + '</button>' +
         '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + esc(DB.wa(msg, waOf(o))) + '">' + t('Kirim petunjuk lewat WhatsApp', 'Send instructions on WhatsApp') + '</a></span>' +
-        (o.status !== 'tayang' && o.status !== 'arsip' ? '<button type="button" class="link" data-archive style="margin-top:.6rem">' + t('Arsipkan pesanan ini', 'Archive this order') + '</button>' : '') + '</section>' +
+        (o.status !== 'tayang' && o.status !== 'arsip' ? '<button type="button" class="link" data-archive style="margin-top:.6rem">' + t('Arsipkan pesanan ini', 'Archive this order') + '</button>' : '')) + '</section>' +
       '</div>';
     $('#o-notes', body).value = o.notes || '';
   }
@@ -458,7 +490,8 @@
         (r.owned ? '<span class="pill pill--pink">' + t('Sudah dimiliki', 'Owned') + '</span>' : '') + (r.hidden && !gone ? '<span class="pill pill--habis">' + t('Tersembunyi', 'Hidden') + '</span>' : '') + '</div></div>' +
         '<div class="tc__in"><b>' + esc(K.lang() === 'en' ? r.name_en : r.name_id) + '</b><span>' + K.tierName(r.tier) + (r.film ? '' : ', ' + t('belum ada film', 'no film yet')) + (r.kit ? '' : ', ' + t('belum ada undangan', 'no invitation yet')) + '</span>' +
         '<span>' + (n ? n + ' ' + t('kali dipilih', n === 1 ? 'time chosen' : 'times chosen') : t('Belum pernah dipilih', 'Not chosen yet')) + '</span>' +
-        (gone ? '<button type="button" class="btn btn--line btn--sm" data-restore="' + esc(r.slug) + '">' + t('Pulihkan', 'Bring back') + '</button>' :
+        (!sup() ? '<span>' + (gone ? t('Terhapus', 'Deleted') : r.hidden ? t('Tersembunyi dari situs', 'Hidden from the site') : t('Tampil di situs', 'Shown on the site')) + '</span>' :
+         gone ? '<button type="button" class="btn btn--line btn--sm" data-restore="' + esc(r.slug) + '">' + t('Pulihkan', 'Bring back') + '</button>' :
           '<button type="button" class="switch" role="switch" aria-checked="' + !r.hidden + '" data-show="' + esc(r.slug) + '"><span>' + t('Tampil di situs', 'Shown on the site') + '</span><i></i></button>' +
           (r.tier === 'eksklusif' ? '<button type="button" class="switch" role="switch" aria-checked="' + !!r.owned + '" data-own="' + esc(r.slug) + '"><span>' + t('Sudah dimiliki', 'Owned') + '</span><i></i></button>' : '') +
           '<span class="tc__acts"><button type="button" class="btn btn--line btn--sm" data-edit="' + esc(r.slug) + '">' + t('Ubah', 'Edit') + '</button>' +
@@ -651,15 +684,142 @@
     });
   });
 
+  /* ---------- The team (inside Kode): owner and superadmins add people, give new tokens, change ranks, cut off ---------- */
+  var RANKS = { pemilik: 3, superadmin: 2, admin: 1, operator: 1 }, addRole = 'admin', openMember = '', confirmCut = '', teamFresh = null;
+  var ROLE_SAY = {
+    superadmin: ['Melihat semuanya, membuat dan mengakhiri kode, mengatur pembayaran, menerbitkan undangan, mengurus tema, menambah dan mencabut admin, dan melihat aktivitas.',
+      'Sees everything, makes and ends codes, sets payment, publishes invitations, manages themes, adds and removes admins, and sees the activity log.'],
+    admin: ['Dasar saja: membalas dan memindahkan permintaan, mengisi dan memeriksa data pesanan, catatan, tenggat, tamu, dan ucapan. Tidak melihat kode, pembayaran, atau aktivitas.',
+      'The basics: reply to and move requests, fill in and check order details, notes, deadlines, guests and wishes. Does not see codes, payment or the activity log.']
+  };
+  function rankOf(r) { return RANKS[r] || 0; }
+  function team() {
+    if (!sup()) return;
+    var roles = rank() >= 3 ? ['superadmin', 'admin'] : ['admin'];
+    if (roles.indexOf(addRole) < 0) addRole = 'admin';
+    $('#ta-role').innerHTML = roles.map(function (r) { return '<button type="button" class="chip" data-r="' + r + '" aria-pressed="' + (addRole === r) + '">' + roleName(r) + '</button>'; }).join('');
+    $('#ta-role-say').textContent = t(ROLE_SAY[addRole][0], ROLE_SAY[addRole][1]);
+    var rows = D.team || [];
+    $('#team').innerHTML = rows.map(function (m) {
+      var gone = !!m.ended_at, below = rankOf(m.role) < rank(), open = openMember === m.id;
+      var said = gone ? t('akses dicabut ', 'access revoked ') + K.ago(m.ended_at) : m.last_seen_at ? t('terakhir aktif ', 'last active ') + K.ago(m.last_seen_at) : t('belum pernah masuk', 'has not logged in yet');
+      var can = m.me || below;
+      var acts = '';
+      if (open && m.me) acts = '<button type="button" class="btn btn--line btn--sm" data-mact="token">' + t('Ganti token saya', 'Replace my token') + '</button>';
+      else if (open && below) {
+        if (gone) acts = '<button type="button" class="btn btn--line btn--sm" data-mact="buka">' + t('Buka lagi dengan token baru', 'Let back in with a new token') + '</button>';
+        else {
+          acts = '<button type="button" class="btn btn--line btn--sm" data-mact="token">' + t('Token baru', 'New token') + '</button>';
+          if (rank() >= 3) acts += '<button type="button" class="btn btn--line btn--sm" data-mact="peran" data-role="' + (m.role === 'superadmin' ? 'admin' : 'superadmin') + '">' + (m.role === 'superadmin' ? t('Jadikan Admin', 'Make Admin') : t('Jadikan Superadmin', 'Make Superadmin')) + '</button>';
+          acts += confirmCut === m.id
+            ? '<button type="button" class="btn btn--pink btn--sm" data-mact="akhiri">' + t('Ya, cabut sekarang', 'Yes, revoke now') + '</button><button type="button" class="btn btn--line btn--sm" data-mact="batal">' + t('Batal', 'Cancel') + '</button>'
+            : '<button type="button" class="btn btn--line btn--sm" data-mact="tanya">' + t('Cabut akses', 'Revoke access') + '</button>';
+        }
+      }
+      return '<div class="row row--code' + (gone ? ' is-dim' : '') + '"><i class="ava ' + (m.role === 'admin' ? 'ava--green' : '') + '">' + esc(String(m.name).charAt(0).toUpperCase()) + '</i>' +
+        '<div class="row__t"><b>' + esc(m.name) + (m.me ? ' <span class="muted">(' + t('Anda', 'you') + ')</span>' : '') + '</b><span>' + esc(said) + '</span></div>' +
+        '<span class="pill ' + (gone ? 'pill--habis' : m.role === 'pemilik' ? 'pill--pink' : m.role === 'superadmin' ? 'pill--tayang' : 'pill--jalan') + '">' + roleName(m.role) + '</span>' +
+        (can ? '<button type="button" class="round" style="width:44px;height:44px" data-member="' + esc(m.id) + '" aria-expanded="' + open + '" aria-label="' + t('Atur', 'Manage') + ' ' + esc(m.name) + '">' + K.ic('tune') + '</button>' : '<span style="width:44px"></span>') + '</div>' +
+        (acts ? '<div class="row__acts" data-mid="' + esc(m.id) + '">' + acts + '</div>' : '');
+    }).join('') || '<div class="empty">' + t('Belum ada orang di tim.', 'Nobody in the team yet.') + '</div>';
+    var f = $('#team-fresh'); f.hidden = !teamFresh;
+    if (teamFresh) {
+      f.innerHTML = '<span class="small">' + (teamFresh.self ? t('Token baru Anda', 'Your new token') : t('Token untuk ', 'Token for ') + esc(teamFresh.name)) + '</span><b class="code">' + esc(teamFresh.token) + '</b>' +
+        '<span class="small">' + (teamFresh.self ? t('Token lama sudah tidak berlaku. Konsol ini sudah memakai yang baru; simpan token ini di tempat aman.', 'The old token no longer works. This console already uses the new one; keep this token somewhere safe.')
+          : t('Token ini hanya tampil sekali. Salin dan kirim secara pribadi kepada ', 'This token is shown only once. Copy it and send it privately to ') + esc(teamFresh.name) + t(', bersama alamat ', ', with the address ') + DB.site + 'tim/.') + '</span>' +
+        '<span class="chips"><button type="button" class="btn btn--line btn--sm" data-copy="' + esc(teamFresh.token) + '">' + t('Salin token', 'Copy the token') + '</button>' +
+        '<button type="button" class="btn btn--line btn--sm" data-fresh-done>' + t('Sudah disalin, tutup', 'Copied, close') + '</button></span>';
+    }
+  }
+  var TEAM_ERR = { nama: ['Isi nama orangnya.', 'Write their name.'], peran: ['Peran itu tidak bisa Anda berikan.', 'You cannot give that role.'], ada: ['Nama itu sudah ada di tim. Pakai "Token baru" di barisnya.', 'That name is already in the team. Use "New token" on their row.'],
+    'lebih-tinggi': ['Orang ini setingkat atau di atas Anda.', 'This person ranks the same as or above you.'], 'tidak-ada': ['Orang ini tidak ditemukan.', 'This person was not found.'] };
+  function teamErr(r) { var e = TEAM_ERR[r.error] || [r.error, r.error]; K.toast(t(e[0], e[1])); }
+  $('#ta-role').addEventListener('click', function (e) { var b = e.target.closest('[data-r]'); if (b) { addRole = b.getAttribute('data-r'); team(); } });
+  $('#team-add').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('#ta-name').value.trim();
+    if (!name) { $('#ta-name').focus(); return K.toast(t('Isi nama orangnya.', 'Write their name.')); }
+    call('team_member_add', { p_name: name, p_role: addRole }).then(function (r) {
+      if (!r) return;
+      if (r.error) return teamErr(r);
+      teamFresh = { name: r.name, token: r.token }; $('#ta-name').value = '';
+      return refresh().then(function () { K.toast(r.name + ': ' + t('ditambahkan sebagai ', 'added as ') + roleName(r.role) + '.'); });
+    }).catch(function () {});
+  });
+  $('#team-panel').addEventListener('click', function (e) {
+    var el;
+    if (e.target.closest('[data-fresh-done]')) { teamFresh = null; team(); return; }
+    if ((el = e.target.closest('[data-member]'))) { var id = el.getAttribute('data-member'); openMember = openMember === id ? '' : id; confirmCut = ''; team(); return; }
+    if (!(el = e.target.closest('[data-mact]'))) return;
+    var mid = el.closest('[data-mid]').getAttribute('data-mid'), act = el.getAttribute('data-mact');
+    var m = (D.team || []).filter(function (x) { return x.id === mid; })[0]; if (!m) return;
+    if (act === 'tanya') { confirmCut = mid; team(); return; }
+    if (act === 'batal') { confirmCut = ''; team(); return; }
+    if (act === 'buka') {
+      call('team_member_add', { p_name: m.name, p_role: m.role === 'pemilik' ? 'admin' : m.role }).then(function (r) {
+        if (!r) return; if (r.error) return teamErr(r);
+        teamFresh = { name: r.name, token: r.token }; openMember = ''; return refresh();
+      }).catch(function () {});
+      return;
+    }
+    var keepLocal = false; try { keepLocal = !!localStorage.getItem(STORE); } catch (x) {}
+    call('team_member_act', { p_id: mid, p_act: act, p_role: el.getAttribute('data-role') || null }).then(function (r) {
+      if (!r) return; if (r.error) return teamErr(r);
+      if (act === 'token') {
+        teamFresh = { name: m.name, token: r.token, self: !!r.self };
+        if (r.self) { token = r.token; remember(r.token, keepLocal); }
+      }
+      confirmCut = ''; if (act !== 'peran') openMember = '';
+      return refresh().then(function () {
+        if (act === 'akhiri') K.toast(m.name + ': ' + t('akses dicabut. Konsolnya tertutup saat itu juga.', 'access revoked. Their console closes right away.'));
+        if (act === 'peran') K.toast(m.name + ': ' + t('sekarang ', 'now ') + roleName(el.getAttribute('data-role')) + '.');
+      });
+    }).catch(function () {});
+  });
+
+  /* ---------- Activity: owner and superadmins; 200 entries at a time, newest first ---------- */
+  var actKind = '', actRows = [], actEnd = false, actBusy = false;
+  function clock(iso) { var d = new Date(iso); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
+  function actDraw() {
+    $('#act-filter').innerHTML = [['', t('Semua', 'All')], ['tim', t('Tim', 'Team')], ['pasangan', t('Pasangan', 'Couples')]].map(function (k) {
+      return '<button type="button" class="chip" data-k="' + k[0] + '" aria-pressed="' + (actKind === k[0]) + '">' + k[1] + '</button>';
+    }).join('');
+    var list = actRows.filter(function (a) { return hit(a.who, a.id, a.en); }), out = '', lastDay = '';
+    list.forEach(function (a) {
+      var d = new Date(a.at), key = d.toDateString();
+      if (key !== lastDay) { if (lastDay) out += '</div>'; out += '<h2 class="sub">' + K.day(d) + ', ' + K.date(d) + '</h2><div class="rows">'; lastDay = key; }
+      out += '<div class="row"><i class="ava ava--sm ' + (a.kind === 'pasangan' ? 'ava--pink' : 'ava--green') + '">' + esc(String(a.who).charAt(0).toUpperCase()) + '</i>' +
+        '<div class="row__t"><b>' + esc(a.who) + (a.kind === 'pasangan' ? ' <span class="muted">' + t('pasangan', 'couple') + '</span>' : '') + '</b><span class="wrap">' + esc(K.lang() === 'en' ? a.en : a.id) + '</span></div>' +
+        '<span class="row__e">' + clock(a.at) + '</span></div>';
+    });
+    if (lastDay) out += '</div>';
+    $('#act').innerHTML = out || '<div class="empty"><b>' + (actBusy ? t('Memuat...', 'Loading...') : t('Belum ada aktivitas.', 'No activity yet.')) + '</b>' + (actBusy ? '' : t('Setiap orang yang masuk dan setiap perubahan muncul di sini selama 30 hari.', 'Every log-in and every change shows here for 30 days.')) + '</div>';
+    $('#act-more').hidden = actEnd || !actRows.length;
+  }
+  function actLoad(reset) {
+    if (!sup() || actBusy) return;
+    if (reset) { actRows = []; actEnd = false; }
+    actBusy = true; actDraw();
+    call('team_activity', { p_before: actRows.length ? actRows[actRows.length - 1].at : null, p_kind: actKind || null }).then(function (r) {
+      actBusy = false; if (!r) return actDraw();
+      actRows = actRows.concat(r); actEnd = r.length < 200; actDraw();
+    }).catch(function () { actBusy = false; actDraw(); });
+  }
+  $('#act-filter').addEventListener('click', function (e) { var b = e.target.closest('[data-k]'); if (b) { actKind = b.getAttribute('data-k'); actLoad(true); } });
+  $('#act-more').addEventListener('click', function () { actLoad(false); });
+  K.onShow.aktivitas = function () { actLoad(true); };
+
   /* ---------- Search: narrows the three lists ---------- */
   $('#search').addEventListener('input', function () {
     q = this.value.trim().toLowerCase();
-    leads(); themes(); codes();
+    leads(); themes(); codes(); if (sup()) actDraw();
     if (q && $('.view.is-on') && $('.view.is-on').getAttribute('data-view') === 'ringkasan') K.go('permintaan');
   });
 
   function all() {
-    overview(); leads(); orders(); themes(); codes();
+    ranked();
+    overview(); leads(); orders(); themes(); codes(); team();
+    if (sup() && $('.view.is-on') && $('.view.is-on').getAttribute('data-view') === 'aktivitas') actDraw();
     if (gateNote) note(gateNote);
     document.title = t('Nawala, konsol tim', 'Nawala, team console');
   }

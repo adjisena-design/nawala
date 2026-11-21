@@ -51,6 +51,8 @@ window.K = (function () {
     grid: '<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
     tune: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
     chat: '<path d="M5 5h14v11H10l-5 4z"/>',
+    pulse: '<path d="M3 12h4l2.500-6 4 12 2.500-6H21"/>',
+    shield: '<path d="M12 3 5 6v6c0 4.200 3 7.500 7 9 4-1.500 7-4.800 7-9V6z"/>',
     video: '<rect x="3" y="6" width="13" height="12" rx="3"/><path d="m16 10 5-3v10l-5-3"/>'
   };
   function ic(name) { return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + (ICON[name] || '') + '</svg>'; }
@@ -59,7 +61,8 @@ window.K = (function () {
   /* ---------- Views: the rail switches them; the address keeps a plain #name ---------- */
   var views = $$('.view'), links = $$('.k__rail a'), onShow = {};
   function show(name) {
-    var found = views.some(function (v) { return v.getAttribute('data-view') === name; });
+    /* a view can be closed to this person (hidden): it then cannot be reached by its address either */
+    var found = views.some(function (v) { return v.getAttribute('data-view') === name && !v.hidden; });
     if (!found) name = views[0].getAttribute('data-view');
     views.forEach(function (v) { v.classList.toggle('is-on', v.getAttribute('data-view') === name); });
     links.forEach(function (a) {

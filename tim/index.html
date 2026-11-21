@@ -58,7 +58,8 @@
   <a href="#permintaan" data-ic="inbox"><span data-en="Requests">Permintaan</span><i id="badge-new" hidden></i></a>
   <a href="#undangan" data-ic="letter"><span data-en="Orders">Pesanan</span></a>
   <a href="#tema" data-ic="themes"><span data-en="Themes">Tema</span></a>
-  <a href="#kode" data-ic="key"><span data-en="Codes">Kode</span></a>
+  <a href="#kode" data-ic="key" data-need="super"><span data-en="Codes">Kode</span></a>
+  <a href="#aktivitas" data-ic="pulse" data-need="super"><span data-en="Activity">Aktivitas</span></a>
 </nav>
 
 <main class="k__main" id="isi">
@@ -72,7 +73,7 @@
         <p class="hero__sub" id="hello-sub"></p>
         <div class="hero__go">
           <button class="btn btn--main" type="button" data-go="permintaan" data-en="Reply to requests">Balas permintaan</button>
-          <button class="btn btn--line" type="button" data-go="kode" data-en="Make a code">Buat kode</button>
+          <button class="btn btn--line" type="button" data-go="kode" data-need="super" data-en="Make a code">Buat kode</button>
         </div>
       </div>
 
@@ -120,7 +121,7 @@
     <div class="panel g" id="orders-panel">
       <div class="panel__h">
         <div><h1 data-en="Orders">Pesanan</h1><p data-en="Every couple who ordered. They fill in their invitation in their room; you check it here, then publish it at nawalainvite.com/their-name.">Setiap pasangan yang memesan. Mereka mengisi undangan di ruang mereka; tim memeriksa di sini, lalu menerbitkannya di nawalainvite.com/nama-mereka.</p></div>
-        <div class="panel__tools"><span class="chips" id="order-count"></span><button type="button" class="btn btn--main btn--sm" id="order-add" data-en="New order">Pesanan baru</button></div>
+        <div class="panel__tools"><span class="chips" id="order-count"></span><button type="button" class="btn btn--main btn--sm" id="order-add" data-need="super" data-en="New order">Pesanan baru</button></div>
       </div>
       <form class="make make--row" id="order-new" hidden novalidate>
         <h2 data-en="New order">Pesanan baru</h2>
@@ -139,7 +140,7 @@
     <div class="panel g">
       <div class="panel__h">
         <div><h1 data-en="Themes">Tema</h1><p data-en="Everything the site shows. Add, edit, hide or delete a theme; mark an Exclusive theme as owned only after a real sale. Changes show on the site at its next opening.">Semua yang tampil di situs. Tambah, ubah, sembunyikan, atau hapus tema; tandai tema Eksklusif sudah dimiliki hanya setelah benar-benar terjual. Perubahan tampil di situs saat halaman dibuka lagi.</p></div>
-        <div class="panel__tools"><button type="button" class="btn btn--main btn--sm" id="theme-add" data-en="Add a theme">Tambah tema</button></div>
+        <div class="panel__tools"><button type="button" class="btn btn--main btn--sm" id="theme-add" data-need="super" data-en="Add a theme">Tambah tema</button></div>
       </div>
       <div class="chips" id="tier-filter" role="group" style="margin-bottom:1rem"></div>
       <div class="grid" id="theme-grid"></div>
@@ -147,7 +148,7 @@
   </section>
 
   <!-- 5. Access codes -->
-  <section class="view" data-view="kode">
+  <section class="view" data-view="kode" data-need="super">
     <div class="panel g">
       <div class="panel__h">
         <div><h1 data-en="Access codes">Kode akses</h1><p data-en="A code opens the couple's room: every theme, every film, matching and saving. When a couple asks for more time, extend it here.">Kode membuka ruang pasangan: semua tema, semua film, pencocokan, dan pilihan tersimpan. Kalau pasangan meminta waktu lebih, perpanjang di sini.</p></div>
@@ -172,6 +173,41 @@
           <div class="rows" id="codes"></div>
         </div>
       </div>
+    </div>
+
+    <!-- The team: who may open this console, at which rank. Owner and superadmins only. -->
+    <div class="panel g" id="team-panel">
+      <div class="panel__h">
+        <div><h2 class="h1" data-en="Team">Tim</h2><p data-en="Who may open this console. Each person has their own token, shown once when it is made; cutting someone off works at once, even on a console they still have open.">Siapa saja yang boleh membuka konsol ini. Setiap orang punya token sendiri yang tampil sekali saat dibuat; mencabut akses berlaku saat itu juga, termasuk di konsol yang masih terbuka.</p></div>
+      </div>
+      <div class="codes">
+        <form class="make" id="team-add" novalidate>
+          <h2 data-en="Add a person">Tambah orang</h2>
+          <label><span data-en="Name">Nama</span>
+            <span class="field"><input id="ta-name" type="text" maxlength="40" autocomplete="off" placeholder="Nama" data-en-placeholder="Name"></span>
+          </label>
+          <div>
+            <span class="small" style="font-weight:600" data-en="Role">Peran</span>
+            <div class="chips" id="ta-role" role="group" style="margin-top:.4rem"></div>
+            <p class="small muted" id="ta-role-say" style="margin-top:.5rem"></p>
+          </div>
+          <button class="btn btn--main" type="submit" data-en="Make their token">Buat token</button>
+          <div class="fresh" id="team-fresh" hidden></div>
+        </form>
+        <div class="rows" id="team"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Activity: owner and superadmins only, the last 30 days -->
+  <section class="view" data-view="aktivitas" data-need="super">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Activity">Aktivitas</h1><p data-en="Who logged in and what they changed, the team and couples alike. Kept for 30 days.">Siapa yang masuk dan apa yang diubah, dari tim maupun pasangan. Disimpan 30 hari.</p></div>
+        <div class="panel__tools"><div class="chips" id="act-filter" role="group"></div></div>
+      </div>
+      <div id="act"></div>
+      <button type="button" class="btn btn--line btn--sm" id="act-more" hidden data-en="Show older">Tampilkan yang lebih lama</button>
     </div>
   </section>
 
