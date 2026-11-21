@@ -47,6 +47,15 @@ window.NAWALA_INVITE = {
     { name: 'Raka dan Tia', text: ['Akhirnya. Kami menunggu undangan ini sejak 2019.', 'At last. We have been waiting for this invitation since 2019.'] }
   ],
 
+  /* the kit's opening film: through the arch into the sky. Played after the seal opens, only if it is ready by then.
+     Until the 720 px file is in the repository, the opening falls back to the still zoom; the second address is the
+     10.8 MB original on Higgsfield, used only with ?film=1 for the owner's review. */
+  film: {
+    src: '../assets/video/umum-opening.mp4',
+    fallback: 'https://d8j0ntlcm91z4.cloudfront.net/user_3DF57pZt4ISNBty2LK7mc8uNf0y/hf_20261121_031720_0e8abc71-5e02-4b65-ab66-900a5c3eda24.mp4',
+    rate: 1.2
+  },
+
   /* the kit's own instrumental; the second address is used until the file is in the repository */
   music: {
     src: '../assets/audio/nawala-umum.mp3',
