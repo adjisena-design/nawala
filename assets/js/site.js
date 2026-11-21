@@ -252,7 +252,7 @@
       var isLang = f.el.hasAttribute('data-lang');
       var x = right - w;
       right = x - (isLang ? (f.el.getAttribute('data-lang') === 'id' ? 22 : 6) : (f.el.classList.contains('nav__login') ? 18 : 8));
-      f.dx = x - r.left; f.dy = (isLang ? 28 : 24) - r.top; f.bx = x;
+      f.dx = x - r.left; f.dy = (isLang ? 28 : 24) - r.top; f.bx = x; f.w = w;
     }
   }
   function navMorph(y, vh) {
@@ -275,7 +275,8 @@
     root.style.setProperty('--wm', clamp((edge - 180) / 60).toFixed(3));
     flips.forEach(function (f, i) {
       var fx, fy, o;
-      if (a < 1) { fx = f.dx; fy = f.dy; o = clamp((edge - f.bx - 44) / 60); }
+      /* a link is gone before the edge reaches its label, so no letter is ever left outside the glass */
+      if (a < 1) { fx = f.dx; fy = f.dy; o = clamp((edge - (f.bx + f.w) - 10) / 46); }
       else { var k = clamp((b - .25) / .75); fx = 0; fy = f.dy * (1 - k); o = clamp((b - .25 - i * .035) / .3); }
       f.el.style.setProperty('--fx', fx.toFixed(1)); f.el.style.setProperty('--fy', fy.toFixed(1)); f.el.style.setProperty('--fo', o.toFixed(3));
     });
@@ -310,12 +311,18 @@
     });
   }
 
-  /* ---------- Nawala: one letter, travelling down the page ----------
-     A list of waypoints tied to scroll positions. Between two waypoints the position, size and turn
-     are blended; the pose is the one of the waypoint just passed. */
+  /* ---------- Nawala: one letter, with a will of its own ----------
+     Scrolling only decides which section Nawala belongs to (the one under the middle of the screen).
+     Inside a section it plays that section's routine on its own clock: flying, the flip, the bump
+     into the branch and the tumble, the hops. When the section changes it flies to the new routine
+     at its own pace. A fast flick never makes it faster; it only changes where it is heading.
+     A point is either on the screen (x, y in pixels) or pinned to the page (dy: a document y), so a
+     letter sitting on a box moves with that box while the page scrolls, as anything on the page does. */
   var nw = $('#nw'), ask = $('#ask'), services = $('.services'), themes = $('.themes'), contact = $('.contact'), pair = $('#pair');
-  var W = [], nwBase = 190, nwIdx = -1, poseNow = 'fly', poseHold = '', mx = 0, my = 0, pairTop = 0, pairSpan = 1;
+  var nwBase = 190, poseNow = 'fly', poseHold = '', mx = 0, my = 0, pairTop = 0, pairSpan = 1;
   var travel = !calm && !!nw;
+  var SECS = [['hero', $('.hero')], ['about', about], ['services', services], ['themes', themes], ['contact', contact]];
+  var R = {}, secNow = '', routine = null, rStart = 0, rLastT = -1, fromS = null, flyFrom = 0, flyDur = 0, cur = null;
   function docTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
   function plan() {
     var vw = window.innerWidth, vh = window.innerHeight, D = desktop.matches;
@@ -323,37 +330,54 @@
     if (pair) { pairTop = docTop(pair); pairSpan = Math.max(80, Math.min(vh * .5, vh - (pairTop - maxY) - 30)); }
     if (!travel) return;
     nwBase = D ? 300 : 190;
-    var A = docTop(about), aS = about.offsetHeight - vh, S = docTop(services), sH = services.offsetHeight, T = docTop(themes), C = docTop(contact);
-        var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
+    var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
     var ph = D ? $('.services__phone').getBoundingClientRect() : null;
     var perchS = D ? .5 : .78, perchY = bT - nwBase * .26 * perchS + (D ? 20 : 6);
-    var land0 = Math.max(T + vh * .5, bT - vh * .74), land1 = Math.min(Math.max(land0 + vh * .3, bT - vh * .3), maxY);
     var side = D ? ph.left - 84 : vw - 58, sideS = D ? .5 : .42;
     var cx = D ? .4 : .5;
+    var pan = $('#themes-panel'), panR = pan ? pan.getBoundingClientRect().right : 0;
     var bn = $('#branch').getBoundingClientRect(), tipX = bn.left + bn.width * .1, tipY = bn.top + window.scrollY + bn.height * .3;
-    W = [
-      { at: 0, x: (D ? .73 : .5) * vw, y: (D ? .47 : .6) * vh, s: D ? 1.3 : 1.2, r: -4, pose: 'fly' },
-      { at: A - vh * .45, x: (D ? .67 : .6) * vw, y: (D ? .4 : .5) * vh, s: 1.02, r: 10, pose: 'tilt' },
-      { at: A - vh * .02, x: (cx + .04) * vw, y: (D ? .6 : .74) * vh, s: .85, r: -6, pose: 'fly' },
-      { at: A + aS * .3, x: cx * vw, y: (D ? .56 : .7) * vh, s: .7, r: 0, pose: 'fly', cue: 'flip' },
-      { at: A + aS * .36, x: (cx - .015) * vw, y: (D ? .52 : .66) * vh, s: .55, r: -3, pose: 'back34' },
-      { at: A + aS * .62, x: (cx - .04) * vw, y: (D ? .47 : .6) * vh, s: .3, r: 0, pose: 'back34' },
-      { at: A + aS * .7, x: cx * vw, y: (D ? .52 : .68) * vh, s: .82, r: 0, pose: 'open' },
-      { at: A + aS, x: (cx + .02) * vw, y: (D ? .5 : .66) * vh, s: .95, r: 0, pose: 'open' },
-      { at: S - vh * .5, x: (cx + .02) * vw, y: .42 * vh, s: .74, r: 12, pose: 'tilt' },
-      { at: S + vh * .12, x: side, y: D ? .26 * vh : 60, s: sideS, r: -5, pose: 'fly' },
-      { at: S + sH * .5, x: side - (D ? 8 : 0), y: D ? .5 * vh : 62, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
-      { at: T - vh, x: side, y: D ? .64 * vh : 60, s: sideS, r: 0, pose: 'fly' },
-      { at: T - vh * .6, x: Math.max(60, tipX - vw * .3), y: .34 * vh, s: .56, r: 6, pose: 'fly' },
-      { at: T - vh * .27, x: tipX - nwBase * .16, dy: tipY, s: .56, r: -4, pose: 'fly', cue: 'bump' },   // straight into the tip of the branch
-      { at: T - vh * .25, x: tipX - nwBase * .2, dy: tipY + 8, s: .56, r: 0, pose: 'tumble' },
-      { at: T + vh * .25, x: D ? Math.min(vw - 120, tipX + vw * .1) : .78 * vw, y: .78 * vh, s: .56, r: 400, pose: 'tumble' },
-      { at: land0 - vh * .12, x: (D ? .72 : .7) * vw, y: .48 * vh, s: .5, r: 720, pose: 'tumble' },
-      { at: land0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 720, pose: 'hop', hop: 4 },
-      { at: land1, x: br.right - (D ? 96 : 70), dy: perchY + (D ? 6 : 4), s: perchS * 1.15, r: 720, pose: 'rest' }
-    ];
-    for (var i = 1; i < W.length; i++) if (W[i].at <= W[i - 1].at) W[i].at = W[i - 1].at + 1;
-    nwIdx = -1;
+    var hx = (D ? .73 : .5) * vw, hy = (D ? .47 : .6) * vh, hs = D ? 1.3 : 1.2;
+    /* each routine: [seconds, point, pose, cue]; loop routines go back to their first point */
+    R = {
+      hero: { loop: true, k: [
+        { t: 0, x: hx, y: hy, s: hs, r: -4, pose: 'fly' },
+        { t: 2.8, x: hx - vw * .018, y: hy - vh * .035, s: hs, r: 2, pose: 'fly' },
+        { t: 5.6, x: hx + vw * .016, y: hy + vh * .02, s: hs * .97, r: -7, pose: 'fly' },
+        { t: 8.4 } ] },
+      about: { loop: true, k: [
+        { t: 0, x: (cx + .04) * vw, y: (D ? .6 : .74) * vh, s: .85, r: -6, pose: 'fly' },
+        { t: 1.8, x: cx * vw, y: (D ? .56 : .7) * vh, s: .7, r: 0, pose: 'fly', cue: 'flip' },
+        { t: 2.6, x: (cx - .015) * vw, y: (D ? .52 : .66) * vh, s: .55, r: -3, pose: 'back34' },
+        { t: 5.4, x: (cx - .04) * vw, y: (D ? .47 : .6) * vh, s: .3, r: 0, pose: 'back34' },
+        { t: 6.8, x: cx * vw, y: (D ? .52 : .68) * vh, s: .82, r: 0, pose: 'open' },
+        { t: 9.6, x: (cx + .02) * vw, y: (D ? .5 : .66) * vh, s: .95, r: 0, pose: 'open' },
+        { t: 11.4, x: (cx + .05) * vw, y: (D ? .56 : .72) * vh, s: .9, r: -8, pose: 'tilt' },
+        { t: 12.6 } ] },
+      services: { loop: true, k: [
+        { t: 0, x: side, y: D ? .3 * vh : 60, s: sideS, r: -5, pose: 'fly' },
+        { t: 3.2, x: side - (D ? 10 : 4), y: D ? .48 * vh : 66, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
+        { t: 6.4, x: side + (D ? 6 : 0), y: D ? .62 * vh : 58, s: sideS, r: 0, pose: 'fly' },
+        { t: 9.6 } ] },
+      /* comes in from the right, flies straight into the tip of the branch, tumbles, gathers itself;
+         on desktop it never crosses the panel's writing, on phones it keeps to the top edge */
+      themes: { loop: true, k: [
+        { t: 0, x: D ? Math.min(vw - 90, tipX + vw * .24) : .8 * vw, y: D ? .2 * vh : .1 * vh, s: D ? .56 : .5, r: -8, pose: 'fly' },
+        { t: 2, x: tipX + nwBase * .12, dy: tipY, s: D ? .56 : .5, r: 6, pose: 'fly', cue: 'bump' },
+        { t: 2.15, x: tipX + nwBase * .16, dy: tipY + 8, s: D ? .56 : .5, r: 0, pose: 'tumble' },
+        { t: 3.9, x: D ? Math.min(vw - 120, Math.max(panR + 90, tipX + vw * .12)) : .84 * vw, y: D ? .7 * vh : .2 * vh, s: D ? .56 : .46, r: 400, pose: 'tumble' },
+        { t: 5.1, x: D ? Math.max(panR + 110, .76 * vw) : .8 * vw, y: D ? .54 * vh : .14 * vh, s: D ? .54 : .46, r: 720, pose: 'fly' },
+        { t: 8.6, x: D ? Math.max(panR + 100, .82 * vw) : .74 * vw, y: D ? .32 * vh : .09 * vh, s: D ? .56 : .48, r: 726, pose: 'tilt' },
+        { t: 10.6 } ] },
+      contact: { loop: false, k: [
+        { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
+        { t: 3.2, x: br.right - (D ? 96 : 70), dy: perchY + (D ? 6 : 4), s: perchS * 1.15, r: 0, pose: 'rest' } ] }
+    };
+    Object.keys(R).forEach(function (n) {
+      var k = R[n].k, last = k[k.length - 1];
+      if (last.x == null) { R[n].len = last.t; k.pop(); } else R[n].len = last.t;
+    });
+    if (routine) routine = R[secNow] || null;
   }
   function setPose(p) {
     if (p === poseNow) return;
@@ -365,33 +389,91 @@
     clearTimeout(cueTimer[name]);
     cueTimer[name] = setTimeout(function () { nw.classList.remove('is-' + name); }, ms);
   }
-  function nwMove(y, vh) {
-    if (!travel || !W.length) return;
-    var i = 0;
-    while (i < W.length - 1 && y >= W[i + 1].at) i++;
-    var a = W[i], b = W[Math.min(i + 1, W.length - 1)];
-    var k = b === a ? 0 : clamp((y - a.at) / (b.at - a.at)), ke = ease(k);
-    var ay = a.dy != null ? a.dy - y : a.y, by = b.dy != null ? b.dy - y : b.y;
-    var x = lerp(a.x, b.x, ke), yy = lerp(ay, by, ke), s = lerp(a.s, b.s, ke), r = lerp(a.r, b.r, ke);
-    var poseA = a.pose;
+  function vy(p, y, vh) {   // a point's height on the screen, kept on the screen
+    var v = p.dy != null ? p.dy - y : p.y;
+    return Math.max(vh * .08, Math.min(vh * .9, v));
+  }
+  function sectionAt(vh) {
+    var mid = vh * .5, name = 'hero';
+    for (var i = 0; i < SECS.length; i++) {
+      var el = SECS[i][1]; if (!el) continue;
+      if (el.getBoundingClientRect().top <= mid) name = SECS[i][0];
+    }
+    return name;
+  }
+  /* where the routine is at time t (seconds), on the screen */
+  function at(rt, t, y, vh) {
+    var k = rt.k, n = k.length, i = 0;
+    if (rt.loop) t = t % rt.len; else t = Math.min(t, rt.len);
+    while (i < n - 1 && t >= k[i + 1].t) i++;
+    var a = k[i], b, span;
+    if (i < n - 1) { b = k[i + 1]; span = b.t - a.t; }
+    else if (rt.loop) { b = k[0]; span = rt.len - a.t; }
+    else { b = a; span = 1; }
+    var q = b === a ? 0 : clamp((t - a.t) / span), qe = ease(q);
+    var br = b.r;
+    if (rt.loop && b === k[0]) br = b.r + 360 * Math.round((a.r - b.r) / 360);   // round the loop without spinning back
+    var o = { x: lerp(a.x, b.x, qe), y: lerp(vy(a, y, vh), vy(b, y, vh), qe), s: lerp(a.s, b.s, qe), r: lerp(a.r, br, qe), pose: a.pose, i: i };
     if (a.hop) {
       /* small hops, one at a time: crouch, in the air, land */
-      x = lerp(a.x, b.x, k);
-      var ph = (k * a.hop) % 1, wave = Math.sin(ph * Math.PI);
-      yy -= wave * 40 * s;
-      poseA = ph < .14 ? 'hop1' : ph < .7 ? 'hop2' : 'hop3';
+      o.x = lerp(a.x, b.x, q);
+      var ph = (q * a.hop) % 1;
+      o.y -= Math.sin(ph * Math.PI) * 40 * o.s;
+      o.pose = q >= 1 ? b.pose : ph < .14 ? 'hop1' : ph < .7 ? 'hop2' : 'hop3';
     }
-    if (y < vh) { var near = 1 - y / vh; x += mx * near; yy += my * near; }
-    var done = ask.classList.contains('is-done') && i >= W.length - 2;
-    setPose(poseHold || (done ? 'open' : poseA));
-    if (done) yy -= 26;
-    nw.style.transform = 'translate3d(' + (x - nwBase / 2).toFixed(1) + 'px,' + (yy - nwBase * .367).toFixed(1) + 'px,0) rotate(' + r.toFixed(1) + 'deg) scale(' + s.toFixed(3) + ')';
-    if (nwIdx !== -1 && i !== nwIdx) {
-      if (i > nwIdx) { for (var n = nwIdx + 1; n <= i; n++) if (W[n].cue) cue(W[n].cue, W[n].cue === 'flip' ? 1100 : 600); }
-      else if (W[nwIdx].cue === 'flip') cue('flip', 1100);
-    }
-    nwIdx = i;
+    return o;
   }
+  function enter(name, now) {
+    secNow = name; routine = R[name] || null;
+    if (!routine) return;
+    if (cur) {   // fly over from wherever it is now, at its own pace
+      fromS = { x: cur.x, y: cur.y, s: cur.s, r: ((cur.r % 360) + 540) % 360 - 180 };
+      var to = at(routine, 0, window.scrollY, window.innerHeight);
+      var d = Math.hypot(to.x - fromS.x, to.y - fromS.y) / Math.max(window.innerWidth, window.innerHeight);
+      flyFrom = now; flyDur = Math.max(.9, Math.min(1.9, .8 + d * 1.6));
+      rStart = now + flyDur * 1000;
+    } else { fromS = null; rStart = now; }
+    rLastT = -1;
+  }
+  var running = false;
+  function frame(now) {
+    if (!travel || document.hidden) { running = false; return; }
+    var y = window.scrollY, vh = window.innerHeight;
+    var name = sectionAt(vh);
+    if (name !== secNow) enter(name, now);
+    if (!routine) { requestAnimationFrame(frame); return; }
+    var o, done = false;
+    if (fromS && now < rStart) {
+      var q = clamp((now - flyFrom) / (flyDur * 1000)), qe = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+      var to = at(routine, 0, y, vh);
+      var dx = to.x - fromS.x, dyy = to.y - fromS.y;
+      var tr = to.r + 360 * Math.round((fromS.r - to.r) / 360);
+      o = { x: fromS.x + dx * qe, y: fromS.y + dyy * qe - Math.sin(q * Math.PI) * Math.min(80, Math.abs(dx) * .12), s: lerp(fromS.s, to.s, qe),
+        r: lerp(fromS.r, tr, qe) + Math.sin(q * Math.PI) * (dx > 0 ? 7 : -7),
+        pose: Math.abs(dx) > Math.abs(dyy) * 1.4 ? 'tilt' : 'fly' };
+    } else {
+      fromS = null;
+      var t = (now - rStart) / 1000;
+      o = at(routine, t, y, vh);
+      /* cues fire when the routine passes their point, the loop included */
+      var tl = routine.loop ? t % routine.len : t;
+      if (rLastT >= 0) routine.k.forEach(function (p) {
+        if (!p.cue) return;
+        var hit = tl >= rLastT ? (p.t > rLastT && p.t <= tl) : (p.t > rLastT || p.t <= tl);
+        if (hit) cue(p.cue, p.cue === 'flip' ? 1100 : 600);
+      });
+      rLastT = tl;
+      done = secNow === 'contact' && ask.classList.contains('is-done');
+    }
+    if (secNow === 'hero') { o.x += mx; o.y += my; }
+    setPose(poseHold || (done ? 'open' : o.pose));
+    var yy = o.y - (done ? 26 : 0);
+    cur = o;
+    nw.style.transform = 'translate3d(' + (o.x - nwBase / 2).toFixed(1) + 'px,' + (yy - nwBase * .367).toFixed(1) + 'px,0) rotate(' + o.r.toFixed(1) + 'deg) scale(' + o.s.toFixed(3) + ')';
+    requestAnimationFrame(frame);
+  }
+  function wake() { if (travel && !running && !document.hidden) { running = true; requestAnimationFrame(frame); } }
+  document.addEventListener('visibilitychange', wake);
   /* touch it and it turns to face you, blushes, and spins once */
   if (nw) {
     var tap = $('.nw__tap', nw), holdTimer = 0;
@@ -437,11 +519,10 @@
     navMorph(y, vh);
     if (calm) return;
     measure(vh);
-    nwMove(y, vh);
     pairHop(y, vh);
   }
   function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(tick); } }
-  function replan() { layoutNav(); plan(); requestTick(); }
+  function replan() { layoutNav(); plan(); requestTick(); wake(); }
   afterLang.push(replan);
   addEventListener('scroll', requestTick, { passive: true });
   addEventListener('resize', replan);

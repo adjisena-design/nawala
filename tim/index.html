@@ -124,7 +124,7 @@
         <div><h1 data-en="Orders">Pesanan</h1><p data-en="Every couple who ordered. They fill in their invitation in their room; you check it here, then publish it at nawalainvite.com/their-name.">Setiap pasangan yang memesan. Mereka mengisi undangan di ruang mereka; tim memeriksa di sini, lalu menerbitkannya di nawalainvite.com/nama-mereka.</p></div>
         <div class="panel__tools"><span class="chips" id="order-count"></span><button type="button" class="btn btn--main btn--sm" id="order-add" data-need="super" data-en="New order">Pesanan baru</button></div>
       </div>
-      <form class="make make--row" id="order-new" hidden novalidate>
+      <form class="make make--row" id="order-new" data-from="#order-add" hidden novalidate>
         <h2 data-en="New order">Pesanan baru</h2>
         <label class="bf__f"><span data-en="Couple">Nama pasangan</span><span class="field"><input id="on-couple" maxlength="80" placeholder="Laras &amp; Bima" autocomplete="off"></span></label>
         <label class="bf__f"><span data-en="Address">Alamat undangan</span><span class="field"><span class="muted">nawalainvite.com/</span><input id="on-slug" maxlength="60" placeholder="laras-bima" autocapitalize="none" spellcheck="false" autocomplete="off"></span></label>
@@ -224,6 +224,7 @@
 </main>
 
 <script>window.NAWALA_BASE = '../';</script>
+<script src="../assets/js/origin.js?v=1"></script>
 <script src="../assets/js/db.js"></script>
 <script src="../assets/js/themes.js"></script>
 <script src="../assets/js/console.js"></script>

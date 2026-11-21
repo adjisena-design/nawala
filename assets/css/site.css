@@ -117,8 +117,9 @@ main{overflow-x:clip}
   .menu-veil[hidden]{display:none}
   .menu-open .menu-veil{opacity:1}
   .nav__items{position:absolute;inset:0 auto 0 0;width:min(84vw,330px);display:flex;flex-direction:column;border-radius:0 32px 32px 0;padding:92px 18px 24px;background:#0e2015;pointer-events:auto;
-    transform:translateX(-105%);visibility:hidden;transition:transform .55s var(--ease),visibility 0s .55s}
-  .menu-open .nav__items{transform:none;visibility:visible;transition:transform .55s var(--ease)}
+    transform:scale(.12);transform-origin:40px 46px;opacity:0;visibility:hidden;transition:transform .5s var(--ease),opacity .3s,visibility 0s .5s}
+  /* the menu grows out of its round button and folds back into it */
+  .menu-open .nav__items{transform:none;opacity:1;visibility:visible;transition:transform .5s var(--ease),opacity .22s}
   .nav__list{display:flex;flex-direction:column;gap:.5rem}
   .nav__list a{height:56px;gap:.6rem;font-size:1.125rem}
   .nav__list li{opacity:0;transform:translateX(-18px);transition:opacity .35s,transform .5s var(--ease)}
@@ -234,8 +235,8 @@ main{overflow-x:clip}
 @keyframes far{from{transform:translate3d(-30vw,5vh,0)}to{transform:translate3d(125vw,-3vh,0)}}
 @keyframes drift{from{transform:translate3d(-30vw,0,0)}to{transform:translate3d(120vw,-3vh,0)}}
 
-.hero__copy{position:static;padding:calc(96px + env(safe-area-inset-top)) 1.25rem 0;max-width:34rem}
-.hero__title{font-size:clamp(2.75rem,11.5vw,4.25rem);color:var(--forest-deep)}
+.hero__copy{position:static;padding:calc(84px + env(safe-area-inset-top)) 1.25rem 0;max-width:34rem}
+.hero__title{font-size:clamp(3rem,13vw,4.75rem);line-height:1.02;color:var(--forest-deep)}
 .hero__lead{margin-top:1.1rem;font-size:1.0625rem;line-height:1.55;color:rgba(12,29,19,.86);max-width:30rem}
 .hero__title,.hero__lead{position:relative;z-index:3}
 .hero .hero__actions{position:absolute;z-index:3;left:1.25rem;right:1.25rem;bottom:calc(84px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:.75rem}
@@ -252,10 +253,10 @@ main{overflow-x:clip}
 @media (min-width:900px){
   .hero .plate img{object-position:50% 50%}
   .hero__mist{background:linear-gradient(90deg,rgba(251,246,234,.9) 0%,rgba(251,246,234,.7) 30%,rgba(251,246,234,.2) 52%,rgba(251,246,234,0) 64%)}
-  .hero__copy{position:absolute;left:calc(var(--rail) + 3vw);top:52%;transform:translateY(-50%);padding:0;max-width:min(36rem,40vw)}
-  .hero__title{font-size:clamp(3.5rem,6vw,6.5rem)}
-  .hero__lead{font-size:1.25rem;margin-top:1.5rem}
-  .hero .hero__actions{position:static;margin-top:2.25rem}
+  .hero__copy{position:absolute;left:calc(var(--rail) + 3vw);top:calc(50% + 24px);transform:translateY(-50%);padding:0;max-width:min(48rem,47vw)}
+  .hero__title{font-size:clamp(3.75rem,min(7.8vw,15svh),9rem);line-height:1.02;letter-spacing:-.026em}
+  .hero__lead{font-size:clamp(1.25rem,1.55vw,1.625rem);line-height:1.5;margin-top:1.4rem;max-width:36rem}
+  .hero .hero__actions{position:static;margin-top:2rem}
   .flock{top:16%}.flock--b{top:30%}
   .dove{width:calc(70px * var(--s,1))}
   .plane{top:14%;width:96px}
@@ -269,15 +270,18 @@ main{overflow-x:clip}
 .about__fade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.95) 0%,rgba(251,246,234,.86) 36%,rgba(251,246,234,.4) 54%,rgba(251,246,234,0) 68%)}
 .about__says{position:absolute;z-index:2;left:1.25rem;right:1.25rem;top:calc(60px + env(safe-area-inset-top));height:52%;color:var(--forest-deep)}
 /* each message travels upward with the scroll: it rises in, slows as it passes the middle, then leaves */
-.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + var(--y,0) * 1px),0);opacity:var(--o,0);will-change:transform,opacity}
-.say h2{font-size:clamp(2.1rem,8.6vw,3rem)}
-.say p{margin-top:.9rem;font-size:1.125rem;line-height:1.55;color:rgba(12,29,19,.86)}
+.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + var(--y,0) * 1px),0);opacity:var(--o,0);will-change:transform,opacity;
+  padding:1.4rem 1.4rem 1.5rem;border-radius:28px;background:rgba(251,246,234,.84);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.45),0 0 48px 18px rgba(251,246,234,.34),0 24px 50px -30px rgba(12,29,19,.45)}
+.say h2{font-size:clamp(2rem,8.2vw,2.8rem);line-height:1.05;letter-spacing:-.018em}
+.say p{margin-top:.8rem;font-size:1.0625rem;line-height:1.6;letter-spacing:.003em;word-spacing:.02em;color:rgba(12,29,19,.88);max-width:34em}
 .flock--c{top:58%;animation-duration:70s;animation-delay:-30s}
 @media (min-width:900px){
   .about__fade{background:linear-gradient(270deg,rgba(251,246,234,.96) 0%,rgba(251,246,234,.88) 26%,rgba(251,246,234,.5) 44%,rgba(251,246,234,0) 60%)}
   .about__says{left:auto;right:5vw;top:0;height:100%;width:min(40rem,40vw)}
-  .say h2{font-size:clamp(2.8rem,4.3vw,5rem)}
-  .say p{font-size:1.375rem;margin-top:1.4rem}
+  .say{padding:2.2rem 2.4rem 2.4rem;border-radius:34px;background:rgba(251,246,234,.6);-webkit-backdrop-filter:blur(16px) saturate(130%);backdrop-filter:blur(16px) saturate(130%)}
+  .say h2{font-size:clamp(2.5rem,3.7vw,4.25rem);line-height:1.04}
+  .say p{font-size:1.25rem;line-height:1.6;margin-top:1.1rem}
   .flock--c{top:30%}
 }
 
@@ -508,7 +512,8 @@ main{overflow-x:clip}
 .detail__text p + p,.detail__text h3 + p{margin-top:.9rem}
 .detail__text #detail-desc{font-size:1.125rem;color:rgba(251,246,234,.88)}
 .detail__note{color:rgba(251,246,234,.7)}
-.pop--login{width:min(30rem,calc(100vw - 20px));height:auto}
+/* height:auto would stretch a modal dialog between its two insets; fit-content keeps it, and its box, exactly in the middle */
+.pop--login{width:min(30rem,calc(100vw - 20px));height:fit-content;max-height:calc(100svh - 24px);margin:auto}
 .pop--login .pop__box{height:auto}
 .login label{display:block;font-weight:700}
 .login input{width:100%;height:58px;margin-top:.6rem;padding:0 1.1rem;border-radius:18px;border:1.5px solid rgba(251,246,234,.3);background:rgba(251,246,234,.96);color:var(--forest);font-size:1.25rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
