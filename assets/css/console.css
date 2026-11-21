@@ -533,3 +533,11 @@ button.link{background:none;border:0;padding:0;min-height:44px;cursor:pointer;co
   .make--row h2{grid-column:1/-1}
   .pv{grid-template-columns:auto 1fr}
 }
+
+/* ---------- Team console: the top bar stays put while the page scrolls (owner, 21 Nov 2026) ----------
+   Sticky, not fixed, so it keeps its place in the layout. A soft shade of the treetops sits behind it
+   so cards passing underneath never read through the pills; the shade fades out at its lower edge. */
+.k--tim .k__top{position:sticky;top:0;z-index:15;padding-bottom:14px}
+.k--tim .k__top::before{content:"";position:absolute;inset:0 0 -26px;z-index:-1;pointer-events:none;
+  background:linear-gradient(rgba(10,24,15,.82),rgba(10,24,15,.6) 62%,rgba(10,24,15,0))}
+@media (min-width:1100px){.k--tim .k__top{padding-bottom:16px}}
