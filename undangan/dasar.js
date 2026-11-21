@@ -332,6 +332,30 @@
   sendLabel();
   $('#again').addEventListener('click', function () { var d = $('#done'); d.hidden = true; d.classList.remove('is-on'); form.hidden = false; nameIn.focus(); });
 
+  /* ---------- The couple's own photos (live invitations), in Nawala's place ---------- */
+  var PH = D.photos || {};
+  function okPhoto(u) { return typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u); }
+  function photo(u, cls) { var im = new Image(); im.className = cls; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = u; return im; }
+  var people = $$('#mempelai .person > img');
+  if (people[0] && okPhoto(PH.bride)) people[0].replaceWith(photo(PH.bride, 'portrait'));
+  if (people[1] && okPhoto(PH.groom)) people[1].replaceWith(photo(PH.groom, 'portrait'));
+  if (okPhoto(PH.cover)) { var cd = $('.cover__date'); if (cd) cd.parentNode.insertBefore(photo(PH.cover, 'cover__photo'), cd.nextSibling); }
+  var album = (PH.gallery || []).filter(okPhoto).slice(0, 8);
+  if (album.length) {
+    var sh = $('#shots'); sh.textContent = '';
+    album.forEach(function (u, i) {
+      var b = make('button', 'shot shot--photo' + (i === 0 || (i === album.length - 1 && album.length % 2 === 0) ? ' shot--wide' : '')); b.type = 'button';
+      b.setAttribute('aria-label', 'Foto ' + (i + 1)); b.appendChild(photo(u, 'ph')); sh.appendChild(b);
+    });
+  }
+  /* links inside the page scroll to their part, also when the page is served under another address (<base>) */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null, id = a && a.getAttribute('href').slice(1);
+    if (!id) return;
+    var el = document.getElementById(id); if (!el) return;
+    e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   /* ---------- Gallery ---------- */
   var box = $('#lightbox');
   $('#shots').addEventListener('click', function (e) {

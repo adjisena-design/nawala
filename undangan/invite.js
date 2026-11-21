@@ -335,10 +335,27 @@
   sendLabel();
   $('#again').addEventListener('click', function () { var d = $('#done'); d.hidden = true; d.classList.remove('is-on'); form.hidden = false; settle(); });
 
+  /* ---------- The couple's own photos (live invitations), in Nawala's place ---------- */
+  var PH = D.photos || {};
+  function okPhoto(u) { return typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u); }
+  function photo(u, cls) { var im = new Image(); im.className = cls; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = u; return im; }
+  [['#mempelai .person > img', PH.bride], ['#mempelai-pria .person > img', PH.groom]].forEach(function (p) {
+    var el = $(p[0]); if (el && okPhoto(p[1])) el.replaceWith(photo(p[1], 'portrait'));
+  });
+  if (okPhoto(PH.cover)) { var duo = $('#penutup .duo'); if (duo) { duo.textContent = ''; duo.classList.add('duo--photo'); duo.appendChild(photo(PH.cover, 'portrait portrait--wide')); } }
+  var album = (PH.gallery || []).filter(okPhoto).slice(0, 8);
+  if (album.length) {
+    var tb = $('#thumbs'); tb.textContent = ''; tb.style.setProperty('--n', album.length > 6 ? 4 : album.length);
+    album.forEach(function (u, i) {
+      var b = make('button', 'shot shot--photo'); b.type = 'button'; b.setAttribute('data-plate', ''); b.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-label', 'Foto ' + (i + 1)); b.appendChild(photo(u, 'ph')); tb.appendChild(b);
+    });
+  }
+
   /* ---------- Gallery: one large frame, six to choose from ---------- */
   var big = $('#big'), thumbs = $$('#thumbs .shot');
   function showShot(s) {
-    big.textContent = ''; big.setAttribute('data-plate', s.getAttribute('data-plate'));
+    big.textContent = ''; big.setAttribute('data-plate', s.getAttribute('data-plate') || ''); big.classList.toggle('shot--photo', s.classList.contains('shot--photo'));
     $$('img', s).forEach(function (im) { big.appendChild(im.cloneNode()); });
     thumbs.forEach(function (x) { x.setAttribute('aria-pressed', String(x === s)); });
   }
