@@ -47,13 +47,87 @@
     }
   };
 
-  /* the photographic Dasar themes: slug, name, and whether writing on the picture is dark (light) or light (dark) */
+  /* the Dasar themes: slug, name, and whether writing on the picture is dark (light) or light (dark) */
   var THEMES = {
     'putih-klasik': ['Putih Klasik', 'Classic White', 'light'], 'sage': ['Sage', 'Sage', 'light'], 'dusty-rose': ['Dusty Rose', 'Dusty Rose', 'light'],
     'emas-lembut': ['Emas Lembut', 'Soft Gold', 'light'], 'biru-langit': ['Biru Langit', 'Sky Blue', 'light'], 'lavender': ['Lavender', 'Lavender', 'light'],
     'terakota': ['Terakota', 'Terracotta', 'light'], 'daun-tropis': ['Daun Tropis', 'Tropical Leaf', 'light'], 'marun': ['Marun', 'Maroon', 'dark'],
-    'melati': ['Melati', 'Jasmine', 'light'], 'senja': ['Senja', 'Sunset', 'light'], 'malam-bintang': ['Malam Bintang', 'Starry Night', 'dark']
+    'melati': ['Melati', 'Jasmine', 'light'], 'senja': ['Senja', 'Sunset', 'light'], 'malam-bintang': ['Malam Bintang', 'Starry Night', 'dark'],
+    /* the painted themes (fourth field: their family): a painted picture, its palette, and its own flowers on the card corners */
+    'sage-pagi': ["Sage Pagi", "Sage Morning", 'light', 'bunga'],
+    'mawar-debu': ["Mawar Debu", "Dusty Rose Garden", 'light', 'bunga'],
+    'lila': ["Lila", "Lilac", 'light', 'bunga'],
+    'terakota-kering': ["Terakota Kering", "Dried Terracotta", 'light', 'bunga'],
+    'navy-emas': ["Navy Emas", "Navy and Gold", 'dark', 'bunga'],
+    'gading': ["Gading", "Ivory", 'light', 'bunga'],
+    'peoni': ["Peoni", "Peony", 'light', 'bunga'],
+    'zaitun': ["Zaitun", "Olive Grove", 'light', 'bunga'],
+    'mentega': ["Kuning Mentega", "Butter Yellow", 'light', 'bunga'],
+    'persik': ["Persik", "Peach", 'light', 'bunga'],
+    'hortensia': ["Hortensia", "Hydrangea", 'light', 'bunga'],
+    'anggrek': ["Anggrek", "Orchid", 'light', 'bunga'],
+    'bunga-liar': ["Bunga Liar", "Wildflowers", 'light', 'bunga'],
+    'lili-putih': ["Lili Putih", "White Lily", 'light', 'bunga'],
+    'anggur-merah': ["Anggur Merah", "Burgundy", 'dark', 'bunga'],
+    'kamomil': ["Kamomil", "Chamomile", 'light', 'bunga'],
+    'tulip': ["Tulip", "Tulip Fields", 'light', 'bunga'],
+    'matahari': ["Bunga Matahari", "Sunflower", 'light', 'bunga'],
+    'sawah': ["Sawah Terasering", "Rice Terraces", 'light', 'tempat'],
+    'toba': ["Danau Toba", "Lake Toba", 'light', 'tempat'],
+    'bromo': ["Bromo Subuh", "Bromo at Dawn", 'light', 'tempat'],
+    'raja-ampat': ["Raja Ampat", "Raja Ampat", 'light', 'tempat'],
+    'dieng': ["Dieng Berkabut", "Misty Dieng", 'light', 'tempat'],
+    'kebun-teh': ["Kebun Teh", "Tea Plantation", 'light', 'tempat'],
+    'belitung': ["Belitung", "Belitung Shore", 'light', 'tempat'],
+    'rinjani': ["Rinjani", "Rinjani", 'light', 'tempat'],
+    'labuan-bajo': ["Labuan Bajo", "Labuan Bajo", 'light', 'tempat'],
+    'kelimutu': ["Kelimutu", "Kelimutu", 'light', 'tempat'],
+    'ngarai': ["Ngarai Sianok", "Sianok Canyon", 'light', 'tempat'],
+    'sumba': ["Savana Sumba", "Sumba Savanna", 'light', 'tempat'],
+    'ijen': ["Kawah Ijen", "Ijen Night", 'dark', 'tempat'],
+    'braga': ["Braga", "Braga Street", 'light', 'tempat'],
+    'kota-tua': ["Kota Tua", "Old Batavia", 'light', 'tempat'],
+    'ubud': ["Hutan Ubud", "Ubud Forest", 'light', 'tempat'],
+    'pinisi': ["Pinisi", "Phinisi Sail", 'light', 'tempat'],
+    'danau-sentani': ["Danau Sentani", "Lake Sentani", 'light', 'tempat'],
+    'lengkung-islami': ["Lengkung Islami", "Islamic Arch", 'light', 'budaya'],
+    'mihrab-lentera': ["Lentera Mihrab", "Lantern Niche", 'dark', 'budaya'],
+    'geometri': ["Geometri Islami", "Islamic Geometry", 'light', 'budaya'],
+    'parang': ["Batik Parang", "Batik Parang", 'light', 'budaya'],
+    'kawung': ["Batik Kawung", "Batik Kawung", 'light', 'budaya'],
+    'mega-mendung': ["Mega Mendung", "Mega Mendung", 'light', 'budaya'],
+    'songket-minang': ["Songket Minang", "Minang Songket", 'dark', 'budaya'],
+    'rumah-gadang': ["Rumah Gadang", "Rumah Gadang", 'light', 'budaya'],
+    'peranakan': ["Ubin Peranakan", "Peranakan Tiles", 'light', 'budaya'],
+    'lampion': ["Lampion Merah", "Red Lanterns", 'light', 'budaya'],
+    'penjor': ["Penjor Bali", "Bali Penjor", 'light', 'budaya'],
+    'toraja': ["Ukiran Toraja", "Toraja Carving", 'light', 'budaya'],
+    'dayak': ["Motif Dayak", "Dayak Motif", 'light', 'budaya'],
+    'angklung': ["Angklung", "Angklung", 'light', 'budaya'],
+    'gunungan': ["Gunungan", "Gunungan", 'light', 'budaya'],
+    'songket-limar': ["Songket Limar", "Limar Songket", 'dark', 'budaya'],
+    'kapel-kaca': ["Kapel Kaca", "Glass Chapel", 'light', 'budaya'],
+    'gerbang-bali': ["Candi Bentar", "Bali Split Gate", 'light', 'budaya'],
+    'fajar': ["Fajar", "First Light", 'light', 'waktu'],
+    'golden-hour': ["Golden Hour", "Golden Hour", 'light', 'waktu'],
+    'jingga': ["Senja Jingga", "Orange Dusk", 'light', 'waktu'],
+    'biru-malam': ["Biru Malam", "Blue Night", 'dark', 'waktu'],
+    'hujan': ["Hujan Taman", "Garden Rain", 'light', 'waktu'],
+    'pantai-siang': ["Pantai Siang", "Midday Beach", 'light', 'waktu'],
+    'sakura': ["Musim Semi", "Spring", 'light', 'waktu'],
+    'gugur': ["Musim Gugur", "Autumn", 'light', 'waktu'],
+    'salju': ["Musim Salju", "Winter", 'light', 'waktu'],
+    'kabut-pinus': ["Kabut Pinus", "Pine Mist", 'light', 'waktu'],
+    'purnama': ["Bulan Purnama", "Full Moon", 'dark', 'waktu'],
+    'pelangi': ["Pelangi", "Rainbow", 'light', 'waktu'],
+    'embun': ["Embun Pagi", "Morning Dew", 'light', 'waktu'],
+    'kunang': ["Kunang-Kunang", "Fireflies", 'dark', 'waktu'],
+    'langit-ungu': ["Langit Ungu", "Violet Sky", 'light', 'waktu'],
+    'padang': ["Padang Rumput", "Grassland", 'light', 'waktu'],
+    'laut-subuh': ["Laut Subuh", "Sea at Dawn", 'light', 'waktu'],
+    'bintang-jatuh': ["Bintang Jatuh", "Shooting Stars", 'dark', 'waktu']
   };
+  var GROUPS = [['foto', 'Foto', 'Photographs'], ['bunga', 'Bunga dan warna', 'Flowers and colour'], ['tempat', 'Tempat di Indonesia', 'Places in Indonesia'], ['budaya', 'Iman dan budaya', 'Faith and culture'], ['waktu', 'Musim dan waktu', 'Seasons and times of day']];
 
   var state = {
     lang: params.lang === 'en' ? 'en' : (params.lang === 'id' ? 'id' : (store('nawala-lang') === 'en' ? 'en' : 'id')),
@@ -447,15 +521,20 @@
     if (!THEMES[slug]) return;
     state.theme = slug;
     root.setAttribute('data-theme', slug); root.setAttribute('data-tone', THEMES[slug][2]);
+    root.setAttribute('data-art', THEMES[slug][3] ? 'lukis' : 'foto');
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', getComputedStyle(root).getPropertyValue('--main').trim() || '#16301F');
     press();
   }
   (function themeButtons() {
     var box = $('#seg-theme');
-    Object.keys(THEMES).forEach(function (slug) {
-      var b = make('button', '', [THEMES[slug][0], THEMES[slug][1]]); b.type = 'button'; b.setAttribute('data-v', slug);
-      box.appendChild(b);
+    GROUPS.forEach(function (g) {
+      box.appendChild(make('p', 'seg__group', [g[1], g[2]]));
+      Object.keys(THEMES).forEach(function (slug) {
+        if ((THEMES[slug][3] || 'foto') !== g[0]) return;
+        var b = make('button', '', [THEMES[slug][0], THEMES[slug][1]]); b.type = 'button'; b.setAttribute('data-v', slug);
+        box.appendChild(b);
+      });
     });
     box.addEventListener('click', function (e) { var v = e.target.getAttribute('data-v'); if (v) setTheme(v); });
   })();

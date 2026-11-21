@@ -435,7 +435,7 @@
 
   /* ---------- Themes: add, edit, hide, mark as owned, delete (and bring back) ---------- */
   var tierFilter = 'semua', confirmDel = '', editing = null;
-  var FAMS = [['alam', 'Alam', 'Nature'], ['royal', 'Kerajaan', 'Royal'], ['religi', 'Religi', 'Faith'], ['nusa', 'Nusantara', 'Nusantara'], ['dunia', 'Mancanegara', 'The world'], ['era', 'Lintas masa', 'Eras'], ['elemen', 'Elemen', 'Elements']];
+  var FAMS = [['alam', 'Alam', 'Nature'], ['royal', 'Kerajaan', 'Royal'], ['religi', 'Religi', 'Faith'], ['nusa', 'Nusantara', 'Nusantara'], ['dunia', 'Mancanegara', 'The world'], ['era', 'Lintas masa', 'Eras'], ['elemen', 'Elemen', 'Elements'], ['bunga', 'Bunga dan warna', 'Flowers and colour'], ['tempat', 'Tempat di Indonesia', 'Places in Indonesia'], ['budaya', 'Iman dan budaya', 'Faith and culture'], ['waktu', 'Musim dan waktu', 'Seasons and times of day']];
   function rowCover(r, size) {
     if (r.cover) return r.cover + (size ? '-' + size : '') + '.webp';
     return '../assets/img/cover-' + r.slug + (size ? '-' + size : '') + '.webp';

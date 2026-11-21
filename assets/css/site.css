@@ -476,6 +476,7 @@ main{overflow-x:clip}
 .cf--dunia{--c1:#1f5aa6;--c2:#8dc0ee;--c3:rgba(255,236,220,.95)}
 .cf--era{--c1:#6f4a22;--c2:#d9b98a;--c3:rgba(60,35,12,.55)}
 .cf--elemen{--c1:#0f5e63;--c2:#74d3ca;--c3:rgba(246,196,69,.8)}
+.cf--bunga,.cf--tempat,.cf--budaya,.cf--waktu{--c1:#e9e1cf;--c2:#f6f1e6;--c3:rgba(255,255,255,.6)}
 
 /* ---------- Pop-ups ---------- */
 .pop{border:0;padding:0;background:none;color:var(--ivory);max-width:none;max-height:none;width:min(1120px,calc(100vw - 20px));height:min(88svh,880px);overflow:visible}
