@@ -37,6 +37,8 @@ window.NAWALA_BUILDER = (function () {
     var ph = obj(d.photos);
     b.photos = { cover: DB.isMedia(ph.cover) ? ph.cover : '', bride: DB.isMedia(ph.bride) ? ph.bride : '', groom: DB.isMedia(ph.groom) ? ph.groom : '',
       gallery: arr(ph.gallery).filter(DB.isMedia).slice(0, GALLERY) };
+    /* the design (undangan/sunting.html) travels with the draft; the invitation shapes it again (assets/js/desain.js) */
+    if (d.design && typeof d.design === 'object' && !Array.isArray(d.design)) b.design = d.design;
     return b;
   }
 
@@ -93,7 +95,8 @@ window.NAWALA_BUILDER = (function () {
       story: d.story.filter(function (s) { return s.title || s.text; }).map(function (s) { return { when: pair(s.when), title: pair(s.title), text: pair(s.text) }; }),
       gifts: d.gifts.filter(function (g) { return g.number; }),
       wishes: [],
-      photos: { cover: d.photos.cover, bride: d.photos.bride, groom: d.photos.groom, gallery: d.photos.gallery.slice() }
+      photos: { cover: d.photos.cover, bride: d.photos.bride, groom: d.photos.groom, gallery: d.photos.gallery.slice() },
+      design: d.design || undefined
     };
     if (!out.events.length && preview) out.events = [{ kind: 'reception', start: '10:00', end: '12:00', place: '(tempat acara)', address: '', map: '' }];
     if (d.dress.note || d.dress.colours.length) out.dress = { note: pair(d.dress.note), colours: d.dress.colours.map(function (c) { return [c.hex, c.name || c.hex, c.name || c.hex]; }) };

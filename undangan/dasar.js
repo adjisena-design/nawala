@@ -494,8 +494,9 @@
     if (!thrifty) play();
     if (reduced) return inside();
     gate.classList.add('is-turn');
-    setTimeout(function () { gate.classList.add('is-open'); }, 900);
-    setTimeout(inside, 2700);
+    var alt = (root.getAttribute('data-open') || 'nawala') !== 'nawala';   /* a seal, a photo or flowers: shorter than Nawala's flight */
+    setTimeout(function () { gate.classList.add('is-open'); }, alt ? 700 : 900);
+    setTimeout(inside, alt ? 1500 : 2700);
   }
   function replay() {
     opening = false; stop(); audio.currentTime = 0;
@@ -522,6 +523,8 @@
     state.theme = slug;
     root.setAttribute('data-theme', slug); root.setAttribute('data-tone', THEMES[slug][2]);
     root.setAttribute('data-art', THEMES[slug][3] ? 'lukis' : 'foto');
+    root.setAttribute('data-family', THEMES[slug][3] || 'foto');
+    if (window.NAWALA_DESIGN) NAWALA_DESIGN.apply(NAWALA_DESIGN.current());   /* frames follow the family */
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', getComputedStyle(root).getPropertyValue('--main').trim() || '#16301F');
     press();
@@ -596,6 +599,16 @@
   root.setAttribute('data-lv', state.level);
   setTheme(state.theme);
   fill(); wording(); relabel();
+  /* the couple's design (fonts, boxes, frames, opening, Nawala, added elements): assets/js/desain.js */
+  if (window.NAWALA_DESIGN) NAWALA_DESIGN.apply(D.design);
+  /* the editor (sunting.html) shows this page in a frame with ?edit=1: no opening, no music, everything visible */
+  var editing = /[?&]edit=1(&|$)/.test(location.search);
+  window.NAWALA_PAGE = { replay: replay, inside: inside, setTheme: setTheme, setLevel: setLevel, editing: editing };
+  if (editing) {
+    root.classList.add('is-edit'); inside(); thrifty = true;
+    $$('.rv').forEach(function (el) { el.classList.add('is-in'); });
+    $$('.scene').forEach(function (s) { s.classList.add('is-near', 'is-live'); });
+  }
   if (state.guest) { nameIn.value = state.guest; nameIn.dataset.auto = '1'; }
   showMusic(); refresh(); press(); tick();
 })();

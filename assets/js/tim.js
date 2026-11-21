@@ -346,18 +346,25 @@
     else previewView(o, body);
     if (otab !== 'data') orderForm = null;
   }
+  /* a design the couple (or the team) changed since the last publish: it waits for the team's check */
+  function designWaiting(o) { var dz = (o.draft || {}).design; return !!(dz && dz.at && (!o.published_at || dz.at > o.published_at)); }
+  function editorLink(o) { return '../undangan/sunting.html?as=tim&u=' + encodeURIComponent(o.slug); }
   function head(o) {
     var s = OSTAT[o.status], live = o.status === 'tayang';
     $('#o-title').textContent = o.couple;
     $('#o-sub').innerHTML = '<span class="pill pill--' + s[2] + '">' + t(s[0], s[1]) + '</span> ' + (o.code ? '<span class="code">' + esc(o.code) + '</span> ' : '') +
       (live ? '<a class="link" target="_blank" rel="noopener" href="https://' + esc(addr(o)) + '">' + esc(addr(o)) + '</a>' : '<span class="muted">' + esc(addr(o)) + ' ' + t('(belum tayang)', '(not live yet)') + '</span>');
     var miss = B.missing(B.norm(o.draft)), r = B.route(o.theme, themeRows());
+    var dasar = B.route(o.theme, themeRows()).route === 'dasar' && o.theme;
+    var designBits = (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
+      (designWaiting(o) ? '<p class="small" style="width:100%"><span class="pill pill--pink">' + t('Desain baru menunggu persetujuan', 'New design waiting for approval') + '</span> ' +
+        t('Periksa di Pratinjau, lalu terbitkan untuk menyetujuinya.', 'Check it in Preview, then publish to approve it.') + '</p>' : '');
     if (!sup()) {
-      $('#o-acts').innerHTML = live ? '<button type="button" class="btn btn--line btn--sm" data-copy="https://' + esc(addr(o)) + '">' + t('Salin tautan', 'Copy the link') + '</button>' : '';
+      $('#o-acts').innerHTML = designBits + (live ? '<button type="button" class="btn btn--line btn--sm" data-copy="https://' + esc(addr(o)) + '">' + t('Salin tautan', 'Copy the link') + '</button>' : '');
       $('#o-acts').insertAdjacentHTML('beforeend', '<p class="small muted" style="width:100%">' + (o.pending || !live ? t('Superadmin atau pemilik yang menerbitkan.', 'A superadmin or the owner publishes it.') : '') + '</p>');
       return;
     }
-    $('#o-acts').innerHTML = (o.status === 'arsip' ? '' :
+    $('#o-acts').innerHTML = designBits + (o.status === 'arsip' ? '' :
       (live && !o.pending ? '' : '<button type="button" class="btn btn--main btn--sm" data-publish' + (miss.length || !r.built || !o.theme ? ' disabled' : '') + '>' + (live ? t('Terbitkan perubahan', 'Publish the changes') : t('Terbitkan', 'Publish')) + '</button>') +
       (live ? '<button type="button" class="btn btn--line btn--sm" data-copy="https://' + esc(addr(o)) + '">' + t('Salin tautan', 'Copy the link') + '</button><button type="button" class="btn btn--line btn--sm" data-unpublish>' + t('Turunkan', 'Take offline') + '</button>' : '')) +
       (!o.theme ? '<p class="small muted" style="width:100%">' + t('Pilih tema dulu di Ringkasan.', 'Choose a theme in Summary first.') + '</p>'
