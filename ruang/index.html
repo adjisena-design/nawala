@@ -57,6 +57,8 @@
   <a href="#jelajah" data-ic="cards"><span data-en="Browse">Jelajah</span></a>
   <a href="#pilihan" data-ic="heart"><span data-en="Saved">Pilihan</span><i id="badge-saved" hidden></i></a>
   <a href="#jadwal" data-ic="calendar"><span data-en="Call">Jadwal</span></a>
+  <a href="#undangan" data-ic="letter" id="rail-ord" hidden><span data-en="Invitation">Undangan</span></a>
+  <a href="#tamu" data-ic="inbox" id="rail-guests" hidden><span data-en="Guests">Tamu</span></a>
 </nav>
 
 <main class="k__main" id="isi">
@@ -167,8 +169,42 @@
     </div>
   </section>
 
+  <!-- 5. Our invitation: names, dates, places, photos, gifts. Saved as typed; the team checks it and publishes. -->
+  <section class="view" data-view="undangan">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Our invitation">Undangan kami</h1><p id="ord-note"></p></div>
+        <div class="panel__tools" id="ord-tools"><button type="button" class="btn btn--line btn--sm" id="ord-preview" data-en="See the preview">Lihat pratinjau</button><button type="button" class="btn btn--main btn--sm" id="ord-submit" data-en="Send for a check">Kirim untuk diperiksa</button></div>
+      </div>
+      <div id="ord-form"></div>
+    </div>
+  </section>
+
+  <!-- 6. Guests: a link each, with a ready WhatsApp message -->
+  <section class="view" data-view="tamu">
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Guest list">Daftar tamu</h1><p id="g-note"></p></div>
+      </div>
+      <div class="codes">
+        <form class="make guests-paste" id="g-add" novalidate>
+          <h2 data-en="Add guests">Tambah tamu</h2>
+          <label class="bf__f"><span data-en="One name per line. A phone number may follow a comma.">Satu nama per baris. Nomor WhatsApp boleh ditulis setelah koma.</span>
+            <span class="field field--area"><textarea id="g-paste" rows="7" placeholder="Bapak dan Ibu Santoso, 081234567890&#10;Dinda Larasati&#10;Keluarga Wijaya"></textarea></span></label>
+          <button class="btn btn--main" type="submit" data-en="Add to the list">Tambahkan</button>
+        </form>
+        <div><div class="rows" id="g-list"></div></div>
+      </div>
+    </div>
+  </section>
+
   <p class="k__sample g"><span data-en="Your saved themes, your choice and your call time are kept with Nawala, so the team sees them too.">Tema tersimpan, pilihan, dan jadwal panggilan kalian disimpan di Nawala, jadi tim kami ikut melihatnya.</span> <button type="button" class="link" id="logout" data-en="Leave the room">Keluar dari ruang</button></p>
 </main>
+
+<div class="room-pv" id="room-pv" hidden>
+  <div class="pv__phone"><iframe id="room-frame" title="Pratinjau undangan"></iframe></div>
+  <button type="button" class="btn btn--main room-pv__x" id="room-pv-x" data-en="Close">Tutup</button>
+</div>
 
 <!-- Five tag questions. Answering is optional; every question can be skipped. -->
 <dialog class="pop" id="pop-match" aria-labelledby="match-h">
@@ -203,6 +239,7 @@
 <script src="../assets/js/db.js"></script>
 <script src="../assets/js/themes.js"></script>
 <script src="../assets/js/console.js"></script>
+<script src="../assets/js/builder.js"></script>
 <script src="../assets/js/ruang.js"></script>
 </body>
 </html>

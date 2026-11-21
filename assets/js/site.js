@@ -25,10 +25,15 @@
   };
   /* pictures and films are named after the Indonesian theme name: assets/img/cover-<slug>.webp (-s for the small one),
      assets/video/<slug>.mp4 */
-  function slug(th) { return th[1].toLowerCase().replace(/ /g, '-'); }
+  var META = null;   /* the themes table, by slug, once the database has answered (see loadThemes) */
+  function slug(th) { return th[6] || th[1].toLowerCase().replace(/ /g, '-'); }
   /* -s (220 wide) and -m (400 wide) are toned down on purpose so many covers can sit together quietly;
      the full-colour picture is only shown once a theme is opened */
-  function cover(th, size) { return 'assets/img/cover-' + slug(th) + (size ? '-' + size : '') + '.webp'; }
+  function cover(th, size) {
+    var m = META && META[slug(th)];
+    if (m && m.cover) return m.cover + (size ? '-' + size : '') + '.webp';   /* uploaded in the team console */
+    return 'assets/img/cover-' + slug(th) + (size ? '-' + size : '') + '.webp';
+  }
   /* Four tiers (owner, 21 Nov 2026). Dasar: the familiar scroll invitation: one real picture, readable cards, frames
      for the couple's photos. Premium: an immersive world: opening film, glass panels standing in the scenery, one swipe
      one step. Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
@@ -485,12 +490,33 @@
   var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
     .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
     .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
-  /* a theme whose sample invitation can really be opened: every Dasar theme, and the worlds in BUILT */
-  function ready(th) { return th[0] === 'dasar' || BUILT.indexOf(' ' + slug(th) + ' ') > -1; }
+  /* a theme whose sample invitation can really be opened: every Dasar theme, and the worlds in BUILT.
+     Once the database has answered, the themes table decides (kit: the world behind it; owned: sold to a couple). */
+  function kitOf(th) { var sl = slug(th), m = META && META[sl]; return m ? m.kit : (th[0] === 'dasar' || BUILT.indexOf(' ' + sl + ' ') > -1 ? sl : null); }
+  function ready(th) { return !!kitOf(th); }
+  function isOwned(sl) { var m = META && META[sl]; return m ? !!m.owned : OWNED.indexOf(' ' + sl + ' ') > -1; }
+  /* The team adds, edits, hides and deletes themes in the team console; the home page asks for them once, early.
+     Until (or unless) the answer comes, the lists in this file are shown. */
+  var themeWatchers = [];
+  (function loadThemes() {
+    if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey || !window.fetch) return;
+    fetch(CONFIG.supabaseUrl + '/rest/v1/rpc/site_themes', { method: 'POST', headers: { apikey: CONFIG.supabaseKey, Authorization: 'Bearer ' + CONFIG.supabaseKey, 'Content-Type': 'application/json' }, body: '{}' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rows) {
+        if (!Array.isArray(rows) || !rows.length) return;
+        META = {}; ALL.length = 0;
+        rows.forEach(function (r) {
+          var f = FAMILIES[r.family], d = r.desc || ['', ''];
+          META[r.slug] = r;
+          ALL.push([r.tier, r.name[0], r.name[1], d[0] || (f ? f[2] : ''), d[1] || (f ? f[3] : ''), r.family || undefined, r.slug]);
+        });
+        themeWatchers.forEach(function (fn) { fn(); });
+      }).catch(function () {});
+  })();
   var SAVE = window.NAWALA_SAVE;
   (function () {
     var river = $('#river');
-    if (river) nearJobs.push([themes, function () {
+    var riverJob = function () {
       var rows = desktop.matches ? 3 : 2, per = desktop.matches ? 14 : 8, html = '';
       for (var r = 0; r < rows; r++) {
         var cards = '';
@@ -498,7 +524,13 @@
         html += '<div class="river__row">' + cards + cards + '</div>';
       }
       river.innerHTML = html;
-    }]);
+    };
+    if (river) nearJobs.push([themes, riverJob]);
+    /* when the database's themes arrive: redraw what is already on screen */
+    themeWatchers.push(function () {
+      if (river && river.innerHTML) riverJob();
+      if (pops.themes && pops.themes.open && viewing < 0) build();
+    });
 
     var pops = { themes: $('#pop-themes'), login: $('#pop-login') };
     var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), viewing = -1, tier = 'premium', builtFor = '';
@@ -521,7 +553,7 @@
       var html = ALL.map(function (th, i) {
         var sl = slug(th), kept = mine.indexOf(sl) > -1;
         if (isSaved ? !kept : th[0] !== tier) return '';
-        var tag = OWNED.indexOf(' ' + sl + ' ') > -1 ? t('Sudah dimiliki', 'Owned') : ready(th) ? '' : t('Segera', 'Soon');
+        var tag = isOwned(sl) ? t('Sudah dimiliki', 'Owned') : ready(th) ? '' : t('Segera', 'Soon');
         var sub = isSaved ? t(TIERS[th[0]][0], TIERS[th[0]][1]) : th[5] ? t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : t(TIERS[th[0]][0], TIERS[th[0]][1]);
         return '<button class="tc' + (kept ? ' is-kept' : '') + '" type="button" data-i="' + i + '"><span class="tc__art' + (th[5] ? ' cf cf--' + th[5] : '') + '"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" width="400" height="500">' +
           (tag ? '<em>' + tag + '</em>' : '') + '</span><b>' + t(th[1], th[2]) + '</b><small>' + sub + '</small></button>';
@@ -539,7 +571,7 @@
       var th = ALL[i], out = [];
       for (var k = 1; k < ALL.length; k++) {
         var o = ALL[(i + k) % ALL.length], sl = slug(o);
-        if (o[0] === th[0] && ready(o) && !(SAVE && (SAVE.isSaved(sl) || SAVE.isPassed(sl))) && OWNED.indexOf(' ' + sl + ' ') < 0) out.push(sl);
+        if (o[0] === th[0] && ready(o) && !(SAVE && (SAVE.isSaved(sl) || SAVE.isPassed(sl))) && !isOwned(sl)) out.push(sl);
       }
       return out;
     }
@@ -551,7 +583,7 @@
     }
     function tell(text) { msg2.hidden = !text; msg2.textContent = text || ''; }
     function showDetail(i) {
-      viewing = i; var th = ALL[i], sl = slug(th), isX = th[0] === 'eksklusif', owned = OWNED.indexOf(' ' + sl + ' ') > -1;
+      viewing = i; var th = ALL[i], sl = slug(th), isX = th[0] === 'eksklusif', owned = isOwned(sl);
       coverEl.className = 'detail__cover' + (th[5] ? '' : ' is-tall');
       coverEl.style.backgroundImage = 'url(' + cover(th, 't') + ')';   /* toned down like the rest of the page; the invitation itself shows the full colour */
       $('#detail-fam').textContent = t(TIERS[th[0]][0], TIERS[th[0]][1]) + (th[5] ? ', ' + t(FAMILIES[th[5]][0], FAMILIES[th[5]][1]) : '');
@@ -560,7 +592,7 @@
       $('#detail-desc').textContent = t(th[3], th[4]) + ' ' + (ready(th) ? t('Buka undangannya dan jalani seperti seorang tamu: geser naik turun untuk melihat isinya, geser ke kanan untuk menyimpan, ke kiri untuk melewati.', 'Open the invitation and walk it as a guest would: swipe up and down to see inside, right to save it, left to pass.')
         : t('Undangannya segera hadir. Kalian sudah bisa menyimpannya.', 'Its invitation is coming soon. You can already save it.'));
       openEl.hidden = !can;
-      openEl.href = can ? (th[0] === 'dasar' ? 'undangan/dasar.html' : 'undangan/') + '?tema=' + sl + '&to=Bapak+dan+Ibu+Santoso&jelajah=' + th[0] + '&antre=' + queueAfter(i).join(',') : '#tema';
+      openEl.href = can ? (th[0] === 'dasar' ? 'undangan/dasar.html' : 'undangan/') + '?tema=' + kitOf(th) + '&to=Bapak+dan+Ibu+Santoso&jelajah=' + th[0] + '&antre=' + queueAfter(i).join(',') : '#tema';
       one.hidden = !isX;
       one.textContent = owned ? t('Tema ini sudah dimiliki satu pasangan dan tidak dijual lagi.', 'This theme already belongs to a couple and is no longer for sale.')
         : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');

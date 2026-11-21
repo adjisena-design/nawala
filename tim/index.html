@@ -56,7 +56,7 @@
 <nav class="k__rail g" aria-label="Konsol tim">
   <a href="#ringkasan" data-ic="home"><span data-en="Overview">Ringkasan</span></a>
   <a href="#permintaan" data-ic="inbox"><span data-en="Requests">Permintaan</span><i id="badge-new" hidden></i></a>
-  <a href="#undangan" data-ic="letter"><span data-en="Invitations">Undangan</span></a>
+  <a href="#undangan" data-ic="letter"><span data-en="Orders">Pesanan</span></a>
   <a href="#tema" data-ic="themes"><span data-en="Themes">Tema</span></a>
   <a href="#kode" data-ic="key"><span data-en="Codes">Kode</span></a>
 </nav>
@@ -115,40 +115,33 @@
     </div>
   </section>
 
-  <!-- 3. Live invitations: answers and wishes from guests -->
+  <!-- 3. Orders: one invitation per couple. The couple fills it in in their room; the team checks, then publishes. -->
   <section class="view" data-view="undangan">
-    <div class="panel g">
+    <div class="panel g" id="orders-panel">
       <div class="panel__h">
-        <div><h1 data-en="Invitations">Undangan</h1><p data-en="A couple's invitation saves answers and wishes once it is registered here. Sample invitations never save anything.">Undangan pasangan menyimpan jawaban dan ucapan setelah didaftarkan di sini. Undangan contoh tidak pernah menyimpan apa pun.</p></div>
+        <div><h1 data-en="Orders">Pesanan</h1><p data-en="Every couple who ordered. They fill in their invitation in their room; you check it here, then publish it at nawalainvite.com/their-name.">Setiap pasangan yang memesan. Mereka mengisi undangan di ruang mereka; tim memeriksa di sini, lalu menerbitkannya di nawalainvite.com/nama-mereka.</p></div>
+        <div class="panel__tools"><span class="chips" id="order-count"></span><button type="button" class="btn btn--main btn--sm" id="order-add" data-en="New order">Pesanan baru</button></div>
       </div>
-      <div class="codes">
-        <form class="make" id="reg" novalidate>
-          <h2 data-en="Register an invitation">Daftarkan undangan</h2>
-          <label><span data-en="The couple">Nama pasangan</span>
-            <span class="field"><input id="reg-couple" type="text" placeholder="Laras &amp; Bima" autocomplete="off" maxlength="80"></span>
-          </label>
-          <label><span data-en="Address name (small letters and dashes)">Nama alamat (huruf kecil dan tanda hubung)</span>
-            <span class="field"><input id="reg-slug" type="text" placeholder="laras-bima" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="60"></span>
-          </label>
-          <p class="small muted" data-en="Use the same name as slug in the couple's file.">Pakai nama yang sama dengan slug di berkas pasangan.</p>
-          <button class="btn btn--main" type="submit" data-en="Register">Daftarkan</button>
-        </form>
-        <div>
-          <div class="rows" id="invites"></div>
-          <h2 class="sub" data-en="Latest wishes">Ucapan terbaru</h2>
-          <div class="rows" id="wishes"></div>
-        </div>
-      </div>
+      <form class="make make--row" id="order-new" hidden novalidate>
+        <h2 data-en="New order">Pesanan baru</h2>
+        <label class="bf__f"><span data-en="Couple">Nama pasangan</span><span class="field"><input id="on-couple" maxlength="80" placeholder="Laras &amp; Bima" autocomplete="off"></span></label>
+        <label class="bf__f"><span data-en="Address">Alamat undangan</span><span class="field"><span class="muted">nawalainvite.com/</span><input id="on-slug" maxlength="60" placeholder="laras-bima" autocapitalize="none" spellcheck="false" autocomplete="off"></span></label>
+        <label class="bf__f"><span data-en="Access code">Kode akses</span><span class="field field--sel"><select id="on-code"></select></span><small data-en="Their room's code. The code is given no end date.">Kode ruang mereka. Kode ini dibuat tanpa batas waktu.</small></label>
+        <button class="btn btn--main" type="submit" data-en="Make the order">Buat pesanan</button>
+      </form>
+      <div class="orders" id="orders"></div>
     </div>
+    <div class="panel g" id="order" hidden></div>
   </section>
 
   <!-- 4. Themes -->
   <section class="view" data-view="tema">
     <div class="panel g">
       <div class="panel__h">
-        <div><h1 data-en="Themes">Tema</h1><p data-en="What each theme has today, and how often couples chose it. A theme is marked as owned in site.js, only after a real sale.">Apa yang sudah ada di tiap tema, dan seberapa sering dipilih pasangan. Tema ditandai sudah dimiliki di site.js, hanya setelah benar-benar terjual.</p></div>
-        <div class="panel__tools chips" id="tier-filter" role="group"></div>
+        <div><h1 data-en="Themes">Tema</h1><p data-en="Everything the site shows. Add, edit, hide or delete a theme; mark an Exclusive theme as owned only after a real sale. Changes show on the site at its next opening.">Semua yang tampil di situs. Tambah, ubah, sembunyikan, atau hapus tema; tandai tema Eksklusif sudah dimiliki hanya setelah benar-benar terjual. Perubahan tampil di situs saat halaman dibuka lagi.</p></div>
+        <div class="panel__tools"><button type="button" class="btn btn--main btn--sm" id="theme-add" data-en="Add a theme">Tambah tema</button></div>
       </div>
+      <div class="chips" id="tier-filter" role="group" style="margin-bottom:1rem"></div>
       <div class="grid" id="theme-grid"></div>
     </div>
   </section>
@@ -182,6 +175,14 @@
     </div>
   </section>
 
+  <dialog class="pop pop--wide" id="theme-pop" aria-labelledby="tp-title">
+  <div class="pop__box">
+    <h2 id="tp-title" data-en="Theme">Tema</h2>
+    <div class="pop__body" id="tp-body"></div>
+    <div class="pop__acts"><button type="button" class="btn btn--line" data-tpclose data-en="Cancel">Batal</button><button type="button" class="btn btn--main" id="tp-save" data-en="Save">Simpan</button></div>
+  </div>
+</dialog>
+
   <p class="k__sample g"><span id="foot-who"></span> <button type="button" class="link" id="reload" data-en="Reload the data">Muat ulang data</button> <button type="button" class="link" id="logout" data-en="Log out">Keluar</button></p>
 </main>
 
@@ -189,6 +190,7 @@
 <script src="../assets/js/db.js"></script>
 <script src="../assets/js/themes.js"></script>
 <script src="../assets/js/console.js"></script>
+<script src="../assets/js/builder.js"></script>
 <script src="../assets/js/tim.js"></script>
 </body>
 </html>

@@ -17,10 +17,15 @@ window.NAWALA = (function () {
   };
   /* pictures and films are named after the Indonesian theme name: assets/img/cover-<slug>.webp (-s for the small one),
      assets/video/<slug>.mp4 */
-  function slug(th) { return th[1].toLowerCase().replace(/ /g, '-'); }
+  var META = null;   /* filled by use(): the rows from the database, by slug */
+  function slug(th) { return th[6] || th[1].toLowerCase().replace(/ /g, '-'); }
   /* -s (220 wide) and -m (400 wide) are toned down on purpose so many covers can sit together quietly;
      the full-colour picture is only shown once a theme is opened */
-  function cover(th, size) { return BASE + 'assets/img/cover-' + slug(th) + (size ? '-' + size : '') + '.webp'; }
+  function cover(th, size) {
+    var m = META && META[slug(th)];
+    if (m && m.cover) return m.cover + (size ? '-' + size : '') + '.webp';   /* a cover uploaded in the team console */
+    return BASE + 'assets/img/cover-' + slug(th) + (size ? '-' + size : '') + '.webp';
+  }
   /* Four tiers. Dasar: one scene, a gentle camera move. Premium: the camera travels into the scene.
      Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   var TIERS = {
@@ -72,9 +77,28 @@ window.NAWALA = (function () {
   var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
     .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
     .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
-  function hasFilm(th) { return FILMS.indexOf(' ' + slug(th) + ' ') > -1; }
-  function film(th) { return BASE + 'assets/video/' + slug(th) + '.mp4'; }
+  function hasFilm(th) { var m = META && META[slug(th)]; return m ? !!m.film : FILMS.indexOf(' ' + slug(th) + ' ') > -1; }
+  function film(th) { var m = META && META[slug(th)]; return m && m.film && m.film !== 'repo' ? m.film : BASE + 'assets/video/' + slug(th) + '.mp4'; }
+
+  /* The lists above are the starting point; the database (themes table, edited in the team console) is the truth.
+     use(rows) replaces every list in place with the rows: [tier, name, English name, description, English description,
+     family, slug]. load() asks the database for the themes the site shows; on failure the built-in lists stay. */
+  function use(rows) {
+    META = {}; ALL.length = 0; BASIC.length = 0; THEMES.length = 0; EXCLUSIVE.length = 0;
+    rows.forEach(function (r) {
+      var name = r.name || [r.name_id, r.name_en], desc = r.desc || [r.desc_id, r.desc_en], fam = FAMILIES[r.family];
+      var e = [r.tier, name[0], name[1], desc[0] || (fam ? fam[2] : ''), desc[1] || (fam ? fam[3] : ''), r.family || undefined, r.slug];
+      META[r.slug] = r; ALL.push(e);
+      (r.tier === 'dasar' ? BASIC : r.tier === 'premium' ? THEMES : EXCLUSIVE).push(e);
+    });
+  }
+  function load() {
+    var DB = window.NAWALA_DB;
+    if (!DB) return Promise.resolve(ALL);
+    return DB.rpc('site_themes').then(function (rows) { if (Array.isArray(rows) && rows.length) use(rows); return ALL; }, function () { return ALL; });
+  }
+  function meta(s) { return (META && META[s]) || null; }
 
   return { BASE: BASE, FAMILIES: FAMILIES, TIERS: TIERS, BASIC: BASIC, EXCLUSIVE: EXCLUSIVE, FILMS: FILMS, OWNED: OWNED,
-    THEMES: THEMES, ALL: ALL, slug: slug, cover: cover, hasFilm: hasFilm, film: film };
+    THEMES: THEMES, ALL: ALL, slug: slug, cover: cover, hasFilm: hasFilm, film: film, use: use, load: load, meta: meta };
 })();

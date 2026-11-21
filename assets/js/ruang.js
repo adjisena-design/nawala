@@ -9,7 +9,8 @@
   var K = window.K, N = window.NAWALA, DB = window.NAWALA_DB, $ = K.$, $$ = K.$$, t = K.t, esc = K.esc;
   var CAP = 30, RUNGS = [30, 15, 10, 5, 1];
   var bySlug = {};
-  N.ALL.forEach(function (th) { bySlug[N.slug(th)] = th; });
+  function index() { bySlug = {}; N.ALL.forEach(function (th) { bySlug[N.slug(th)] = th; }); }
+  index();
 
   /* ---------- State ---------- */
   function blank() { return { saved: [], no: [], answers: [[], [], [], [], []], final: '', call: null }; }
@@ -118,7 +119,7 @@
       [t('Masuk dengan kode', 'Log in with your code'), t('Kode diterima lewat WhatsApp', 'The code arrived on WhatsApp'), 'done'],
       [t('Pilih tema', 'Choose a theme'), done2 ? K.themeName(bySlug[state.final]) : n + ' ' + t('tersimpan, saring sampai satu', 'saved, narrow them to one'), done2 ? 'done' : 'now'],
       [t('Panggilan video', 'Video call'), done3 ? callText() : t('Tiga puluh menit bersama tim', 'Thirty minutes with the team'), done3 ? 'done' : done2 ? 'now' : ''],
-      [t('Isi data undangan', 'Fill in your details'), t('Nama, tanggal, foto, dan daftar tamu', 'Names, dates, photos and the guest list'), done2 && done3 ? 'now' : ''],
+      [t('Isi data undangan', 'Fill in your details'), ORD() ? t('Buka menu Undangan dan Tamu', 'Open Invitation and Guests in the menu') : t('Nama, tanggal, foto, dan daftar tamu', 'Names, dates, photos and the guest list'), ORD() ? 'now' : done2 && done3 ? 'now' : ''],
       [t('Tinjau, lalu tayang', 'Review, then go live'), t('Tautan pribadi untuk tiap tamu', 'A personal link for every guest'), '']
     ];
     $('#todo').innerHTML = steps.map(function (s, i) {
@@ -370,11 +371,15 @@
         note(['Kode ini tidak dikenali, atau masa berlakunya sudah habis. Hubungi kami lewat WhatsApp dan kami perpanjang.', 'This code is not recognised, or it has reached its end date. Tell us on WhatsApp and we will extend it.']);
         return;
       }
-      room = r; skew = new Date(r.now).getTime() - Date.now(); state = clean(r.state); hist = []; warned = false;
+      room = r; skew = new Date(r.now).getTime() - Date.now(); hist = []; warned = false;
       try { sessionStorage.setItem(STORE, r.code); localStorage.setItem(STORE, r.code); } catch (e) {}
       $('#gate-code').value = '';
-      document.body.classList.remove('is-locked');
-      all(); K.show(location.hash.slice(1));
+      /* the themes the site shows today (the team edits them), then the couple's own choices */
+      return N.load().then(function () {
+        index(); state = clean(r.state); ordForm = null;
+        document.body.classList.remove('is-locked');
+        all(); K.show(location.hash.slice(1));
+      });
     }, function () {
       note(['Kode belum bisa diperiksa karena database Nawala tidak terhubung. Coba lagi sebentar lagi, atau hubungi kami lewat WhatsApp.', 'The code cannot be checked because the Nawala database is out of reach. Try again in a moment, or ask us on WhatsApp.']);
     }).then(function () { $('#gate-go').disabled = false; });
@@ -387,13 +392,104 @@
   });
   $('#logout').addEventListener('click', function () { if (dirty) { clearTimeout(saveTimer); push(true); } lock(null); });
 
+  /* ---------- Our invitation: the couple fills it in once they have ordered; the team checks it and publishes ---------- */
+  var B = window.NAWALA_BUILDER, ordForm = null;
+  function ORD() { return room && room.order; }
+  function liveLink(name) { var o = ORD(); return DB.site + o.slug + (name ? '?to=' + encodeURIComponent(name) : ''); }
+  function order() {
+    var o = ORD();
+    $('#rail-ord').hidden = !o; $('#rail-guests').hidden = !o;
+    if (!o) { $('#ord-form').innerHTML = '<div class="empty"><b>' + t('Belum ada pesanan.', 'No order yet.') + '</b>' + t('Halaman ini terbuka setelah kalian memesan lewat tim Nawala.', 'This page opens once you have ordered through the Nawala team.') + '</div>'; $('#ord-tools').hidden = true; return; }
+    $('#ord-tools').hidden = false;
+    var st = { isi: t('Silakan isi. Semua tersimpan otomatis.', 'Fill it in. Everything saves as you type.'),
+      periksa: t('Terkirim. Tim Nawala sedang memeriksa; kalian masih boleh mengubah.', 'Sent. The Nawala team is checking it; you may still make changes.'),
+      tayang: t('Undangan kalian sudah tayang di ', 'Your invitation is live at ') + 'nawalainvite.com/' + o.slug + t('. Perubahan baru tampil setelah diperiksa tim.', '. New changes show once the team has checked them.') }[o.status] || '';
+    $('#ord-note').textContent = st;
+    $('#ord-submit').hidden = o.status === 'tayang';
+    $('#ord-submit').textContent = o.status === 'periksa' ? t('Kirim ulang untuk diperiksa', 'Send for a check again') : t('Kirim untuk diperiksa', 'Send for a check');
+    if (!ordForm) ordForm = B.form($('#ord-form'), o.draft, { slug: o.slug, who: function () { return room.code; }, onChange: function (d) {
+      o.draft = d;
+      DB.rpc('room_order_save', { p_code: room.code, p_draft: d }).then(function (ok) {
+        if (ok === false) lock(['Masa berlaku kode ini sudah habis. Hubungi kami lewat WhatsApp dan kami perpanjang.', 'This code has reached its end date. Tell us on WhatsApp and we will extend it.']);
+      }, function () { K.toast(t('Belum tersimpan ke Nawala. Kami coba lagi saat kalian melanjutkan.', 'Not saved to Nawala yet. We try again as you carry on.')); });
+    } });
+  }
+  $('#ord-submit').addEventListener('click', function () {
+    var o = ORD(); if (!o) return;
+    if (ordForm) ordForm.flush();
+    var miss = B.missing(B.norm(o.draft));
+    if (miss.length) return K.toast(t('Lengkapi dulu: ', 'First complete: ') + miss.join(', '));
+    DB.rpc('room_order_submit', { p_code: room.code }).then(function () {
+      if (o.status === 'isi') o.status = 'periksa'; order();
+      K.toast(t('Terkirim ke tim Nawala. Kami kabari lewat WhatsApp.', 'Sent to the Nawala team. We will reply on WhatsApp.'));
+    }, function () { K.offline ? K.offline() : null; });
+  });
+  $('#ord-preview').addEventListener('click', function () {
+    var o = ORD(); if (!o) return; if (ordForm) ordForm.flush();
+    $('#room-pv').hidden = false;
+    var rows = N.ALL.map(function (e) { var sl = N.slug(e), m = N.meta(sl) || {}; return { slug: sl, tier: e[0], kit: m.kit || (e[0] === 'dasar' ? sl : null) }; });
+    B.preview($('#room-frame'), o.draft, o, rows, t('Tamu undangan', 'Our guest'));
+  });
+  $('#room-pv-x').addEventListener('click', function () { $('#room-pv').hidden = true; $('#room-frame').src = 'about:blank'; });
+
+  /* ---------- Guests: one link each, sent on WhatsApp ---------- */
+  function message(g) {
+    var o = ORD(), en = K.lang() === 'en';
+    return en ? 'Dear ' + g.name + ',\n\nWith joy we invite you to our wedding.\n\nOpen the invitation: ' + liveLink(g.name) + '\n\nIt would mean a great deal to us if you could come and give us your blessing.\n\nWith love,\n' + o.couple
+      : 'Kepada Yth. ' + g.name + ',\n\nTanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di hari pernikahan kami.\n\nBuka undangan: ' + liveLink(g.name) + '\n\nMerupakan kehormatan bagi kami bila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\nKami yang berbahagia,\n' + o.couple;
+  }
+  function guests() {
+    var o = ORD(); if (!o) return;
+    var list = o.guests || [], ans = { hadir: [t('Hadir', 'Coming'), 'tayang'], tidak: [t('Tidak hadir', 'Not coming'), 'habis'], ragu: [t('Belum pasti', 'Not sure'), 'jalan'] };
+    $('#g-note').textContent = (o.live ? t('Tiap tamu punya tautan sendiri: namanya tertulis di amplop.', 'Each guest has their own link: their name is on the envelope.')
+      : t('Tautan sudah bisa disalin, tetapi baru terbuka setelah undangan tayang.', 'Links can be copied now, but they open only once the invitation is live.')) + ' ' + list.length + ' ' + t('tamu', list.length === 1 ? 'guest' : 'guests') + '.';
+    $('#g-list').innerHTML = list.length ? list.map(function (g, i) {
+      var a = g.answer && ans[g.answer];
+      return '<div class="row"><div class="row__t"><b>' + esc(g.name) + '</b><span>' + (g.phone ? esc(g.phone.replace(/^62/, '0')) + ', ' : '') + (g.sent_at ? t('sudah dikirim', 'sent') : t('belum dikirim', 'not sent yet')) + (a ? '' : ', ' + t('belum menjawab', 'no answer yet')) + '</span></div>' +
+        (a ? '<span class="pill pill--' + a[1] + '">' + a[0] + '</span>' : '') +
+        '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" data-sent="' + i + '" href="' + esc((g.phone ? 'https://wa.me/' + g.phone.replace(/^0/, '62') : 'https://wa.me/') + '?text=' + encodeURIComponent(message(g))) + '">WhatsApp</a>' +
+        '<button type="button" class="round" style="width:44px;height:44px" data-glink="' + i + '" aria-label="' + t('Salin tautan', 'Copy the link') + '">' + K.ic('copy') + '</button>' +
+        '<button type="button" class="round" style="width:44px;height:44px" data-gdel="' + i + '" aria-label="' + t('Hapus dari daftar', 'Remove from the list') + '">' + K.ic('x') + '</button></div>';
+    }).join('') : '<div class="empty"><b>' + t('Daftar masih kosong.', 'The list is empty.') + '</b>' + t('Tempel nama tamu di kotak, satu nama per baris.', 'Paste guest names in the box, one per line.') + '</div>';
+  }
+  function saveGuests(list, done) {
+    DB.rpc('room_guests_save', { p_code: room.code, p_guests: list.map(function (g) { return { name: g.name, phone: g.phone || '', sent: !!g.sent_at }; }) }).then(function (ok) {
+      if (!ok) throw new Error('no');
+      return DB.rpc('room_open', { p_code: room.code }).then(function (r) { if (r && r.order) { room.order.guests = r.order.guests; } guests(); if (done) done(); });
+    }).catch(function () { K.toast(t('Daftar tamu belum tersimpan. Coba lagi.', 'The guest list was not saved. Try again.')); });
+  }
+  $('#g-add').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var o = ORD(); if (!o) return;
+    var lines = $('#g-paste').value.split(/\n+/).map(function (l) { return l.trim(); }).filter(Boolean);
+    if (!lines.length) return K.toast(t('Tulis minimal satu nama.', 'Write at least one name.'));
+    var list = (o.guests || []).slice();
+    lines.forEach(function (l) {
+      var m = l.match(/^(.*?)[,;\t]\s*([+0-9][0-9 .\-]{7,})$/), name = (m ? m[1] : l).trim().slice(0, 80), phone = m ? m[2].replace(/\D/g, '').replace(/^0/, '62') : '';
+      if (name && !list.some(function (g) { return g.name.toLowerCase() === name.toLowerCase(); })) list.push({ name: name, phone: phone });
+    });
+    saveGuests(list, function () { $('#g-paste').value = ''; K.toast(t('Daftar tamu tersimpan.', 'Guest list saved.')); });
+  });
+  $('#g-list').addEventListener('click', function (e) {
+    var o = ORD(); if (!o) return;
+    var el, list = (o.guests || []).slice();
+    if ((el = e.target.closest('[data-glink]'))) {
+      var u = liveLink(list[+el.getAttribute('data-glink')].name);
+      try { navigator.clipboard.writeText(u).then(function () { K.toast(t('Tautan disalin.', 'Link copied.')); }, function () { K.toast(u); }); } catch (er) { K.toast(u); }
+    } else if ((el = e.target.closest('[data-gdel]'))) {
+      list.splice(+el.getAttribute('data-gdel'), 1); saveGuests(list);
+    } else if ((el = e.target.closest('[data-sent]'))) {
+      var g = list[+el.getAttribute('data-sent')]; if (!g.sent_at) { g.sent_at = new Date().toISOString(); saveGuests(list); }
+    }
+  });
+
   function all() {
-    home(); browse(); saved(); schedule();
+    home(); browse(); saved(); schedule(); order(); guests();
     if (gateNote) note(gateNote);
     document.title = t('Nawala, ruang pasangan', 'Nawala, the couple\'s room');
   }
   /* a view is drawn again each time it is opened, so it never shows what was true a few taps ago */
-  K.onShow.beranda = home; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule;
+  K.onShow.beranda = home; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule; K.onShow.tamu = guests;
   K.onLang(all);
   K.start();
   if (stored()) enter(stored()); else $('#gate-code').focus();
