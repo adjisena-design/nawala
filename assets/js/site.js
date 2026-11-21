@@ -350,17 +350,26 @@
       var top = about.getBoundingClientRect().top + window.scrollY, span = about.offsetHeight - window.innerHeight;
       return { top: top, end: top + span, s: [top + span * (.5 / 3), top + span * .5, top + span * (2.5 / 3)].map(Math.round) };
     }
-    function inside(y, S) { return y >= S.s[0] - 6 && y <= S.s[2] + 6; }
+    /* the hero counts too: from the sky, one swipe glides down to the first message with the light rising in step */
+    function inside(y, S) { return y <= S.s[2] + 6; }
     function nearest(y, S) { var n = 0; for (var i = 1; i < 3; i++) if (Math.abs(S.s[i] - y) < Math.abs(S.s[n] - y)) n = i; return n; }
+    /* our own glide, eased and of a fixed length (a browser's smooth scroll is too quick on iOS and looks like a jump) */
     function glide(to) {
+      var from = window.scrollY, d = to - from, ms = Math.min(1300, Math.max(700, 600 + Math.abs(d) * .45)), t0 = 0;
       gliding = true;
-      window.scrollTo({ top: to, behavior: 'smooth' });
-      setTimeout(function () { gliding = false; lastY = window.scrollY; }, 760);
+      requestAnimationFrame(function f(now) {
+        if (!t0) t0 = now;
+        var q = Math.min(1, (now - t0) / ms), e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+        window.scrollTo({ top: Math.round(from + d * e), behavior: 'instant' });
+        if (q < 1) requestAnimationFrame(f); else setTimeout(function () { gliding = false; lastY = window.scrollY; }, 60);
+      });
     }
     function step(dir) {
-      var S = stops(), i = nearest(window.scrollY, S), to;
+      var S = stops(), y = window.scrollY, to;
+      if (y < S.s[0] - 6) { if (dir > 0) glide(S.s[0]); return; }   // in the sky: down goes to the first message, up does nothing
+      var i = nearest(y, S);
       if (dir > 0) to = i < 2 ? S.s[i + 1] : S.end + Math.round(window.innerHeight * .9);
-      else to = i > 0 ? S.s[i - 1] : S.top - Math.round(window.innerHeight * .9);
+      else to = i > 0 ? S.s[i - 1] : 0;
       glide(Math.max(0, to));
     }
     /* a native fling that runs into the stretch is caught at the first or last message */
@@ -395,6 +404,8 @@
       wheelSum += e.deltaY;
       if (Math.abs(wheelSum) > 18) { wheelAt = now; step(wheelSum > 0 ? 1 : -1); wheelSum = 0; }
     }, { passive: false });
+    var next = $('.hero__next');
+    if (next) next.addEventListener('click', function (e) { e.preventDefault(); if (!gliding) glide(stops().s[0]); });
     addEventListener('keydown', function (e) {
       if (!inside(window.scrollY, stops()) || /input|textarea|select/i.test(e.target.tagName)) return;
       var k = e.key, d = (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) ? 1 : (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) ? -1 : 0;
