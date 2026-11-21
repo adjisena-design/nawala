@@ -525,3 +525,8 @@ html:not([data-art="lukis"]) .gflow i{background:var(--accent);-webkit-mask:url(
 .is-edit .it.is-sel,.is-edit .fr.is-sel{touch-action:none;cursor:move}
 .is-edit .rv{opacity:1!important;transform:none!important}
 .is-edit.is-peek .gate{display:flex!important}
+/* the review sheet's main action is Nawala's neon pill, as everywhere (assets/css/kit.css); the rest stay glass */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+#sheet-x{color:#16301F;border:2px solid transparent;background:linear-gradient(#FBF6EA,#FBF6EA) padding-box,conic-gradient(from var(--a),#F4A6C0,#F6C445,#D8436B,#F4A6C0) border-box;animation:kit-spin 5s linear infinite}
+@keyframes kit-spin{to{--a:360deg}}
+@media (prefers-reduced-motion:reduce){#sheet-x{animation:none}}

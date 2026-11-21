@@ -1,0 +1,60 @@
+/* Nawala's buttons: two kinds, everywhere (owner, 21 Nov 2026).
+   1. The one main action of a screen or sheet: an ivory pill with a slowly turning neon edge (.btn--glow).
+      At most one per screen or sheet.
+   2. Everything else: the material of the home page's menu bar. Dark green glass with ivory writing (.btn--glass);
+      on dark pages and inside dark glass the same glass is ivory-tinted instead, so it still shows.
+      Groups of choices (tabs, chips, segments) sit in one glass bar (.gbar); the chosen one is an ivory pill.
+   Older class names map onto these two: .btn--main is the main action; .btn--line, .btn--quiet and .btn--pink are glass.
+   Loaded after each page's own stylesheet. */
+
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+:root{
+  --kg:rgba(14,32,21,.78); --kg-hover:rgba(14,32,21,.9); --kg-ink:#FBF6EA;
+  --kg-edge:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.09);
+  --kg-pick:#FBF6EA; --kg-pick-ink:#16301F;
+}
+/* dark surroundings: the glass turns ivory-tinted */
+.k--tim,.glass,.pop,.sheet--dark,.on-dark{--kg:rgba(251,246,234,.12);--kg-hover:rgba(251,246,234,.22);--kg-edge:inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(251,246,234,.18)}
+.k--tim .fresh,.k--tim .booked{--kg:rgba(14,32,21,.78);--kg-hover:rgba(14,32,21,.9);--kg-edge:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.09)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;min-height:50px;padding:.65rem 1.45rem;border:0;border-radius:999px;cursor:pointer;
+  font-weight:650;font-size:1rem;line-height:1.2;text-align:center;text-decoration:none;
+  transition:transform .25s cubic-bezier(.3,1.35,.5,1),box-shadow .3s,background-color .3s}
+.btn:active{transform:scale(.96)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;transform:none}
+.btn--sm{min-height:44px;padding:.45rem 1.05rem;font-size:.9375rem}
+.btn svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 1. the main action */
+.btn--glow,.btn--main{color:#16301F;border:2px solid transparent;
+  background:linear-gradient(#FBF6EA,#FBF6EA) padding-box,conic-gradient(from var(--a),#F4A6C0,#F6C445,#D8436B,#F4A6C0) border-box;
+  box-shadow:0 10px 30px -12px rgba(216,67,107,.55);animation:kit-spin 5s linear infinite}
+.btn--glow:hover,.btn--main:hover{box-shadow:0 0 28px 2px rgba(244,166,192,.55),0 12px 34px -12px rgba(216,67,107,.7);transform:translateY(-2px)}
+@keyframes kit-spin{to{--a:360deg}}
+
+/* 2. everything else: menu-bar glass */
+.btn--glass,.btn--line,.btn--quiet,.btn--pink{color:var(--kg-ink);background:var(--kg);box-shadow:var(--kg-edge);border-radius:18px}
+.btn--glass:hover,.btn--line:hover,.btn--quiet:hover,.btn--pink:hover{background:var(--kg-hover)}
+.btn--pink{color:#F4A6C0}                                     /* a second, deliberate tap (delete, revoke) */
+.btn--glass[aria-pressed="true"],.btn--line[aria-pressed="true"]{background:var(--kg-pick);color:var(--kg-pick-ink);box-shadow:none}
+/* an icon in an ivory tile, like Masuk in the menu */
+.btn--glass .tile,.btn--line .tile{display:grid;place-items:center;width:36px;height:36px;margin-left:-.75rem;border-radius:12px;background:var(--kg-pick);color:var(--kg-pick-ink)}
+.btn--glass .tile svg,.btn--line .tile svg{width:20px;height:20px}
+@media (min-width:900px){.btn--glass,.btn--line,.btn--quiet,.btn--pink{-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}}
+
+/* a group of choices: one glass bar, the chosen one an ivory pill */
+.gbar{display:flex;align-items:center;gap:4px;padding:5px;border-radius:22px;background:var(--kg);box-shadow:var(--kg-edge);color:var(--kg-ink)}
+.gbar > button,.gbar > a{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:44px;padding:0 15px;border:0;border-radius:16px;
+  background:none;color:inherit;font:inherit;font-weight:650;font-size:1rem;text-decoration:none;white-space:nowrap;cursor:pointer;transition:background-color .25s,color .25s}
+.gbar > button:hover,.gbar > a:hover{background:rgba(251,246,234,.14)}
+.gbar > [aria-pressed="true"],.gbar > [aria-selected="true"],.gbar > .is-here{background:var(--kg-pick);color:var(--kg-pick-ink)}
+@media (min-width:900px){.gbar{-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}}
+
+/* the consoles' chip rows: when they are choices (buttons), they become one glass bar */
+.chips:has(> button.chip){display:flex;flex-wrap:wrap;gap:4px;padding:5px;border-radius:22px;background:var(--kg);box-shadow:var(--kg-edge);width:fit-content;max-width:100%}
+.chips--scroll:has(> button.chip){flex-wrap:nowrap;width:auto}
+.chips > button.chip{background:none;box-shadow:none;color:var(--kg-ink);border-radius:16px}
+.chips > button.chip:hover{background:rgba(251,246,234,.14)}
+.chips > button.chip[aria-pressed="true"],.chips > button.chip[aria-selected="true"]{background:var(--kg-pick);color:var(--kg-pick-ink)}
+
+@media (prefers-reduced-motion:reduce){.btn--glow,.btn--main{animation:none}}

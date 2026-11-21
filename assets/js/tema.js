@@ -34,13 +34,15 @@
     $$('[data-en]').forEach(function (el) { el.textContent = el.getAttribute('data-' + lang); });
     $$('[data-en-label]').forEach(function (el) { el.setAttribute('aria-label', el.getAttribute(lang === 'en' ? 'data-en-label' : 'data-id-label')); });
     $$('[data-en-placeholder]').forEach(function (el) { el.placeholder = el.getAttribute('data-' + lang + '-placeholder'); });
-    var langBtn = $('#lang span'); if (langBtn) langBtn.textContent = lang === 'en' ? 'ID' : 'EN';
+    $$('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
     doc.title = t('Koleksi tema Nawala', 'The Nawala theme collection');
   }
-  $('#lang').addEventListener('click', function () {
-    lang = lang === 'en' ? 'id' : 'en';
-    try { localStorage.setItem('nawala-lang', lang); } catch (e) {}
-    applyLang(); fams(); render();
+  $$('[data-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      lang = b.getAttribute('data-lang');
+      try { localStorage.setItem('nawala-lang', lang); } catch (e) {}
+      applyLang(); fams(); render();
+    });
   });
 
   /* ---------- Themes ---------- */
@@ -87,7 +89,7 @@
     var keys = Object.keys(N.FAMILIES).filter(function (k) { return have[k]; });
     if (fam && !have[fam]) fam = '';
     var box = $('#fams');
-    box.hidden = !keys.length || tier === 'kustom' || tier === 'tersimpan';
+    box.hidden = !keys.length;
     box.innerHTML = '<button type="button" data-fam="" aria-pressed="' + (!fam) + '">' + t('Semua keluarga', 'All families') + '</button>' +
       keys.map(function (k) { return '<button type="button" data-fam="' + k + '" aria-pressed="' + (fam === k) + '">' + t(N.FAMILIES[k][0], N.FAMILIES[k][1]) + '</button>'; }).join('');
   }
@@ -144,7 +146,7 @@
         '<p>' + (shutMatch.length && (words || fam) ? t(shutMatch.length + ' di antaranya cocok dengan pencarian kalian. ', shutMatch.length + ' of them match your search. ') : '') +
         t('Semuanya terbuka dengan kode akses dari kami. Mintalah lewat WhatsApp, tanpa biaya.', 'They all open with an access code from us. Ask for one on WhatsApp; it is free.') + '</p>' +
         '<div class="acts"><a class="btn btn--glow" target="_blank" rel="noopener" href="' + waLink() + '">' + t('Minta kode lewat WhatsApp', 'Ask for a code on WhatsApp') + '</a>' +
-        '<button class="btn btn--line" type="button" data-unlock>' + t('Saya punya kode akses', 'I have an access code') + '</button></div></div>';
+        '<button class="btn btn--glass" type="button" data-unlock>' + t('Saya punya kode akses', 'I have an access code') + '</button></div></div>';
     }
     return html + '</section>';
   }
@@ -154,7 +156,7 @@
 
   function render() {
     tabs.forEach(function (b) { var on = b.getAttribute('data-tier') === tier; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
-    custom.hidden = tier !== 'kustom';
+    custom.hidden = tier !== 'kustom'; savedChip();
     $('#filters').hidden = tier === 'kustom';
     root.classList.toggle('is-open-all', unlocked());
     $('#key-btn').hidden = unlocked();
@@ -185,7 +187,7 @@
     return t(n + ' dari 10 tema tersimpan di browser ini saja. Jika data browser dihapus atau ponsel direset, simpanan ini hilang. Masuk dengan kode akses agar tersimpan di Nawala.',
       n + ' of 10 themes saved, in this browser only. If the browser data is cleared or the phone is reset, they are gone. Enter an access code to keep them with Nawala.');
   }
-  function savedChip() { $('#saved-n').textContent = SAVE ? SAVE.list().length : 0; }
+  function savedChip() { var n = SAVE ? SAVE.list().length : 0; $('#saved-n').textContent = n; $('#saved-chip').classList.toggle('has', n > 0); $('#saved-chip').setAttribute('aria-pressed', String(tier === 'tersimpan')); }
 
   /* ---------- Controls ---------- */
   function setTier(k, push) {
@@ -200,11 +202,14 @@
       var n = tabs[(k + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click();
     });
   });
-  $('#fams').addEventListener('click', function (e) { var b = e.target.closest('[data-fam]'); if (!b) return; fam = b.getAttribute('data-fam'); fams(); render(); });
+  $('#fams').addEventListener('click', function (e) { var b = e.target.closest('[data-fam]'); if (!b) return; fam = b.getAttribute('data-fam'); fams(); saringN(); render(); });
   var typing;
   $('#q').addEventListener('input', function (e) { clearTimeout(typing); var v = e.target.value; typing = setTimeout(function () { words = v.trim().toLowerCase(); render(); }, 180); });
-  $('#only-open').addEventListener('change', function (e) { onlyOpen = e.target.checked; render(); });
-  $('#saved-chip').addEventListener('click', function (e) { e.preventDefault(); setTier('tersimpan', true); });
+  $('#only-open').addEventListener('click', function (e) { onlyOpen = !onlyOpen; e.currentTarget.setAttribute('aria-pressed', String(onlyOpen)); saringN(); render(); });
+  var drawer = $('#drawer'), saring = $('#saring');
+  saring.addEventListener('click', function () { drawer.hidden = !drawer.hidden; saring.setAttribute('aria-expanded', String(!drawer.hidden)); });
+  function saringN() { var n = (fam ? 1 : 0) + (onlyOpen ? 1 : 0), b = $('#saring-n'); b.hidden = !n; b.textContent = n; }
+  $('#saved-chip').addEventListener('click', function () { setTier(tier === 'tersimpan' ? 'semua' : 'tersimpan', true); });
   $('#custom-wa').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Halo Nawala, saya ingin tema kustom. Saya akan kirim inspirasinya.');
 
   /* ---------- Moving: entrance, floating, drifting columns, the theme behind ---------- */

@@ -548,3 +548,9 @@ dialog::backdrop{background:rgba(8,18,12,.8)}
 @keyframes lean-l{0%,25%,100%{transform:none}45%,70%{transform:translate3d(10px,-4px,0) rotate(7deg)}}
 @keyframes lean-r{0%,25%,100%{transform:none}45%,70%{transform:translate3d(-10px,-4px,0) rotate(-7deg)}}
 @media (prefers-reduced-motion:reduce){[data-close] .duo img{animation:none!important}}
+
+/* the review sheet's main action is Nawala's neon pill, as everywhere (assets/css/kit.css); the rest stay glass */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+#sheet-x{color:#16301F;border:2px solid transparent;background:linear-gradient(#FBF6EA,#FBF6EA) padding-box,conic-gradient(from var(--a),#F4A6C0,#F6C445,#D8436B,#F4A6C0) border-box;animation:kit-spin 5s linear infinite}
+@keyframes kit-spin{to{--a:360deg}}
+@media (prefers-reduced-motion:reduce){#sheet-x{animation:none}}
