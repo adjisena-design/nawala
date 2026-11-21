@@ -107,7 +107,7 @@ main{overflow-x:clip}
   .nav__orb{position:absolute;z-index:-1;left:40px;top:calc(var(--bar-top) + 30px);width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;pointer-events:none;background:rgba(14,32,21,.86);transform:scale(.5);opacity:0}
   .nav__orb.is-on{animation:orb .36s cubic-bezier(.3,.7,.3,1) both}
   .nav__top{position:absolute;left:10px;right:10px;top:var(--bar-top);height:60px;border-radius:22px;transform-origin:30px 50%;
-    transform:scaleX(calc(1 - var(--na,0) * .84));opacity:calc(1 - var(--na,0))}
+    transform:scaleX(calc(1 - var(--na,0) * .84));opacity:clamp(0,(1 - var(--na,0)) * 3,1)}
   .nav__brand{position:absolute;left:76px;top:calc(var(--bar-top) + 4px);height:52px;opacity:calc(1 - var(--na,0) * 2.4)}
   .nav__brand img{display:none}
   .nav__word{font-size:1.6rem}
@@ -280,11 +280,11 @@ main{overflow-x:clip}
 .about__fade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.95) 0%,rgba(251,246,234,.86) 36%,rgba(251,246,234,.4) 54%,rgba(251,246,234,0) 68%)}
 .about__says{position:absolute;z-index:2;left:1.25rem;right:1.25rem;top:calc(60px + env(safe-area-inset-top));height:52%;color:var(--forest-deep)}
 /* each message travels upward with the scroll: it rises in, slows as it passes the middle, then leaves */
-.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + 70px),0);opacity:0;visibility:hidden;transition:transform .8s var(--ease),opacity .55s,visibility 0s .8s;
+.say{position:absolute;left:0;right:0;top:50%;transform:translate3d(0,calc(-50% + 56px),0);opacity:0;visibility:hidden;transition:transform .5s var(--ease),opacity .35s,visibility 0s .5s;
   padding:1.4rem 1.4rem 1.5rem;border-radius:28px;background:rgba(251,246,234,.84);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.45),0 0 48px 18px rgba(251,246,234,.34),0 24px 50px -30px rgba(12,29,19,.45)}
-.say.is-on{transform:translate3d(0,-50%,0);opacity:1;visibility:visible;transition:transform .8s var(--ease),opacity .6s .12s}
-.say.is-past{transform:translate3d(0,calc(-50% - 70px),0)}
+.say.is-on{transform:translate3d(0,-50%,0);opacity:1;visibility:visible;transition:transform .55s var(--ease),opacity .4s .06s}
+.say.is-past{transform:translate3d(0,calc(-50% - 56px),0)}
 .say h2{font-size:clamp(2rem,8.2vw,2.8rem);line-height:1.05;letter-spacing:-.018em}
 .say p{margin-top:.8rem;font-size:1.0625rem;line-height:1.6;letter-spacing:.003em;word-spacing:.02em;color:rgba(12,29,19,.88);max-width:34em}
 .flock--c{top:58%;animation-duration:70s;animation-delay:-30s}
@@ -549,7 +549,8 @@ main{overflow-x:clip}
 .contact__bg{position:absolute;inset:0;overflow:hidden}
 .contact__bg .plate{inset:-4% 0 0;transform:translate3d(0,calc((1 - var(--e,1)) * -7%),0);will-change:transform}
 .contact__bg .plate img{object-position:50% 100%}
-.contact__inner{position:relative;z-index:6;flex:1;display:grid;gap:2rem;align-content:start;padding-top:6rem;padding-bottom:2rem}
+.contact__inner{position:relative;z-index:6;flex:1;display:grid;gap:2rem;align-content:start;padding-top:2.5rem;padding-bottom:2rem}
+@media (max-width:899px){.contact > .fade-top{height:18vh}}
 .contact__lead h2{font-size:clamp(2.1rem,8vw,3rem);color:var(--forest)}
 .contact__lead p{margin-top:.9rem;font-size:1.125rem;color:rgba(22,48,31,.82)}
 .contact__note{font-size:.9375rem;color:rgba(22,48,31,.8);max-width:26rem;padding:.7rem 1rem;border-radius:14px;background:rgba(251,246,234,.72);justify-self:start}
@@ -651,10 +652,12 @@ main{overflow-x:clip}
   75%,100%{transform:translate3d(var(--d),0,0) scale(1);z-index:3}}
 .pair__cap{max-width:26rem;font-size:.9375rem;color:rgba(22,48,31,.86);padding:.7rem 1rem;border-radius:14px;background:rgba(251,246,234,.72)}
 
-.foot{position:relative;z-index:6;margin-top:auto;padding:3rem 0 calc(1.5rem + env(safe-area-inset-bottom));color:var(--ivory);background:linear-gradient(0deg,rgba(12,29,19,.86) 0%,rgba(12,29,19,.55) 55%,transparent 100%)}
+.foot{position:relative;z-index:6;margin-top:auto;padding:6rem 0 calc(1.75rem + env(safe-area-inset-bottom));color:var(--ivory);background:linear-gradient(0deg,rgba(12,29,19,.96) 0%,rgba(12,29,19,.9) 45%,rgba(12,29,19,.6) 75%,transparent 100%)}
 .foot__in{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1.5rem;font-size:.9375rem}
 .foot__word{font:var(--display-weight) 1.6rem/1 var(--display);letter-spacing:var(--display-track)}
 .foot a{margin-left:auto;font-weight:600;text-underline-offset:4px;min-height:44px;display:inline-flex;align-items:center}
+.foot a.foot__wa{text-decoration:none}
+.foot__line{color:rgba(251,246,234,.72)}
 @media (max-width:899px){.foot a{margin-left:0;width:100%}}
 .foot__doors{display:flex;flex-wrap:wrap;gap:0 1.5rem;width:100%}
 .foot__doors a{margin-left:0;width:auto;font-weight:500;opacity:.85}
@@ -786,7 +789,7 @@ main{overflow-x:clip}
 .scr--day::before{background:rgba(12,29,19,.72)}
 .day{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .day li{position:relative;z-index:1;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.65rem;height:var(--rh);text-align:left}
-.day li > i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(251,246,234,.14);box-shadow:inset 0 0 0 1px rgba(251,246,234,.3)}
+.day li > i{position:relative;z-index:1;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#33433A;box-shadow:inset 0 0 0 1px rgba(251,246,234,.3)}
 .day li > i svg{width:17px;height:17px}
 .day li div{display:flex;flex-direction:column;min-width:0}
 .day li b{font:600 .9375rem/1.2 var(--body);letter-spacing:0}
@@ -845,27 +848,27 @@ main{overflow-x:clip}
 /* ---------- the loops ---------- */
 @media (prefers-reduced-motion:no-preference){
   /* arch */
-  .about.is-live .say.is-on .dm__msg{animation:dmIn 6s var(--ease) infinite both}
-  .about.is-live .say.is-on .dm__msg:nth-child(2){animation-delay:.45s}
-  .about.is-live .say.is-on .dm__msg:nth-child(3){animation-delay:.9s}
+  .about.is-live .say.is-on .dm__msg{animation:dmIn 4.2s var(--ease) infinite both}
+  .about.is-live .say.is-on .dm__msg:nth-child(2){animation-delay:.3s}
+  .about.is-live .say.is-on .dm__msg:nth-child(3){animation-delay:.6s}
   @keyframes dmIn{0%{opacity:0;transform:translate3d(28px,0,0) scale(.96)}9%{opacity:1;transform:none}82%{opacity:1;transform:none}92%,100%{opacity:0;transform:translate3d(0,-6px,0)}}
 
-  .about.is-live .say.is-on .dm__envelope{animation:gEnv 6.5s infinite both}
-  .about.is-live .say.is-on .dm__flap{animation:gFlap 6.5s infinite both}
-  .about.is-live .say.is-on .dm__world{animation:gWorld 6.5s var(--ease) infinite both}
-  .about.is-live .say.is-on .dm__card{animation:gCard 6.5s var(--ease) infinite both}
-  .about.is-live .say.is-on .dm--gift .tap{animation:tap 6.5s .65s infinite both}
+  .about.is-live .say.is-on .dm__envelope{animation:gEnv 4.8s infinite both}
+  .about.is-live .say.is-on .dm__flap{animation:gFlap 4.8s infinite both}
+  .about.is-live .say.is-on .dm__world{animation:gWorld 4.8s var(--ease) infinite both}
+  .about.is-live .say.is-on .dm__card{animation:gCard 4.8s var(--ease) infinite both}
+  .about.is-live .say.is-on .dm--gift .tap{animation:tap 4.8s .45s infinite both}
   @keyframes gEnv{0%,21%{opacity:1;transform:none}34%{opacity:0;transform:translate3d(0,40%,0) scale(.9)}93%{opacity:0;transform:translate3d(0,12px,0)}100%{opacity:1;transform:none}}
   @keyframes gFlap{0%,19%{transform:none}27%,100%{transform:rotateX(178deg)}}
   @keyframes gWorld{0%,22%{transform:scale(1.22)}48%,100%{transform:scale(1)}}
   @keyframes gCard{0%,38%{opacity:0;transform:translate3d(-50%,18px,0)}50%,86%{opacity:1;transform:translate3d(-50%,0,0)}93%,100%{opacity:0;transform:translate3d(-50%,0,0)}}
 
-  .about.is-live .say.is-on .dm__covers i:nth-child(2){animation:sPick 7s infinite both}
-  .about.is-live .say.is-on .dm--steps li:nth-child(2){animation:sDim2 7s infinite both}
-  .about.is-live .say.is-on .dm--steps li:nth-child(3){animation:sDim3 7s infinite both}
-  .about.is-live .say.is-on .dm__field span{animation:sType 7s steps(12) infinite both}
-  .about.is-live .say.is-on .dm__done svg{animation:sDone 7s var(--ease) infinite both}
-  .about.is-live .say.is-on .dm__line s{animation:sLine 7s var(--ease) infinite both}
+  .about.is-live .say.is-on .dm__covers i:nth-child(2){animation:sPick 5s infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(2){animation:sDim2 5s infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(3){animation:sDim3 5s infinite both}
+  .about.is-live .say.is-on .dm__field span{animation:sType 5s steps(12) infinite both}
+  .about.is-live .say.is-on .dm__done svg{animation:sDone 5s var(--ease) infinite both}
+  .about.is-live .say.is-on .dm__line s{animation:sLine 5s var(--ease) infinite both}
   @keyframes sPick{0%,6%{transform:translate3d(0,0,0)}12%,90%{transform:translate3d(0,-7px,0) scale(1.08)}100%{transform:none}}
   @keyframes sDim2{0%,18%{opacity:.35}24%,92%{opacity:1}100%{opacity:.35}}
   @keyframes sDim3{0%,52%{opacity:.35}58%,92%{opacity:1}100%{opacity:.35}}
@@ -882,7 +885,7 @@ main{overflow-x:clip}
   .services.is-live .scr.play .day li:nth-child(6){animation-delay:7.5s}
   .services.is-live .scr.play .day__dot{animation:dDot 9s var(--ease) infinite both}
   .services.is-live .scr.play .day__line i{animation:dLine 9s var(--ease) infinite both}
-  @keyframes dRow{0%{opacity:.38;transform:none}4%,15%{opacity:1;transform:translate3d(5px,0,0)}19%{opacity:.82;transform:none}96%{opacity:.82}100%{opacity:.38}}
+  @keyframes dRow{0%{opacity:.4}4%,96%{opacity:1}100%{opacity:.4}}
   @keyframes dDot{0%{opacity:0;transform:translate3d(0,0,0) scale(.6)}3%{opacity:1;transform:translate3d(0,0,0)}
     16.6%{transform:translate3d(0,0,0)}19.6%,33.3%{transform:translate3d(0,var(--rh),0)}36.3%,50%{transform:translate3d(0,calc(var(--rh) * 2),0)}
     53%,66.6%{transform:translate3d(0,calc(var(--rh) * 3),0)}69.6%,83.3%{transform:translate3d(0,calc(var(--rh) * 4),0)}86.3%,95%{opacity:1;transform:translate3d(0,calc(var(--rh) * 5),0)}100%{opacity:0;transform:translate3d(0,calc(var(--rh) * 5),0)}}
@@ -906,9 +909,9 @@ main{overflow-x:clip}
   .services.is-live .scr--seat.play .seat__find s{animation:pType 6s steps(14) infinite both}
   .services.is-live .scr--seat.play .seat__ring{animation:pRing 6s ease-out infinite both}
   .services.is-live .scr--seat.play .seat__got{animation:pGot 6s var(--ease) infinite both}
-  @keyframes pType{0%,6%{transform:translateX(0)}32%,100%{transform:translateX(101%)}}
-  @keyframes pRing{0%,36%{opacity:0;transform:scale(.5)}40%{opacity:1}52%{opacity:0;transform:scale(1.7)}53%{opacity:0;transform:scale(.5)}56%{opacity:1}68%,100%{opacity:0;transform:scale(1.7)}}
-  @keyframes pGot{0%,38%{opacity:0;transform:translate3d(0,10px,0)}48%,90%{opacity:1;transform:none}97%,100%{opacity:0}}
+  @keyframes pType{0%,4%{transform:translateX(0)}15%,100%{transform:translateX(101%)}}
+  @keyframes pRing{0%,18%{opacity:0;transform:scale(.5)}40%{opacity:1}52%{opacity:0;transform:scale(1.7)}53%{opacity:0;transform:scale(.5)}56%{opacity:1}68%,100%{opacity:0;transform:scale(1.7)}}
+  @keyframes pGot{0%,20%{opacity:0;transform:translate3d(0,10px,0)}30%,90%{opacity:1;transform:none}97%,100%{opacity:0}}
 
   .services.is-live .scr--gift.play .tap{animation:tap 5s .4s infinite both}
   .services.is-live .scr--gift.play .pass__stamp{animation:gStamp 5s var(--ease) infinite both}
@@ -930,3 +933,13 @@ main{overflow-x:clip}
 @media (min-width:900px){.phone__screen .scr__in{padding:118px 22px 70px}}
 @keyframes orb{0%{transform:scale(.5);opacity:0}35%{transform:scale(1);opacity:1}100%{transform:scale(.62);opacity:0}}
 @media (prefers-reduced-motion:reduce){.nav__orb{display:none}}
+/* phones: animated pictures carry no drop-shadow filter (it is repainted on every frame) */
+@media (max-width:899px){.scr--invite img,.pair__body img,.ask__mascot img{filter:none}}
+/* phones: a soft shade at the top of the screen, in the tone of the section, so writing that scrolls under the menu button fades instead of colliding with it */
+@media (max-width:899px){
+  .top-shade{position:fixed;z-index:39;left:0;right:0;top:0;height:calc(86px + env(safe-area-inset-top));pointer-events:none;opacity:0;transition:opacity .4s,background-color .4s;
+    background:linear-gradient(180deg,rgba(251,246,234,.95) 0%,rgba(251,246,234,.8) 55%,rgba(251,246,234,0) 100%)}
+  .bar-gone .top-shade{opacity:1}
+  [data-sec="services"] .top-shade,[data-sec="themes"] .top-shade{background:linear-gradient(180deg,rgba(12,29,19,.92) 0%,rgba(12,29,19,.72) 55%,rgba(12,29,19,0) 100%)}
+}
+@media (min-width:900px){.top-shade{display:none}}

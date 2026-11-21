@@ -258,7 +258,7 @@
   /* The morph no longer follows the finger. Scrolling past a small threshold decides bar or rail
      (with a little room either side so it cannot flicker); the change then plays on its own clock,
      so it can never stop half-way. A round glass orb swells over the corner at the hand-over. */
-  var orbSide = null, navGoal = -1, navM = 0, navFrom = 0, navT0 = 0, navDur = 0, navRun = false, orb = $('.nav__orb');
+  var menuBtnEl = $('.menu-btn'), orbSide = null, navGoal = -1, navM = 0, navFrom = 0, navT0 = 0, navDur = 0, navRun = false, orb = $('.nav__orb');
   function navMorph(y, vh) {
     var D = desktop.matches;
     if (calm) { navGoal = 1; navM = 1; drawNav(1, D); return; }
@@ -285,8 +285,10 @@
     }
     lastM = m;
     var a = clamp(m / .55), b = clamp((m - .4) / .6);
-    root.style.setProperty('--na', D ? a.toFixed(4) : m.toFixed(3));
-    root.style.setProperty('--nb', b.toFixed(4));
+    /* set on the menu and its button only: a variable on <html> would make the browser restyle the whole page every frame */
+    var na = D ? a.toFixed(4) : m.toFixed(3);
+    nav.style.setProperty('--na', na); nav.style.setProperty('--nb', b.toFixed(4));
+    if (menuBtnEl) menuBtnEl.style.setProperty('--na', na);
     nav.classList.toggle('is-bar', a < 1);
     nav.classList.toggle('is-top', m === 0);
     nav.classList.toggle('is-rail', m === 1);
@@ -295,8 +297,8 @@
     /* the bar's right edge pulls back like a curtain; each link fades as the edge reaches it,
        then reappears in the rail and slides down into its place */
     var edge = 88 + (window.innerWidth - 104) * (1 - a);
-    root.style.setProperty('--lab', a < 1 ? 1 : 0);
-    root.style.setProperty('--wm', clamp((edge - 180) / 60).toFixed(3));
+    nav.style.setProperty('--lab', a < 1 ? 1 : 0);
+    nav.style.setProperty('--wm', clamp((edge - 180) / 60).toFixed(3));
     flips.forEach(function (f, i) {
       var fx, fy, o;
       /* a link is gone before the edge reaches its label, so no letter is ever left outside the glass */
@@ -337,42 +339,67 @@
   }
 
   /* ---------- The arch: one swipe, one message ----------
-     When a swipe or a wheel turn ends inside the arch's pinned stretch, the page glides to the next
-     message's resting point in the direction of that swipe (one step, however hard the swipe), so the
-     stage never rests between two messages. Swipes that end outside the arch are left alone. */
+     Inside the arch's pinned stretch the page does not scroll under the finger. A swipe (or one turn of
+     the wheel, or an arrow key) moves exactly one message, gliding on its own clock; at the last message a
+     swipe down carries on to the next section, at the first a swipe up goes back to the sky. A fling that
+     comes in from outside is stopped at the first (or last) message, so no message can be skipped. */
   (function () {
     if (calm || !about) return;
-    var gesture = null, gliding = false, timer = 0, touching = false, rest = window.scrollY;   // rest: where the page stood still last
+    var gliding = false, wheelAt = 0, wheelSum = 0, tY = 0, tOn = false, lastY = window.scrollY;
     function stops() {
       var top = about.getBoundingClientRect().top + window.scrollY, span = about.offsetHeight - window.innerHeight;
-      return [top + span * (.5 / 3), top + span * .5, top + span * (2.5 / 3)].map(Math.round).concat([top, top + span]);
+      return { top: top, end: top + span, s: [top + span * (.5 / 3), top + span * .5, top + span * (2.5 / 3)].map(Math.round) };
     }
-    function settle() {
-      if (touching) { timer = setTimeout(settle, 120); return; }
-      var y = window.scrollY, s = stops(), from = gesture; gesture = null; rest = y;
-      if (from === null || y <= s[3] + 2 || y >= s[4] - 2) return;     // ended outside the pinned stretch
-      var d = y - from, near = 0;
-      for (var i = 1; i < 3; i++) if (Math.abs(s[i] - from) < Math.abs(s[near] - from)) near = i;
-      var target;
-      if (from < s[3]) target = s[0];
-      else if (from > s[4]) target = s[2];
-      else if (Math.abs(d) < 24) target = s[near];
-      else if (near === 2 && d > 0) target = s[4] + 2;                 // past the last message: on to the next section
-      else if (near === 0 && d < 0) target = s[3] - 2;                 // before the first: back up toward the sky
-      else target = s[near + (d > 0 ? 1 : -1)];
-      if (Math.abs(target - y) < 3) return;
+    function inside(y, S) { return y >= S.s[0] - 6 && y <= S.s[2] + 6; }
+    function nearest(y, S) { var n = 0; for (var i = 1; i < 3; i++) if (Math.abs(S.s[i] - y) < Math.abs(S.s[n] - y)) n = i; return n; }
+    function glide(to) {
       gliding = true;
-      window.scrollTo({ top: target, behavior: 'smooth' });
-      setTimeout(function () { gliding = false; rest = window.scrollY; }, 900);
+      window.scrollTo({ top: to, behavior: 'smooth' });
+      setTimeout(function () { gliding = false; lastY = window.scrollY; }, 760);
     }
-    addEventListener('touchstart', function () { touching = true; }, { passive: true });
-    addEventListener('touchend', function () { touching = false; }, { passive: true });
-    addEventListener('touchcancel', function () { touching = false; }, { passive: true });
+    function step(dir) {
+      var S = stops(), i = nearest(window.scrollY, S), to;
+      if (dir > 0) to = i < 2 ? S.s[i + 1] : S.end + Math.round(window.innerHeight * .9);
+      else to = i > 0 ? S.s[i - 1] : S.top - Math.round(window.innerHeight * .9);
+      glide(Math.max(0, to));
+    }
+    /* a native fling that runs into the stretch is caught at the first or last message */
+    function halt(to) {
+      var html = document.documentElement, was = html.style.overflow;
+      html.style.overflow = 'hidden';                 // stops the momentum on iOS
+      requestAnimationFrame(function () { html.style.overflow = was; glide(to); });
+    }
     addEventListener('scroll', function () {
-      if (gliding) return;
-      if (gesture === null) gesture = rest;
-      clearTimeout(timer); timer = setTimeout(settle, 140);
+      var y = window.scrollY;
+      if (!gliding && !tOn) {
+        var S = stops();
+        if (lastY < S.s[0] - 6 && y >= S.s[0] - 6 && y < S.end) halt(S.s[0]);
+        else if (lastY > S.s[2] + 6 && y <= S.s[2] + 6 && y > S.top) halt(S.s[2]);
+      }
+      lastY = y;
     }, { passive: true });
+    addEventListener('touchstart', function (e) {
+      tOn = inside(window.scrollY, stops()); tY = e.touches[0].clientY;
+    }, { passive: true });
+    addEventListener('touchmove', function (e) { if (tOn) e.preventDefault(); }, { passive: false });
+    addEventListener('touchend', function (e) {
+      if (!tOn) return; tOn = false;
+      var dy = tY - (e.changedTouches[0] ? e.changedTouches[0].clientY : tY);
+      if (Math.abs(dy) > 28 && !gliding) step(dy > 0 ? 1 : -1);
+    }, { passive: true });
+    addEventListener('wheel', function (e) {
+      if (!inside(window.scrollY, stops()) && !gliding) return;
+      e.preventDefault();
+      var now = Date.now();
+      if (gliding || now - wheelAt < 650) { wheelAt = gliding ? now : wheelAt; return; }
+      wheelSum += e.deltaY;
+      if (Math.abs(wheelSum) > 18) { wheelAt = now; step(wheelSum > 0 ? 1 : -1); wheelSum = 0; }
+    }, { passive: false });
+    addEventListener('keydown', function (e) {
+      if (!inside(window.scrollY, stops()) || /input|textarea|select/i.test(e.target.tagName)) return;
+      var k = e.key, d = (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) ? 1 : (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) ? -1 : 0;
+      if (!d) return; e.preventDefault(); if (!gliding) step(d);
+    });
   })();
 
   /* ---------- Nawala: one letter, with a will of its own ----------
@@ -504,7 +531,7 @@
     if (!travel || document.hidden) { running = false; return; }
     var y = window.scrollY, vh = window.innerHeight;
     var name = sectionAt(vh);
-    if (name !== secNow) enter(name, now);
+    if (name !== secNow) { enter(name, now); root.setAttribute('data-sec', name); }
     if (!routine) { requestAnimationFrame(frame); return; }
     var o, done = false;
     if (fromS && now < rStart) {
