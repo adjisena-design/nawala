@@ -147,7 +147,7 @@ The owner sent a reel (lanterns rising, a camera descent onto a palace, turquois
 - Lanterns: `.lamps` in `index.html` (14 `<i>` with place, size, time, drift and one of four cut-outs from `fx-lanterns.webp`); hidden in `skeleton.css` and shown only by this kit. They rise the stage height, sway, fade at both ends, eight on phones under 600px, still under reduced motion, behind the pages (`.worlds` gets `z-index:1` in this kit).
 - Pages: `panel-seribu-lentera-kertas.webp` as `border-image` (slice 170 172, 50px); its middle ornaments were painted out so the stretched edges stay clean. Gold arch behind the couple, arched gallery frame, gold-outlined RSVP choices.
 - Cover set (`cover-seribu-lentera*.webp`) remade from the palace picture; descriptions in `site.js`, `themes.js` and the database; tags in `tema-tags.js` (tosca, lentera, istana).
-- `supabase/migrations/20261122_seribu_lentera.sql` sets `kit`, clears the old corridor film, updates the descriptions.
+- `supabase/migrations/20261122_seribu_lentera.sql` sets `kit`, clears the old corridor film, updates the descriptions. Run by Claude through the owner's Chrome on 22 Nov 2026, 20:55 (theme number E-005).
 - Job numbers (22 Nov 2026): lantern sky `103a477f-4452-4928-9b9e-f074963d25e2`, palace from above `f508cd43-ff2b-4c44-a49a-a62c80d21f14`, pendopo `78595d61-c6fe-464f-99f5-cb17b677110c`, pool `dba558d6-c2b3-4b9b-8364-79eb7bec975c`, garden `4bf593ad-0e0b-4352-91c2-2ecccfe38284`, lanterns `1b889743-a135-43d1-9824-52ad8a7cf434`, paper `fbc85ac3-7987-4fa6-9fab-9cddcb182f9c`. Originals in `Downloads/Nawala/generated/lentera/`.
 - No cultural review yet; not tried on a real phone.
 
