@@ -16,11 +16,11 @@ window.NAWALA_DENAH = (function () {
     return o;
   }
   function item(it, o) {
-    var hl = o.hl === it.id, tbl = !!TABLE[it.type], s = '', fill = hl ? '#2f55d4' : tbl ? '#fff' : (it.color || '#e7e2d8'), ink = hl ? '#fff' : '#1c2024';
-    var line = hl ? '#2f55d4' : tbl ? '#1c2024' : '#9aa3ad', sw = hl ? 0.07 : 0.035;
+    var hl = o.hl === it.id, tbl = !!TABLE[it.type], s = '', fill = hl ? '#D8436B' : tbl ? '#fff' : (it.color || '#e7e2d8'), ink = hl ? '#fff' : '#1c2024';
+    var line = hl ? '#D8436B' : tbl ? '#1c2024' : '#9aa3ad', sw = hl ? 0.07 : 0.035;
     if (it.type === 'round') s += '<circle r="' + it.w / 2 + '" fill="' + fill + '" stroke="' + line + '" stroke-width="' + sw + '"/>';
     else if (it.type === 'label') s += '';
-    else if (it.type === 'rows') s += hl ? '<rect x="' + (-it.w / 2 - 0.12) + '" y="' + (-it.h / 2 - 0.12) + '" width="' + (it.w + 0.24) + '" height="' + (it.h + 0.24) + '" rx=".14" fill="none" stroke="#2f55d4" stroke-width=".08"/>' : '';
+    else if (it.type === 'rows') s += hl ? '<rect x="' + (-it.w / 2 - 0.12) + '" y="' + (-it.h / 2 - 0.12) + '" width="' + (it.w + 0.24) + '" height="' + (it.h + 0.24) + '" rx=".14" fill="none" stroke="#D8436B" stroke-width=".08"/>' : '';
     else if (it.type === 'gazebo') { var a = it.w / 2, b = it.h / 2, k = 0.29; s += '<polygon points="' + [-a * k, -b, a * k, -b, a, -b * k, a, b * k, a * k, b, -a * k, b, -a, b * k, -a, -b * k].join(' ') + '" fill="' + fill + '" stroke="' + line + '" stroke-width="' + sw + '"/>'; }
     else s += '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" rx="' + (tbl ? 0.08 : 0.18) + '" fill="' + fill + '" stroke="' + line + '" stroke-width="' + sw + '"' + (it.type === 'standing' ? ' stroke-dasharray=".25 .15"' : '') + '/>';
     if (tbl && Array.isArray(it.seat)) chairs(it).forEach(function (p, i) {
@@ -31,7 +31,7 @@ window.NAWALA_DENAH = (function () {
     });
     var rot = ' transform="rotate(' + (-(it.r || 0)) + ')"', fs;
     if (it.type === 'label') s += '<text font-size="' + r2(it.h * 0.62) + '" font-weight="600" fill="#1c2024"' + rot + '>' + esc(it.text) + '</text>';
-    else if (it.type === 'rows') s += '<text font-size=".3" font-weight="600" y="' + (-it.h / 2 - 0.38) + '" fill="' + (hl ? '#2f55d4' : '#1c2024') + '"' + rot + '>' + esc(it.name) + '</text>';
+    else if (it.type === 'rows') s += '<text font-size=".3" font-weight="600" y="' + (-it.h / 2 - 0.38) + '" fill="' + (hl ? '#D8436B' : '#1c2024') + '"' + rot + '>' + esc(it.name) + '</text>';
     else { fs = tbl ? (Math.min(it.w, it.h) < 0.95 ? 0.24 : 0.3) : Math.max(0.24, Math.min(0.4, Math.min(it.w, it.h) * 0.22)); s += '<text font-size="' + r2(fs) + '" font-weight="600" fill="' + ink + '"' + rot + '>' + esc(it.name) + '</text>'; }
     return '<g transform="translate(' + r2(it.x) + ' ' + r2(it.y) + ') rotate(' + (it.r || 0) + ')">' + s + '</g>';
   }
@@ -40,7 +40,7 @@ window.NAWALA_DENAH = (function () {
     var items = (plan.items || []).slice().sort(function (a, b) { return order(a) - order(b); });
     return '<svg viewBox="-0.6 -0.6 ' + (R.w + 1.2) + ' ' + (R.h + 1.2) + '" role="img" aria-label="' + esc(plan.name) + '" style="font-family:inherit">' +
       '<style>text{text-anchor:middle;dominant-baseline:central}</style>' +
-      '<rect x="0" y="0" width="' + R.w + '" height="' + R.h + '" fill="#fff" stroke="#1c2024" stroke-width=".06"/>' +
+      '<rect x="0" y="0" width="' + R.w + '" height="' + R.h + '" fill="#fff" stroke="#16301F" stroke-width=".06"/>' +
       items.map(function (it) { return item(it, o); }).join('') + '</svg>';
   }
   /* where a table is, in words */

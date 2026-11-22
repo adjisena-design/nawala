@@ -5,183 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Demo Denah &amp; Kursi, Nawala</title>
-<style>
-/* The seating planner demo, opened from the home page (services, "Susun denah sendiri") in a full-screen box.
-   Same editor as the design preview on claude.ai, couple's view only, sample data, nothing is saved.
-   Neutral planner look (owner's decision, 22 Nov 2026), Jakarta from the site's own fonts, console density. */
-@font-face{font-family:"Jakarta";src:url("../assets/fonts/jakarta.woff2") format("woff2");font-weight:200 800;font-display:swap}
-:root{color-scheme:light;--bg:#eef0f2;--panel:#fff;--paper:#fff;--ink:#1c2024;--mute:#5f666e;--line:#dde1e5;--grid:#e9ecef;--grid2:#d6dbe0;--acc:#2f55d4;--acc2:#e7ecfb;--warn:#c9342a;--warnbg:#fdecea;--ok:#2a8a5c;--chair:#fff;--chairline:#9aa3ad}
-*{box-sizing:border-box;min-width:0}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Jakarta,system-ui,sans-serif;overflow:hidden}
-button,input,select{font:inherit;color:inherit}
-button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 11px;min-height:36px}
-button:hover:not(:disabled){border-color:var(--chairline)}
-button:disabled{opacity:.45;cursor:not-allowed}
-button:focus-visible,input:focus-visible,select:focus-visible,.filebtn:focus-within{outline:2px solid var(--acc);outline-offset:1px}
-.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
-.pri:hover:not(:disabled){filter:brightness(1.08);border-color:var(--acc)}
-input[type=text],input[type=number],input[type=search],select{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 9px;min-height:36px;width:100%}
-h1,h2{margin:0;line-height:1.15;font-weight:700}
-.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
-.demo{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:6px 16px;font-size:13px;color:var(--mute);background:#f7f8fa;border-bottom:1px solid var(--line)}
-.demo button{min-height:30px;padding:3px 10px;font-size:13px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;border-radius:0;min-height:30px;padding:4px 11px;background:transparent;font-size:13px}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button[aria-pressed=true]{background:var(--acc2);color:var(--acc);font-weight:600}
-.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
-.crumb{font-size:12.5px;color:var(--mute)}
-.top h1{font-size:19px}
-.tier{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--acc2);color:var(--acc);font-weight:600;white-space:nowrap}
-.sp{flex:1}
-.status{font-size:13px;color:var(--mute);white-space:nowrap;display:flex;align-items:center;gap:6px}
-.status i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
-.status.draft i{background:#d9962a}
-.ico{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px}
-.ico svg{width:17px;height:17px}
-.view{display:none;min-height:0}
-.view.on{display:grid}
-#v-edit{grid-template-columns:270px minmax(0,1fr) 280px}
-aside{background:var(--panel);overflow:auto;min-height:0}
-#guests{border-right:1px solid var(--line);display:flex;flex-direction:column}
-#props{border-left:1px solid var(--line);padding:14px 16px 24px}
-.pad{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
-.pad h2,#props h2{font-size:15.5px}
-.row{display:flex;gap:8px;align-items:center}
-.lbl{font-size:12.5px;color:var(--mute)}
-.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer}
-.chk input{width:16px;height:16px;accent-color:var(--acc)}
-.groups{display:flex;flex-wrap:wrap;gap:6px}
-.gchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:3px 9px;min-height:28px;background:var(--paper)}
-.gchip i{width:9px;height:9px;border-radius:50%}
-.gchip[aria-pressed=false]{opacity:.45}
-.glist{list-style:none;margin:0;padding:6px 8px 16px;overflow:auto;flex:1}
-.glist li{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px;border-radius:8px;cursor:grab;user-select:none;touch-action:none}
-.glist li:hover{background:var(--bg)}
-.glist li.hl{background:var(--acc2)}
-.glist li i{width:10px;height:10px;border-radius:50%}
-.glist .nm{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.glist .sub{font-size:12px;color:var(--mute)}
-.cnt{font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--mute);white-space:nowrap}
-.cnt.full{color:var(--ok);font-weight:600}
-.tag{font-size:11px;padding:1px 6px;border-radius:99px;border:1px solid var(--line);margin-left:4px}
-.tag.no{color:var(--warn);border-color:currentColor}
-.tag.q{color:#9a6a10;border-color:currentColor}
-.empty{padding:20px 12px;color:var(--mute);font-size:13.5px;text-align:center;display:block!important;cursor:default!important}
-.stage{position:relative;display:grid;grid-template-rows:auto 1fr;min-height:0}
-.palette{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);align-items:center}
-.pal{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 7px;min-height:32px;font-size:13px;background:var(--paper)}
-.pal svg{width:18px;height:18px;flex:none}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
-.canvas{position:relative;overflow:hidden;min-height:0;background:var(--bg);touch-action:none}
-.canvas>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.canvas.pan{cursor:grabbing}
-.zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-.zoom button{border:0;min-height:32px}
-.zoom span{font-size:12.5px;min-width:44px;text-align:center;align-self:center;font-variant-numeric:tabular-nums}
-.hint{position:absolute;left:12px;bottom:12px;font-size:13px;color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 11px;max-width:min(520px,60%)}
-.room{fill:var(--paper);stroke:var(--ink)}
-.dim{font-size:.42px;fill:var(--mute);font-family:Jakarta,sans-serif;text-anchor:middle}
-.it .body{stroke:var(--chairline)}
-.it.tbl .body{fill:var(--paper);stroke:var(--ink)}
-.it text{font-family:Jakarta,sans-serif;text-anchor:middle;dominant-baseline:central;fill:var(--ink);pointer-events:none}
-.it.sel .body{stroke:var(--acc)}
-.it.warn .body{stroke:var(--warn)}
-.chair{fill:var(--chair);stroke:var(--chairline)}
-.chair.off{fill:none;stroke-dasharray:.06 .05;opacity:.6}
-.chair.taken{stroke:rgba(0,0,0,.25)}
-.chair.drop{stroke:var(--acc);stroke-width:.06}
-.ini{font-size:.16px;font-weight:700;fill:#fff!important}
-.hdl{fill:#fff;stroke:var(--acc);cursor:pointer}
-.it.hi .body{fill:var(--acc)!important;stroke:var(--acc)!important}
-.it.hi text{fill:#fff!important}
-.ghost{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:#fff;font-size:13px;padding:6px 10px;border-radius:8px;transform:translate(12px,8px);white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.2)}
-#props section{display:grid;gap:9px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
-#props section:last-child{border-bottom:0}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.f{display:grid;gap:4px}
-.step{display:flex;align-items:center;gap:6px}
-.step button{min-width:36px;padding:4px}
-.step output{min-width:36px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
-.sw{display:flex;flex-wrap:wrap;gap:6px}
-.sw button{width:26px;height:26px;min-height:26px;padding:0;border-radius:50%}
-.sw button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
-.sw input{width:26px;height:26px;padding:0;border:0;background:none}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{background:var(--bg);border-radius:10px;padding:9px 10px}
-.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
-.stat span{font-size:12px;color:var(--mute)}
-.warns{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.warns li{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:7px 9px;font-size:13px;cursor:pointer}
-.warns li.info{background:var(--bg);color:var(--mute);cursor:default}
-.seated{list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.seated li{display:flex;gap:8px;align-items:center;font-size:13.5px}
-.seated li i{width:9px;height:9px;border-radius:50%;flex:none}
-.seated li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.seated button{min-height:28px;padding:2px 8px;font-size:12.5px}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.danger{color:var(--warn)}
-.kbd{font-size:12px;color:var(--mute);margin:0}
-.filebtn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;min-height:36px;cursor:pointer;background:var(--panel)}
-.filebtn input{position:absolute;opacity:0;width:1px;height:1px}
-fieldset{border:0;margin:0;padding:0;min-width:0}
-.pop{position:fixed;z-index:15;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;min-width:220px;gap:4px}
-.pop.on{display:grid}
-.pop button{text-align:left}
-.pop .pal{border:0}
-.modal{position:fixed;inset:0;background:rgba(15,18,22,.45);display:none;place-items:center;z-index:30;padding:16px}
-.modal.on{display:grid}
-.card{background:var(--panel);border-radius:14px;padding:20px;width:min(520px,100%);display:grid;gap:12px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.card h2{font-size:18px}
-.card p{margin:0;color:var(--mute);font-size:14px}
-.box{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:8px}
-textarea{width:100%;min-height:180px;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:8px;font:12.5px/1.5 ui-monospace,Menlo,monospace;color:var(--ink)}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:#fff;padding:9px 14px;border-radius:10px;font-size:13.5px;z-index:40;transition:transform .2s,opacity .2s;pointer-events:none;max-width:90vw}
-.toast.on{opacity:1;transform:translateX(-50%)}
-#v-guest,#v-usher{grid-template-columns:minmax(0,1fr) 320px;overflow:auto}
-.showcase{display:grid;place-items:center;padding:24px}
-.phone{width:340px;height:700px;border-radius:44px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.25)}
-.screen{width:100%;height:100%;border-radius:34px;background:#faf9f7;overflow:auto;padding:28px 20px;display:grid;align-content:start;gap:14px}
-.screen .who{font-size:12.5px;color:#6b7178;text-align:center}
-.screen h3{font-size:22px;text-align:center;margin:0}
-.mytable{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:16px;text-align:center;display:grid;gap:4px}
-.mytable span{font-size:12.5px;color:#6b7178}
-.mytable b{font-size:30px}
-.miniplan{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:8px}
-.miniplan svg,.bigplan svg{width:100%;height:auto;display:block}
-.bigplan svg{max-height:62vh}
-.side{background:var(--panel);border-left:1px solid var(--line);padding:18px;display:grid;align-content:start;gap:14px}
-.side p{margin:0;font-size:13.5px;color:var(--mute)}
-.usher{padding:24px;display:grid;gap:14px;align-content:start}
-.usher input{font-size:18px;min-height:50px;padding:10px 14px}
-.res{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.res li{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer}
-.res li.on{border-color:var(--acc);background:var(--acc2)}
-.res b{font-variant-numeric:tabular-nums;white-space:nowrap}
-.bigplan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px}
-.narrow{display:none}
-@media (max-width:1180px){#v-edit{grid-template-columns:240px minmax(0,1fr) 250px}}
-@media (max-width:899px){
- #v-edit{grid-template-columns:minmax(0,1fr)}
- #guests,#props,.palette,.hint{display:none}
- .narrow{display:block;margin:10px 12px 0;padding:10px 12px;border-radius:10px;background:var(--acc2);color:var(--acc);font-size:13.5px}
- #v-guest,#v-usher{grid-template-columns:minmax(0,1fr)}
- .side{border-left:0;border-top:1px solid var(--line)}
-}
-@media (prefers-reduced-motion:reduce){.toast{transition:none}}
-</style>
+<link rel="stylesheet" href="denah.css?v=20261122t">
+<style>/* The seating planner demo: a guided story with the sample couple, no code needed, nothing saved.
+   Arrange the room, publish, open Dinda's real invitation (her table appears), then the ushers' page finds her.
+   Published state is kept in localStorage "nawala-denah-demo" so meja.js and penerima.html can read it. */
+.narrow{display:none!important}</style>
 </head>
 <body>
 <div class="app">
   <div class="demo">
-    <span data-en="Demo with a sample couple. Try anything: nothing is saved. In Nawala this plan is kept for your wedding.">Demo dengan pasangan contoh. Coba apa saja: tidak ada yang tersimpan. Di Nawala denah ini tersimpan untuk pernikahan Anda.</span>
+    <nav class="story" id="story" aria-label="Alur demo">
+      <button data-st="edit"><i>1</i><span data-en="Arrange the room">Susun ruangan</span></button>
+      <button data-st="publish"><i>2</i><span data-en="Publish">Terbitkan</span></button>
+      <button data-st="guest"><i>3</i><span data-en="Dinda's invitation">Undangan Dinda</span></button>
+      <button data-st="usher"><i>4</i><span data-en="At the door">Di pintu masuk</span></button>
+    </nav>
+    <span class="say" id="say"></span>
+    <button id="next" class="pri" data-en="Next">Lanjut</button>
     <button id="reset" data-en="Start over">Mulai ulang</button>
   </div>
   <div class="top">
+    <a class="brand" href="../" target="_top" aria-label="Nawala"><img src="../assets/img/nawala-hero-480.webp" width="480" height="413" alt=""></a>
     <div>
-      <div class="crumb" data-en="Couple's room, Laras &amp; Bima">Ruang pasangan, Laras &amp; Bima</div>
-      <div class="row"><h1 data-en="Floor plan &amp; seats">Denah &amp; Kursi</h1><span class="tier" data-en="Exclusive and Custom">Eksklusif dan Kustom</span></div>
+      <div class="crumb" data-en="Demo, Laras &amp; Bima's room. Nothing is saved.">Demo, ruang Laras &amp; Bima. Tidak ada yang tersimpan.</div>
+      <div class="row"><h1 data-en="Floor plan &amp; seats">Denah &amp; Kursi</h1></div>
     </div>
     <span class="seg" id="viewSeg">
       <button data-view="edit" aria-pressed="true" data-en="Plan">Denah</button>
@@ -236,26 +83,18 @@ textarea{width:100%;min-height:180px;border:1px solid var(--line);border-radius:
   </div>
 
   <div class="view" id="v-guest">
-    <div class="showcase"><div class="phone"><div class="screen" id="gScreen"></div></div></div>
-    <div class="side">
-      <h2 style="font-size:16px" data-en="What guests see">Yang dilihat tamu</h2>
-      <p data-en="Once a guest has answered the RSVP, their invitation shows their table. Only the published version is shown.">Setelah tamu menjawab RSVP, undangannya menunjukkan meja mereka. Hanya versi yang sudah diterbitkan yang tampil.</p>
+    <div class="showcase"><div class="phone"><iframe id="gFrame" title="Undangan Dinda" loading="lazy"></iframe></div></div>
+    <div class="side g">
+      <h2 data-en="Her own invitation">Undangan miliknya sendiri</h2>
+      <p data-en="This is the real Nawala invitation, as the guest gets it on WhatsApp. Tap Open the invitation: once the plan is published, her table appears at the top left. Tap it to see the room.">Ini undangan Nawala yang sebenarnya, seperti yang diterima tamu lewat WhatsApp. Ketuk Buka undangan: setelah denah diterbitkan, mejanya muncul di kiri atas. Ketuk untuk melihat ruangannya.</p>
       <div class="f"><span class="lbl" data-en="See it as">Lihat sebagai tamu</span><select id="gPick"></select></div>
       <label class="chk"><input type="checkbox" id="showFull" checked> <span data-en="Show guests the whole plan">Tampilkan denah lengkap ke tamu</span></label>
-      <p data-en="When this is off, guests only see the table's name and where it is, in words.">Jika dimatikan, tamu hanya melihat nama meja dan letaknya dalam kata-kata.</p>
+      <button id="gReload" data-en="Open it again">Buka ulang undangan</button>
     </div>
   </div>
 
   <div class="view" id="v-usher">
-    <div class="usher">
-      <h2 style="font-size:18px" data-en="Find a guest at the entrance">Cari tamu di pintu masuk</h2>
-      <input type="search" id="uSearch" placeholder="Ketik nama tamu" data-en-ph="Type a guest's name">
-      <div class="bigplan" id="uPlan"></div>
-    </div>
-    <div class="side">
-      <p data-en="For the ushers on the day. View only, from the published version.">Untuk penerima tamu di hari H. Hanya bisa melihat, dari versi yang sudah diterbitkan.</p>
-      <ul class="res" id="uRes"></ul>
-    </div>
+    <iframe class="frame-wide g" id="uFrame" title="Penerima tamu" loading="lazy"></iframe>
   </div>
 </div>
 
@@ -350,6 +189,7 @@ let S=sample();
 const L=()=>S.layouts[S.active];
 const T=it=>TYPES[it.type];
 const G=id=>S.guests.find(g=>g.id===id);
+const narrow=()=>matchMedia('(max-width:899px)').matches;
 const GR=id=>S.groups.find(g=>g.id===id)||{color:'#888',name:t('Tanpa grup','No group')};
 const isTbl=it=>!!T(it).table;
 const reserved=(it,i)=>it.type==='couple'&&i<2;
@@ -419,7 +259,7 @@ function itemSVG(it,o){const warn=o.bad&&o.bad.has(it.id),cls=['it'];if(isTbl(it
  const sw=o.sel===it.id||warn?.07:.035;let b='';
  if(it.type==='round')b=`<circle class="body" r="${it.w/2}" stroke-width="${sw}"/>`;
  else if(it.type==='gazebo'){const r=it.w/2,h=it.h/2,k=.29;b=`<polygon class="body" points="${-r*k},${-h} ${r*k},${-h} ${r},${-h*k} ${r},${h*k} ${r*k},${h} ${-r*k},${h} ${-r},${h*k} ${-r},${-h*k}" fill="${it.color}" stroke-width="${sw}"/>`}
- else if(it.type==='label')b=`<rect class="body" x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" fill="transparent" stroke="${o.sel===it.id?'#2f55d4':'none'}" stroke-width="${sw}" stroke-dasharray=".1 .08"/>`;
+ else if(it.type==='label')b=`<rect class="body" x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" fill="transparent" stroke="${o.sel===it.id?'#D8436B':'none'}" stroke-width="${sw}" stroke-dasharray=".1 .08"/>`;
  else if(it.type==='rows')b=`<rect class="body" x="${-it.w/2-.08}" y="${-it.h/2-.08}" width="${it.w+.16}" height="${it.h+.16}" rx=".12" fill="transparent" stroke-width="${o.sel===it.id||warn?sw:0}"/>`;
  else b=`<rect class="body" x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" rx="${isTbl(it)?.08:.18}" ${it.color?`fill="${it.color}"`:''} stroke-width="${sw}" ${it.type==='standing'?'stroke-dasharray=".25 .15"':''}/>`;
  let ch='';
@@ -427,12 +267,12 @@ function itemSVG(it,o){const warn=o.bad&&o.bad.has(it.id),cls=['it'];if(isTbl(it
   ch+=`<g class="ch" data-it="${it.id}" data-c="${i}"><circle class="chair${off?' off':''}${fill?' taken':''}" cx="${X}" cy="${Y}" r=".22" stroke-width=".03" ${fill?`style="fill:${fill}"`:''}>${g?`<title>${esc(g.name)}</title>`:''}</circle>${fill?`<text class="ini" x="${X}" y="${Y}" transform="rotate(${-it.r} ${X} ${Y})">${res?(i===0?'L':'B'):esc(initials(g.name))}</text>`:''}</g>`});
  const rot=` transform="rotate(${-it.r})"`;let tx='';
  if(it.type==='label')tx=`<text font-size="${r2(it.h*.62)}" font-weight="600"${rot}>${esc(it.text)}</text>`;
- else if(isTbl(it)&&it.type!=='rows')tx=`<text font-size="${Math.min(it.w,it.h)<.95?.24:.3}" font-weight="600" y="${it.type==='round'?-.1:0}"${rot}>${esc(it.name)}</text>`+(it.type==='round'?`<text font-size=".22" y=".22"${rot} style="fill:#5f666e">${usedSeats(it)}/${activeSeats(it)}</text>`:'');
+ else if(isTbl(it)&&it.type!=='rows')tx=`<text font-size="${Math.min(it.w,it.h)<.95?.24:.3}" font-weight="600" y="${it.type==='round'?-.1:0}"${rot}>${esc(it.name)}</text>`+(it.type==='round'?`<text font-size=".22" y=".22"${rot} style="fill:rgba(22,48,31,.62)">${usedSeats(it)}/${activeSeats(it)}</text>`:'');
  else if(it.type==='rows')tx=`<text font-size=".3" font-weight="600" y="${-it.h/2-.35}"${rot}>${esc(it.name)} ${usedSeats(it)}/${activeSeats(it)}</text>`;
- else{const fs=Math.max(.24,Math.min(.4,Math.min(it.w,it.h)*.22));tx=`<text font-size="${r2(fs)}" font-weight="600"${rot}>${esc(it.name)}</text>`+(it.type==='standing'?`<text font-size="${r2(fs*.8)}" y="${r2(fs*1.2)}"${rot} style="fill:#5f666e">${t('kapasitas','capacity')} ${it.cap}</text>`:'')}
+ else{const fs=Math.max(.24,Math.min(.4,Math.min(it.w,it.h)*.22));tx=`<text font-size="${r2(fs)}" font-weight="600"${rot}>${esc(it.name)}</text>`+(it.type==='standing'?`<text font-size="${r2(fs*.8)}" y="${r2(fs*1.2)}"${rot} style="fill:rgba(22,48,31,.62)">${t('kapasitas','capacity')} ${it.cap}</text>`:'')}
  let hd='';
  if(o.sel===it.id&&!o.ro){const k=1/vp.s,ext=it.h/2+(isTbl(it)&&it.type!=='rows'?.6:.1);
-  hd+=`<line x1="0" y1="${-ext}" x2="0" y2="${-ext-22*k}" stroke="#2f55d4" stroke-width="${1.5*k}"/><circle class="hdl" data-h="rot" cy="${-ext-22*k}" r="${7*k}" stroke-width="${2*k}"/>`;
+  hd+=`<line x1="0" y1="${-ext}" x2="0" y2="${-ext-22*k}" stroke="#D8436B" stroke-width="${1.5*k}"/><circle class="hdl" data-h="rot" cy="${-ext-22*k}" r="${7*k}" stroke-width="${2*k}"/>`;
   if(it.type!=='rows')hd+=`<rect class="hdl" data-h="size" x="${it.w/2+.08-6*k}" y="${it.h/2+.08-6*k}" width="${12*k}" height="${12*k}" rx="${2*k}" stroke-width="${2*k}" style="cursor:nwse-resize"/>`}
  return `<g class="${cls.join(' ')}" data-id="${it.id}" transform="translate(${r2(it.x)} ${r2(it.y)}) rotate(${it.r})" style="cursor:${o.ro?'default':'move'}">${b}${ch}${tx}${hd}</g>`}
 function planSVG(lay,o){const R=lay.room;let s=`<rect class="room" x="0" y="0" width="${R.w}" height="${R.h}" stroke-width=".06"/>`;
@@ -481,23 +321,23 @@ function renderProps(){const lay=L(),it=lay.items.find(i=>i.id===sel),fs=$('#pro
   <div class="acts"><button id="dup">${t('Duplikat','Duplicate')}</button><button id="del" class="danger">${t('Hapus','Delete')}</button></div>
   <p class="kbd">${t('Ctrl+D duplikat, Delete hapus, panah menggeser 10 cm.','Ctrl+D duplicates, Delete removes, arrows move 10 cm.')}</p></section>${seated}`}
 function renderTabs(){$('#layTabs').innerHTML=`<span class="lbl">${t('Denah:','Plans:')}</span><span class="seg">${S.layouts.map((l,i)=>`<button data-lay="${i}" aria-pressed="${i===S.active}">${esc(l.name)}</button>`).join('')}</span><button id="layAdd" style="min-height:30px;padding:3px 9px;font-size:13px" ${ro()?'disabled':''}>${t('+ Denah baru','+ New plan')}</button><span class="kbd" style="margin-left:auto">${L().room.w} &times; ${L().room.h} m</span>`}
-function renderPalette(){$('#palette').innerHTML=`<span class="lbl">${t('Tambah:','Add:')}</span>`+PAL.map(([n,ks],i)=>`<button class="pal" data-pg="${i}">${icon(ks[0])}${n} <span aria-hidden="true" style="color:#5f666e">&#9662;</span></button>`).join('')+`<span class="kbd" style="margin-left:auto">${t('Benda baru muncul di tengah layar.','New things appear in the middle of the view.')}</span>`}
-function renderStatus(){const d=cur!==pub;$('#status').classList.toggle('draft',d);$('#status span').textContent=d?t('Ada perubahan belum terbit','Unpublished changes'):t('Sudah terbit','Published');$('#publish').disabled=!d||ro();$('#undo').disabled=!past.length||ro();$('#redo').disabled=!future.length||ro()}
-function renderAll(){render();renderGuests();renderProps();renderTabs();renderStatus();if(view==='guest')renderGuestView();if(view==='usher')renderUsher()}
+function renderPalette(){$('#palette').innerHTML=`<span class="lbl">${t('Tambah:','Add:')}</span>`+PAL.map(([n,ks],i)=>`<button class="pal" data-pg="${i}">${icon(ks[0])}${n} <span aria-hidden="true" style="color:rgba(22,48,31,.62)">&#9662;</span></button>`).join('')+`<span class="kbd" style="margin-left:auto">${t('Benda baru muncul di tengah layar.','New things appear in the middle of the view.')}</span>`}
+function renderStatus(){const d=cur!==pub;$('#status').classList.toggle('draft',d);$('#status span').textContent=d?t('Ada perubahan belum terbit','Unpublished changes'):t('Sudah terbit','Published');$('#publish').disabled=!d;$('#undo').disabled=!past.length||ro();$('#redo').disabled=!future.length||ro()}
+function renderAll(){if(typeof story==='function'&&$('#say'))try{story()}catch(e){}render();renderGuests();renderProps();renderTabs();renderStatus();if(view==='guest')renderGuestView();if(view==='usher')renderUsher()}
 
 /* read-only views, from the published version */
 const pubLayout=()=>JSON.parse(pub).l[0];
 function pubSeat(lay,gid){for(const it of lay.items)if(it.seat&&it.seat.includes(gid))return{it,n:it.seat.filter(s=>s===gid).length};return null}
 const staticPlan=(lay,hl)=>`<svg viewBox="-1 -1.2 ${lay.room.w+2} ${lay.room.h+2.2}" role="img" aria-label="${esc(lay.name)}">${planSVG(lay,{hl,ro:true})}</svg>`;
 function where(lay,it){const R=lay.room,h=it.x<R.w*.4?0:it.x>R.w*.6?2:1,v=it.y<R.h*.35?0:it.y>R.h*.7?2:1;return [t('Sisi kiri','Left side'),t('Tengah','Middle'),t('Sisi kanan','Right side')][h]+', '+[t('dekat pelaminan','near the stage'),t('bagian tengah ruangan','middle of the room'),t('dekat pintu masuk','near the entrance')][v]}
-function renderGuestView(){const lay=pubLayout(),pk=$('#gPick');if(!pk.options.length)pk.innerHTML=S.guests.filter(g=>g.rsvp==='hadir').map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
- const g=G(pk.value),p=pubSeat(lay,g.id),full=$('#showFull').checked;
- $('#gScreen').innerHTML=`<div class="who">${t('Kepada Yth.','Dear')}</div><h3>${esc(g.name)}</h3><div class="who">${t('Resepsi Laras &amp; Bima','Laras &amp; Bima\'s reception')}</div>`+(p?`<div class="mytable"><span>${t('Meja Anda','Your table')}</span><b>${esc(p.it.name)}</b><span>${t(`${p.n} kursi disiapkan`,`${p.n} chairs set`)}. ${where(lay,p.it)}</span></div>${full?`<div class="miniplan">${staticPlan(lay,p.it.id)}</div>`:''}`:`<div class="mytable"><span>${t('Meja Anda','Your table')}</span><b style="font-size:20px">${t('Belum ditentukan','Not set yet')}</b><span>${t('Silakan tanyakan penerima tamu di pintu masuk.','Please ask the ushers at the entrance.')}</span></div>`)}
-let uPick=null;
-function renderUsher(){const lay=pubLayout(),q=$('#uSearch').value.trim().toLowerCase(),rows=S.guests.filter(g=>!q||g.name.toLowerCase().includes(q)).map(g=>({g,p:pubSeat(lay,g.id)}));
- $('#uRes').innerHTML=rows.length?rows.map(({g,p})=>`<li data-u="${g.id}" class="${uPick===g.id?'on':''}"><span>${esc(g.name)}</span><b>${p?esc(p.it.name):t('belum ada meja','no table yet')}</b></li>`).join(''):`<li style="cursor:default">${t('Nama tidak ditemukan.','No such name.')}</li>`;
- const pk=uPick&&pubSeat(lay,uPick);$('#uPlan').innerHTML=staticPlan(lay,pk&&pk.it.id)}
-
+/* what the published demo hands to the real invitation (meja.js) and the ushers' page (penerima.html) */
+const STORE='nawala-denah-demo';
+function share(){try{const o=JSON.parse(pub);localStorage.setItem(STORE,JSON.stringify({couple:'Laras & Bima',plans:o.l,showPlan:S.showPlan,
+ groups:S.groups.map(g=>({name:g.name,color:g.color})),guests:S.guests.map(g=>({id:g.id,name:g.name,party:g.size,grp:GR(g.group).name}))}))}catch(e){}}
+let gSrc='',uSrc='';
+function renderGuestView(){const pk=$('#gPick');if(!pk.options.length){const list=S.guests.filter(g=>g.rsvp==='hadir').sort((a,b)=>(b.name==='Dinda Larasati')-(a.name==='Dinda Larasati'));pk.innerHTML=list.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}
+ const g=G(pk.value);if(!g)return;const src='index.html?to='+encodeURIComponent(g.name)+'&denah=demo'+(EN?'&lang=en':'');if(src!==gSrc){gSrc=src;$('#gFrame').src=src}}
+function renderUsher(){const src='penerima.html?demo=1&embed=1'+(EN?'&lang=en':'');if(src!==uSrc){uSrc=src;$('#uFrame').src=src}}
 /* canvas */
 function toWorld(e){const r=svg.getBoundingClientRect();return[(e.clientX-r.left-vp.tx)/vp.s,(e.clientY-r.top-vp.ty)/vp.s]}
 const sn=v=>snapOn?Math.round(v*4)/4:r2(v);
@@ -551,7 +391,7 @@ pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return
 
 /* controls */
 function addItem(type){const lay=L(),r=canvas.getBoundingClientRect(),o={x:sn((r.width/2-vp.tx)/vp.s),y:sn((r.height/2-vp.ty)/vp.s)};
- for(let k=0;k<40&&lay.items.some(i=>Math.abs(i.x-o.x)<1.2&&Math.abs(i.y-o.y)<1.2);k++){o.x=r2(o.x+2.75);if(o.x>lay.room.w-1.5){o.x=1.75;o.y=r2(o.y+3)}}
+ for(let k=0;k<40&&lay.items.some(i=>Math.abs(i.x-o.x)<1.2&&Math.abs(i.y-o.y)<1.2);k++){o.x=r2(o.x+3.5);if(o.x>lay.room.w-1.5){o.x=1.75;o.y=r2(o.y+3.5)}}
  if(TYPES[type].table&&type!=='couple'&&type!=='rows')o.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);
  const it=mk(type,o);lay.items.push(it);sel=it.id;chairMode=false;commit()}
 function dupItem(){const lay=L(),it=lay.items.find(i=>i.id===sel);if(!it)return;const c=JSON.parse(JSON.stringify(it));c.id=nid('i');c.x=r2(it.x+1);c.y=r2(it.y+1);if(c.seat)c.seat=c.seat.map(()=>null);if(TBLRX.test(c.name))c.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);lay.items.push(c);sel=c.id;commit()}
@@ -592,12 +432,12 @@ $('#undo').onclick=undo;$('#redo').onclick=redo;
 $('#zIn').onclick=()=>{const r=canvas.getBoundingClientRect();zoomAt(1.25,r.width/2,r.height/2)};
 $('#zOut').onclick=()=>{const r=canvas.getBoundingClientRect();zoomAt(.8,r.width/2,r.height/2)};
 $('#zFit').onclick=fit;
-$('#publish').onclick=()=>{pub=cur;renderStatus();toast(t('Terbit di demo ini. Lihat Tampilan tamu dan Penerima tamu. Di Nawala, tamu langsung melihat versi ini.','Published in this demo: see Guest view and Ushers. In Nawala, guests see this version at once.'))};
-function setView(v){view=v;$$('#viewSeg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.view===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));renderAll();if(v==='edit')requestAnimationFrame(fit)}
+$('#publish').onclick=()=>{pub=cur;share();gSrc='';uSrc='';renderStatus();toast(t('Terbit. Tamu yang hadir kini melihat mejanya.','Published. Guests who are coming now see their table.'));if(step==='publish')go('guest');else story()};
+function setView(v){view=v;if(!quiet&&step!==(v==='edit'?(step==='publish'?'publish':'edit'):v)){step=v==='edit'?'edit':v;story()}$$('#viewSeg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.view===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));renderAll();if(v==='edit')requestAnimationFrame(fit)}
 $('#viewSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setView(b.dataset.view)});
-$('#gPick').addEventListener('change',renderGuestView);$('#showFull').addEventListener('change',renderGuestView);
-$('#uSearch').addEventListener('input',()=>{uPick=null;renderUsher()});
-$('#uRes').addEventListener('click',e=>{const li=e.target.closest('[data-u]');if(li){uPick=li.dataset.u;renderUsher()}});
+$('#gPick').addEventListener('change',renderGuestView);
+$('#gReload').onclick=()=>{gSrc='';renderGuestView()};
+$('#showFull').addEventListener('change',e=>{S.showPlan=e.target.checked;share();gSrc='';renderGuestView();toast(t('Berlaku untuk tamu.','Applied for guests.'))});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))){if(modal.classList.contains('on'))modal.classList.remove('on');else if(parent!==window)parent.postMessage('nawala-denah-close',location.origin);return}if(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))return;const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(mod&&k==='y'){e.preventDefault();redo();return}
  if(e.key==='Escape'){const busy=sel||pop.classList.contains('on')||modal.classList.contains('on');if(!busy&&parent!==window)parent.postMessage('nawala-denah-close',location.origin);modal.classList.remove('on');sel=null;chairMode=false;hidePop();renderAll();return}
@@ -627,8 +467,19 @@ let tt;function toast(m){const x=$('#toast');x.textContent=m;x.classList.add('on
 function start(){S=sample();sel=null;chairMode=false;uPick=null;$('#gPick').innerHTML='';
  cur=snap();past=[];future=[];
  const keep=filt.hide;filt.hide=new Set(['g3','g4','g6']);filt.rsvp=true;quiet=true;autoSeat();quiet=false;filt.hide=keep;filt.rsvp=$('#rsvpOnly').checked;
- cur=snap();pub=cur;past=[];future=[];renderAll();fit()}
-$('#reset').onclick=()=>{start();toast(t('Demo dimulai ulang.','The demo starts over.'))};
+ cur=snap();pub=cur;past=[];future=[];gSrc='';uSrc='';share();renderAll();fit()}
+$('#reset').onclick=()=>{start();go('edit');toast(t('Demo dimulai ulang.','The demo starts over.'))};
+/* the story: four steps, one at a time */
+const STEPS=['edit','publish','guest','usher'];let step='edit';
+const SAY={edit:()=>narrow()?t('Di ponsel denah hanya untuk dilihat; menyusun dilakukan di laptop. Ketuk Lanjut untuk melihat hasilnya.','On a phone the plan is to look at; arranging happens on a laptop. Tap Next to see the result.'):t('Seret nama tamu ke kursi, tambah meja lewat Tambah, atau ketuk Dudukkan otomatis per grup.','Drag a guest onto a chair, add tables under Add, or tap Seat automatically by group.'),
+ publish:()=>cur!==pub?t('Tekan Terbitkan perubahan di kanan atas. Hanya versi terbit yang dilihat tamu.','Press Publish changes at the top right. Guests only see what is published.'):t('Sudah terbit. Ketuk Lanjut untuk melihatnya dari sisi tamu.','Published. Tap Next to see it as a guest.'),
+ guest:()=>t('Undangan Dinda yang sebenarnya. Ketuk Buka undangan, lalu Meja Anda di kiri atas.','Dinda\'s real invitation. Tap Open the invitation, then Your table at the top left.'),
+ usher:()=>t('Hari H di pintu masuk: penerima tamu mengetik nama, mejanya langsung terlihat.','On the day at the door: the usher types a name and the table shows at once.')};
+function story(){$$('#story button').forEach(b=>{b.setAttribute('aria-current',b.dataset.st===step?'step':'false');b.classList.toggle('done',STEPS.indexOf(b.dataset.st)<STEPS.indexOf(step)||(b.dataset.st==='publish'&&cur===pub))});
+ $('#say').textContent=SAY[step]();const last=step==='usher';$('#next').textContent=last?t('Ulangi dari awal','Start again'):t('Lanjut','Next')}
+function go(st){step=st;quiet=true;setView(st==='publish'?'edit':st);quiet=false;story();if(st==='publish'&&cur!==pub)$('#publish').focus({preventScroll:true})}
+$('#story').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(b)go(b.dataset.st)});
+$('#next').onclick=()=>{const i=STEPS.indexOf(step);go(i===STEPS.length-1?'edit':STEPS[i+1])};
 renderPalette();
 new ResizeObserver(()=>{if(view==='edit')fit()}).observe(canvas);
 start();

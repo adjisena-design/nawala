@@ -5,7 +5,8 @@
 (function () {
   'use strict';
   var D = window.NAWALA_INVITE, DB = window.NAWALA_DB, V = window.NAWALA_DENAH;
-  if (!D || D.sample !== false || !D.slug || !DB || !V) return;
+  var DEMO = /[?&]denah=demo(&|$)/.test(location.search);
+  if (!D || !V || (!DEMO && (D.sample !== false || !D.slug || !DB))) return;
   var m = location.search.match(/[?&]to=([^&]+)/), name = '';
   try { name = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')).trim() : ''; } catch (e) { name = ''; }
   if (!name) return;
@@ -52,7 +53,21 @@
       '<button type="button" class="meja-x">' + esc(t('Tutup', 'Close')) + '</button></div>';
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
+  /* the seating demo (denah-demo.html) leaves its published plan in this browser: answer from it, no database */
+  function demo() {
+    var o = null; try { o = JSON.parse(localStorage.getItem('nawala-denah-demo') || 'null'); } catch (e) {}
+    if (!o || !o.plans) return null;
+    var g = (o.guests || []).filter(function (x) { return x.name.toLowerCase() === name.toLowerCase(); })[0]; if (!g) return null;
+    var seats = [];
+    o.plans.forEach(function (l, p) { (l.items || []).forEach(function (it) {
+      var n = (it.seat || []).filter(function (v) { return v === g.id; }).length;
+      if (n) seats.push({ plan: p, plan_name: l.name, id: it.id, table: it.name, chairs: n, x: it.x, y: it.y, w: l.room.w, h: l.room.h });
+    }); });
+    var plans = o.showPlan === false ? null : o.plans.map(function (l) { return { name: l.name, room: l.room, items: (l.items || []).map(function (it) { var c = {}; for (var k in it) c[k] = it[k]; if (c.seat) c.seat = c.seat.map(function (v) { return v ? 1 : null; }); return c; }) }; });
+    return { answer: 'hadir', seats: seats, plans: plans };
+  }
   function check() {
+    if (DEMO) { var r0 = demo(); if (r0 && r0.seats.length) { data = r0; show(); } return; }
     DB.rpc('guest_seat', { p_slug: D.slug, p_guest: name }).then(function (r) {
       if (r && r.seats && r.seats.length) { data = r; show(); }
     }, function () {});
