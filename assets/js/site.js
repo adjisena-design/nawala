@@ -699,12 +699,23 @@
     function setActive(i) {
       current = i;
       items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); });
-      screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); if (desktop.matches && !calm) s.classList.toggle('play', k === i); });
+      screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+      replay(i);
       /* the tab bar belongs to the guest's pages (data-tab); the lead, the opening and the couple's planner hide it */
       var tab = items[i].getAttribute('data-tab');
       tabs.forEach(function (el, k) { el.classList.toggle('is-on', String(k) === tab); });
       if (frame) frame.classList.toggle('is-cover', i <= 1 || tab === null);
     }
+    /* a screen's loop always starts from its beginning when it arrives: the class comes off, one frame passes,
+       and it goes back on (owner, 22 Nov 2026: the day's light sometimes started at the third icon or already full) */
+    function replay(i) {
+      if (!desktop.matches || calm) return;
+      screens.forEach(function (s) { s.classList.remove('play'); });
+      void phone.offsetWidth;
+      requestAnimationFrame(function () { if (current === i) screens[i].classList.add('play'); });
+    }
+    var svcSec = $('.services');
+    if (svcSec && 'IntersectionObserver' in window) new IntersectionObserver(function (en) { if (en[0].isIntersecting) replay(current); }, { threshold: .35 }).observe(svcSec);
     function place() {
       screens.forEach(function (s, i) {
         s.classList.remove('play');
