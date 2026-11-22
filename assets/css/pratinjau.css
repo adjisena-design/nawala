@@ -3,10 +3,10 @@
 
 /* ---------- 2. Every guest receives a letter of their own: three Nawala, three names ---------- */
 .dm--letters{position:relative;height:160px;max-width:32rem;margin-top:1rem}
-.lt{position:absolute;top:var(--y);left:var(--x);width:54%;aspect-ratio:720/395;transform:rotate(var(--r));--r:0deg}
-.lt:nth-child(1){--x:-4%;--y:20%;--r:-6deg}
-.lt:nth-child(2){--x:22%;--y:0%;--r:3deg}
-.lt:nth-child(3){--x:48%;--y:24%;--r:-2deg}
+.lt{position:absolute;top:var(--y);left:var(--x);width:48%;aspect-ratio:720/395;transform:rotate(var(--r));--r:0deg}
+.lt:nth-child(1){--x:-5%;--y:22%;--r:-6deg;z-index:1}
+.lt:nth-child(2){--x:26%;--y:0%;--r:3deg;z-index:3}
+.lt:nth-child(3){--x:57%;--y:26%;--r:-2deg;z-index:2}
 .lt img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 12px rgba(12,29,19,.28))}
 .lt__label{position:absolute;left:29%;width:41.4%;top:52%;min-height:40%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.25rem .3rem;border-radius:5px;text-align:center;background:#FFFDF7;box-shadow:inset 0 0 0 1px rgba(216,67,107,.28),0 4px 8px -6px rgba(12,29,19,.5);transform:rotate(-1.6deg)}
 .lt__label span{font-size:.6875rem;font-weight:600;line-height:1.15;color:rgba(12,29,19,.6)}
@@ -22,11 +22,11 @@
 .dm__phone{position:relative;height:150px;border-radius:18px;overflow:hidden;background:#dfe3d6 url("../img/beranda-buka.webp") 50% 43%/cover;box-shadow:0 18px 34px -22px rgba(12,29,19,.6)}
 .dm__phone video{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 43%}
 @media (min-width:900px){
-  .say[data-step="1"]{left:-13vw;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:2rem;align-items:center}
+  .say[data-step="1"]{left:-6vw;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:2rem;align-items:center}
   .say[data-step="1"] h2{grid-column:1;grid-row:1;align-self:end}
   .say[data-step="1"] p{grid-column:1;grid-row:2;align-self:start}
   .say[data-step="1"] .dm--film{grid-column:2;grid-row:1 / span 2;margin:0}
-  .dm__phone{height:min(440px,56vh);aspect-ratio:360/780;padding:7px;border-radius:32px;background:#0E1711;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14),0 30px 50px -26px rgba(12,29,19,.7)}
+  .dm__phone{height:min(400px,52vh);aspect-ratio:360/780;padding:7px;border-radius:32px;background:#0E1711;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14),0 30px 50px -26px rgba(12,29,19,.7)}
   .dm__phone video{border-radius:26px;object-position:50% 50%}
 }
 
