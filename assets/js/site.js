@@ -338,21 +338,39 @@
     });
   }
 
-  /* ---------- The arch: one swipe, one message ----------
-     Inside the arch's pinned stretch the page does not scroll under the finger. A swipe (or one turn of
-     the wheel, or an arrow key) moves exactly one message, gliding on its own clock; at the last message a
-     swipe down carries on to the next section, at the first a swipe up goes back to the sky. A fling that
-     comes in from outside is stopped at the first (or last) message, so no message can be skipped. */
+  /* ---------- Guided stretch: one swipe, one step ----------
+     From the sky down to the last services item the page does not scroll under the finger. A swipe (or one
+     turn of the wheel, or an arrow key) moves exactly one step, gliding on its own clock: the sky, the arch's
+     three messages, then each item of the services (the day in one link, then the five services; on phones a
+     tall card gets a stop at its top and one at its bottom). From the last step a swipe down glides to the
+     themes, where free scrolling begins; from the first, a swipe up goes back to the sky. A fling that comes
+     in from outside is caught at the first (or last) step, so nothing can be skipped by one hard swipe.
+     Owner, 22 Nov 2026: the dark services stretch had no such stop and one hard gesture skipped three items. */
   (function () {
     if (calm || !about) return;
-    var gliding = false, wheelAt = 0, wheelSum = 0, tY = 0, tOn = false, lastY = window.scrollY;
+    var gliding = false, wheelAt = 0, wheelSum = 0, tY = 0, tOn = false, lastY = window.scrollY, jumpUntil = 0;
+    var svcItems = $$('.services__list > .svc'), themesSec = $('.themes');
+    function absTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
     function stops() {
-      var top = about.getBoundingClientRect().top + window.scrollY, span = about.offsetHeight - window.innerHeight;
-      return { top: top, end: top + span, s: [top + span * (.5 / 3), top + span * .5, top + span * (2.5 / 3)].map(Math.round) };
+      var vh = window.innerHeight, top = absTop(about), span = about.offsetHeight - vh, list = [];
+      [.5 / 3, .5, 2.5 / 3].forEach(function (f) { list.push(Math.round(top + span * f)); });
+      var head = desktop.matches ? 0 : 76;          // phones: room under the menu button
+      var foot = Math.round(vh * (desktop.matches ? .1 : .1));   // the band of leaves held at the bottom of the screen
+      svcItems.forEach(function (li) {
+        var t = absTop(li), h = li.offsetHeight, room = vh - head - foot - 16;
+        if (h <= room) list.push(Math.round(t + h / 2 - (vh + head - foot) / 2));
+        else { list.push(Math.round(t - head - 12)); list.push(Math.round(t + h - vh + foot + 16)); }
+      });
+      /* keep them in order and apart, so no two stops land on the same place */
+      var out = [];
+      list.forEach(function (y) { if (!out.length || y > out[out.length - 1] + 40) out.push(y); });
+      var exit = themesSec ? Math.round(absTop(themesSec)) : out[out.length - 1] + vh;
+      if (exit <= out[out.length - 1] + 40) exit = out[out.length - 1] + Math.round(vh * .9);
+      return { list: out, last: out[out.length - 1], exit: exit };
     }
     /* the hero counts too: from the sky, one swipe glides down to the first message with the light rising in step */
-    function inside(y, S) { return y <= S.s[2] + 6; }
-    function nearest(y, S) { var n = 0; for (var i = 1; i < 3; i++) if (Math.abs(S.s[i] - y) < Math.abs(S.s[n] - y)) n = i; return n; }
+    function inside(y, S) { return y <= S.last + 6; }
+    function nearest(y, S) { var n = 0; for (var i = 1; i < S.list.length; i++) if (Math.abs(S.list[i] - y) < Math.abs(S.list[n] - y)) n = i; return n; }
     /* our own glide, eased and of a fixed length (a browser's smooth scroll is too quick on iOS and looks like a jump) */
     function glide(to) {
       var from = window.scrollY, d = to - from, ms = Math.min(1300, Math.max(700, 600 + Math.abs(d) * .45)), t0 = 0;
@@ -366,29 +384,32 @@
     }
     function step(dir) {
       var S = stops(), y = window.scrollY, to;
-      if (y < S.s[0] - 6) { if (dir > 0) glide(S.s[0]); return; }   // in the sky: down goes to the first message, up does nothing
+      if (y < S.list[0] - 6) { if (dir > 0) glide(S.list[0]); return; }   // in the sky: down goes to the first message, up does nothing
       var i = nearest(y, S);
-      if (dir > 0) to = i < 2 ? S.s[i + 1] : S.end + Math.round(window.innerHeight * .9);
-      else to = i > 0 ? S.s[i - 1] : 0;
+      if (dir > 0) to = i < S.list.length - 1 ? S.list[i + 1] : S.exit;
+      else to = i > 0 ? S.list[i - 1] : 0;
       glide(Math.max(0, to));
     }
-    /* a native fling that runs into the stretch is caught at the first or last message */
+    /* a native fling that runs into the stretch is caught at the first or last step */
     function halt(to) {
       var html = document.documentElement, was = html.style.overflow;
       html.style.overflow = 'hidden';                 // stops the momentum on iOS
       requestAnimationFrame(function () { html.style.overflow = was; glide(to); });
     }
+    /* a tap on a menu link travels where it was sent, without being caught on the way */
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href^="#"]')) jumpUntil = Date.now() + 1800; }, true);
     addEventListener('scroll', function () {
       var y = window.scrollY;
-      if (!gliding && !tOn) {
+      if (!gliding && !tOn && Date.now() > jumpUntil) {
         var S = stops();
-        if (lastY < S.s[0] - 6 && y >= S.s[0] - 6 && y < S.end) halt(S.s[0]);
-        else if (lastY > S.s[2] + 6 && y <= S.s[2] + 6 && y > S.top) halt(S.s[2]);
+        if (lastY < S.list[0] - 6 && y >= S.list[0] - 6 && y < S.last) halt(S.list[0]);
+        else if (lastY > S.last + 6 && y <= S.last + 6 && y > S.list[0]) halt(S.last);
       }
       lastY = y;
     }, { passive: true });
     addEventListener('touchstart', function (e) {
-      tOn = inside(window.scrollY, stops()); tY = e.touches[0].clientY;
+      tOn = inside(window.scrollY, stops()) && !(e.target.closest && e.target.closest('dialog,.nav__items'));
+      tY = e.touches[0].clientY;
     }, { passive: true });
     addEventListener('touchmove', function (e) { if (tOn) e.preventDefault(); }, { passive: false });
     addEventListener('touchend', function (e) {
@@ -397,6 +418,7 @@
       if (Math.abs(dy) > 28 && !gliding) step(dy > 0 ? 1 : -1);
     }, { passive: true });
     addEventListener('wheel', function (e) {
+      if (e.target.closest && e.target.closest('dialog')) return;
       if (!inside(window.scrollY, stops()) && !gliding) return;
       e.preventDefault();
       var now = Date.now();
@@ -405,9 +427,9 @@
       if (Math.abs(wheelSum) > 18) { wheelAt = now; step(wheelSum > 0 ? 1 : -1); wheelSum = 0; }
     }, { passive: false });
     var next = $('.hero__next');
-    if (next) next.addEventListener('click', function (e) { e.preventDefault(); if (!gliding) glide(stops().s[0]); });
+    if (next) next.addEventListener('click', function (e) { e.preventDefault(); if (!gliding) glide(stops().list[0]); });
     addEventListener('keydown', function (e) {
-      if (!inside(window.scrollY, stops()) || /input|textarea|select/i.test(e.target.tagName)) return;
+      if (!inside(window.scrollY, stops()) || /input|textarea|select/i.test(e.target.tagName) || (e.target.closest && e.target.closest('dialog'))) return;
       var k = e.key, d = (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) ? 1 : (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) ? -1 : 0;
       if (!d) return; e.preventDefault(); if (!gliding) step(d);
     });

@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261122d">
+<link rel="stylesheet" href="assets/css/site.css?v=20261122e">
 <link rel="stylesheet" href="assets/css/kit.css?v=20261121o">
 </head>
 <body>
@@ -120,6 +120,8 @@ d.classList.add('js');})();
   <div class="flock flock--a" aria-hidden="true"><i class="dove" style="--x:46%;--y:6%;--s:1;--d:0s"><b></b></i><i class="dove" style="--x:26%;--y:28%;--s:0.8;--d:-0.2s"><b></b></i><i class="dove" style="--x:66%;--y:26%;--s:0.9;--d:-0.33s"><b></b></i><i class="dove" style="--x:6%;--y:54%;--s:0.7;--d:-0.1s"><b></b></i><i class="dove" style="--x:84%;--y:50%;--s:0.75;--d:-0.4s"><b></b></i><i class="dove" style="--x:50%;--y:68%;--s:0.6;--d:-0.27s"><b></b></i><i class="dove" style="--x:28%;--y:84%;--s:0.55;--d:-0.05s"><b></b></i></div>
   <div class="flock flock--b" aria-hidden="true"><i class="dove" style="--x:40%;--y:10%;--s:0.6;--d:-0.1s"><b></b></i><i class="dove" style="--x:14%;--y:40%;--s:0.5;--d:-0.3s"><b></b></i><i class="dove" style="--x:70%;--y:36%;--s:0.55;--d:-0.2s"><b></b></i><i class="dove" style="--x:44%;--y:70%;--s:0.45;--d:-0.35s"><b></b></i><i class="dove" style="--x:86%;--y:74%;--s:0.4;--d:-0.15s"><b></b></i></div>
   <div class="hero__mist" aria-hidden="true"></div>
+  <div class="flock flock--near" aria-hidden="true"><i class="dove" style="--x:10%;--y:10%;--s:1.6;--d:-0.15s"><b></b></i><i class="dove" style="--x:55%;--y:52%;--s:1.25;--d:-0.3s"><b></b></i></div>
+  <div class="fore fore--hero" aria-hidden="true"><img src="assets/img/fx-branch.webp" width="1000" height="376" alt="" loading="lazy"></div>
 
   <div class="hero__copy">
     <h1 class="hero__title" data-h1 data-en="The living letter.">Surat yang hidup.</h1>
@@ -146,6 +148,8 @@ d.classList.add('js');})();
       </picture>
     </div>
     <div class="flock flock--c" aria-hidden="true"><i class="dove" style="--x:30%;--y:20%;--s:0.7;--d:0s"><b></b></i><i class="dove" style="--x:60%;--y:48%;--s:0.55;--d:-0.2s"><b></b></i><i class="dove" style="--x:12%;--y:70%;--s:0.5;--d:-0.3s"><b></b></i></div>
+    <div class="fore fore--arch" aria-hidden="true"><img src="assets/img/fg-treetops-mobile-sm.webp" width="720" height="262" alt="" loading="lazy"></div>
+    <div class="bflies bflies--arch" aria-hidden="true"><i style="--x:14%;--y:62%;--n:2;--s:0.9;--t:16s;--d:-4s"></i><i style="--x:30%;--y:74%;--n:5;--s:0.75;--t:13s;--d:-8s"></i><i style="--x:44%;--y:58%;--n:0;--s:0.6;--t:19s;--d:-2s"></i><i style="--x:8%;--y:80%;--n:6;--s:1;--t:15s;--d:-11s"></i></div>
     <div class="about__fade" aria-hidden="true"></div>
     <div class="about__says">
       <div class="say" data-step="0">
@@ -172,8 +176,8 @@ d.classList.add('js');})();
         <ol class="dm dm--steps" aria-hidden="true">
           <li><div class="dm__covers"><i></i><i></i><i></i></div><b data-en="Choose a theme">Pilih tema</b><span data-en="You">Kalian</span></li>
           <li><div class="dm__field"><span>Laras &amp; Bima</span><s></s></div><b data-en="Fill in the details">Isi data</b><span data-en="You">Kalian</span></li>
-          <li><div class="dm__done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></div><b data-en="Checked, then live">Diperiksa, lalu tayang</b><span data-en="Nawala team">Tim Nawala</span></li>
-          <i class="dm__line"><s></s></i>
+          <li><div class="dm__done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.500 4.500 4.500L19 7.500"/></svg></div><b data-en="Checked, live">Diperiksa, tayang</b><span data-en="Nawala team">Tim Nawala</span></li>
+          <i class="dm__line"><s></s><u class="dm__head"></u></i>
         </ol>
       </div>
     </div>
@@ -193,6 +197,8 @@ d.classList.add('js');})();
       </picture>
     </div>
     <div class="flock flock--d"><i class="dove" style="--x:40%;--y:30%;--s:0.6;--d:0s"><b></b></i><i class="dove" style="--x:70%;--y:60%;--s:0.45;--d:-0.2s"><b></b></i></div>
+    <div class="motes"><i style="--x:12%;--y:68%;--t:7s;--d:-1s"></i><i style="--x:24%;--y:40%;--t:9s;--d:-4s"></i><i style="--x:38%;--y:78%;--t:8s;--d:-2s"></i><i style="--x:52%;--y:30%;--t:10s;--d:-6s"></i><i style="--x:63%;--y:62%;--t:7.5s;--d:-3s"></i><i style="--x:74%;--y:22%;--t:9.5s;--d:-7s"></i><i style="--x:84%;--y:70%;--t:8.5s;--d:-5s"></i><i style="--x:92%;--y:44%;--t:11s;--d:-8s"></i><i style="--x:46%;--y:88%;--t:9s;--d:-0.5s"></i><i style="--x:6%;--y:30%;--t:10.5s;--d:-9s"></i><i style="--x:68%;--y:84%;--t:8s;--d:-2.5s"></i><i style="--x:30%;--y:16%;--t:12s;--d:-10s"></i></div>
+    <div class="bflies bflies--svc"><i style="--x:58%;--y:70%;--n:3;--s:0.8;--t:17s;--d:-6s"></i><i style="--x:86%;--y:30%;--n:7;--s:0.7;--t:14s;--d:-3s"></i><i style="--x:40%;--y:20%;--n:1;--s:0.6;--t:20s;--d:-12s"></i></div>
     <div class="services__shade"></div>
   </div>
   <div class="fade-top" aria-hidden="true"></div>
@@ -310,6 +316,7 @@ d.classList.add('js');})();
       </li>
     </ul>
   </div>
+  <div class="svc-fore" aria-hidden="true"><img src="assets/img/fg-treetops-mobile-sm.webp" width="720" height="262" alt="" loading="lazy"></div>
 </section>
 
 <!-- 4. Themes: a river of covers drifts behind; one button opens the collection -->
@@ -329,7 +336,7 @@ d.classList.add('js');})();
   </div>
   <div class="fade-top" aria-hidden="true"></div>
   <div class="themes__branch" id="branch" aria-hidden="true"><img src="assets/img/fx-branch.webp" width="1000" height="376" alt="" loading="lazy"></div>
-  <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:58%;--y:78%;--n:5;--s:0.7;--t:13s;--d:-6s"></i></div>
+  <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:58%;--y:78%;--n:5;--s:0.7;--t:13s;--d:-6s"></i><i style="--x:92%;--y:18%;--n:6;--s:0.9;--t:17s;--d:-1s"></i><i style="--x:66%;--y:12%;--n:2;--s:0.65;--t:21s;--d:-12s"></i><i style="--x:78%;--y:86%;--n:7;--s:1.1;--t:14s;--d:-5s"></i><i style="--x:96%;--y:48%;--n:4;--s:0.75;--t:18s;--d:-8s"></i></div>
   <div class="themes__panel glass" id="themes-panel">
     <h2 data-en="Four ways to begin your invitation.">Empat cara memulai undangan kalian.</h2>
     <p data-en="From simple and safe to made only for you. Every one is a real scene in motion, never a flat paper template. These are opening scenes; the full invitations are ready in January 2027.">Dari yang sederhana dan aman sampai yang dibuat hanya untuk kalian. Semuanya adegan nyata yang bergerak, bukan templat kertas tempel. Ini adegan pembukanya; undangan lengkapnya siap Januari 2027.</p>
@@ -357,6 +364,7 @@ d.classList.add('js');})();
         <img src="assets/img/plate-boulder-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
     </div>
+    <div class="fore fore--meadow"><img src="assets/img/fg-boulder-mobile-sm.webp" width="720" height="262" alt="" loading="lazy"></div>
   </div>
   <div class="bflies" aria-hidden="true"><i style="--x:8%;--y:72%;--n:0;--s:1.1;--t:14s;--d:-2s"></i><i style="--x:18%;--y:84%;--n:1;--s:0.8;--t:17s;--d:-8s"></i><i style="--x:30%;--y:66%;--n:2;--s:0.9;--t:12s;--d:-5s"></i><i style="--x:40%;--y:88%;--n:3;--s:1;--t:19s;--d:-11s"></i><i style="--x:52%;--y:74%;--n:4;--s:0.7;--t:15s;--d:-1s"></i><i style="--x:62%;--y:86%;--n:5;--s:1;--t:13s;--d:-7s"></i><i style="--x:74%;--y:70%;--n:6;--s:0.8;--t:18s;--d:-4s"></i><i style="--x:86%;--y:82%;--n:7;--s:0.9;--t:16s;--d:-10s"></i><i style="--x:46%;--y:58%;--n:1;--s:0.6;--t:21s;--d:-13s"></i></div>
   <div class="wrap contact__inner">
@@ -536,6 +544,6 @@ d.classList.add('js');})();
 <script src="assets/js/origin.js?v=2"></script>
 <script src="assets/js/db.js?v=20261121n" defer></script>
 <script src="assets/js/simpan.js?v=20261121n" defer></script>
-<script src="assets/js/site.js?v=20261122d" defer></script>
+<script src="assets/js/site.js?v=20261122e" defer></script>
 </body>
 </html>

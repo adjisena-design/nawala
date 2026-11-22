@@ -354,11 +354,15 @@ main{overflow-x:clip}
 .seat__plan text{font-family:var(--body);font-weight:650;text-anchor:middle;dominant-baseline:central}
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(88%,300px);margin-bottom:.3rem}
 .shots i{aspect-ratio:1;border-radius:12px;background:rgba(251,246,234,.14) 50% 70%/cover;box-shadow:inset 0 0 0 1px rgba(251,246,234,.16)}
-.is-near .shots i:nth-child(1),.is-near .shots i:nth-child(5){background-image:url("../img/plate-treetops-mobile-sm.webp")}
-.is-near .shots i:nth-child(2),.is-near .shots i:nth-child(6){background-image:url("../img/plate-arch-mobile-sm.webp");background-position:50% 55%}
-.is-near .shots i:nth-child(3){background-image:url("../img/plate-boulder-mobile-sm.webp");background-position:50% 85%}
-.is-near .shots i:nth-child(4){background-image:url("../img/plate-sky-mobile-sm.webp")}
-.shots i:nth-child(4){background-position:50% 96%}.shots i:nth-child(5){background-position:70% 35%}.shots i:nth-child(6){background-position:20% 80%}
+/* guest gallery: wedding snapshots with bride and groom Nawala standing in for the couple (Higgsfield, 22 Nov 2026) */
+.is-near .shots i:nth-child(1){background-image:url("../img/tamu-lengkung.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.is-near .shots i:nth-child(2){background-image:url("../img/tamu-kue.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.is-near .shots i:nth-child(3){background-image:url("../img/tamu-pelaminan.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.is-near .shots i:nth-child(4){background-image:url("../img/tamu-cincin.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.is-near .shots i:nth-child(5){background-image:url("../img/tamu-meja.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.is-near .shots i:nth-child(6){background-image:url("../img/tamu-lengkung.webp"),url("../img/plate-treetops-mobile-sm.webp")}
+.shots i{background-position:50% 50%}
+.shots i:nth-child(1){background-position:50% 62%}.shots i:nth-child(2){background-position:50% 30%}.shots i:nth-child(6){background-size:180%,cover;background-position:50% 20%}
 
 @media (min-width:900px){
   .services{padding:0 0 8vh}
@@ -713,7 +717,7 @@ main{overflow-x:clip}
 .dm{position:relative;margin-top:1rem;list-style:none;padding:0}
 .say h2{font-size:clamp(1.8rem,7.4vw,2.5rem)}
 .say p{font-size:1.0625rem;line-height:1.55}
-@media (prefers-reduced-motion:no-preference){.about__says{height:62%}}
+@media (prefers-reduced-motion:no-preference) and (max-width:899px){.about__says{height:62%}}
 .about__fade{background:linear-gradient(180deg,rgba(251,246,234,.96) 0%,rgba(251,246,234,.9) 46%,rgba(251,246,234,.45) 64%,rgba(251,246,234,0) 78%)}
 
 /* 1. each guest gets their own letter */
@@ -762,6 +766,11 @@ main{overflow-x:clip}
 .dm__done svg{width:46px;height:46px;padding:11px;border-radius:50%;color:var(--ivory);background:var(--moss);box-shadow:0 0 0 6px rgba(79,122,58,.18)}
 .dm__line{position:absolute;z-index:0;left:16.6%;right:16.6%;top:31px;height:3px;border-radius:2px;background:rgba(22,48,31,.12)}
 .dm__line s{position:absolute;inset:0;border-radius:2px;background:var(--moss);transform-origin:0 50%}
+.dm__head{position:absolute;inset:0;pointer-events:none;opacity:0}
+.dm__head::before{content:"";position:absolute;left:-7px;top:-5.5px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px var(--moss),0 0 14px 4px rgba(246,196,69,.75)}
+.dm--steps{align-items:start}
+.dm--steps li > div{transform-origin:50% 60%}
+.dm--steps li b{white-space:nowrap}
 
 @media (min-width:900px){
   .about__fade{background:linear-gradient(270deg,rgba(251,246,234,.96) 0%,rgba(251,246,234,.88) 26%,rgba(251,246,234,.5) 44%,rgba(251,246,234,0) 60%)}
@@ -790,7 +799,7 @@ main{overflow-x:clip}
 .scr--day::before{background:rgba(12,29,19,.72)}
 .day{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .day li{position:relative;z-index:1;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.65rem;height:var(--rh);text-align:left}
-.day li > i{position:relative;z-index:1;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#33433A;box-shadow:inset 0 0 0 1px rgba(251,246,234,.3)}
+.day li > i{position:relative;z-index:1;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#2B3A31;opacity:1;box-shadow:inset 0 0 0 1px rgba(251,246,234,.3)}
 .day li > i svg{width:17px;height:17px}
 .day li div{display:flex;flex-direction:column;min-width:0}
 .day li b{font:600 .9375rem/1.2 var(--body);letter-spacing:0}
@@ -820,7 +829,7 @@ main{overflow-x:clip}
 .pass__stamp{position:absolute;left:50%;top:50%;padding:.2rem .7rem;border:2px solid var(--rose);border-radius:10px;color:var(--rose);background:rgba(251,246,234,.9);font-style:normal;font-size:.875rem;letter-spacing:.02em;white-space:nowrap;transform:translate(-50%,-50%) rotate(-9deg);opacity:0}
 .shots{position:relative}
 .shots__new{position:absolute;left:0;top:0;width:calc((100% - 12px) / 3);aspect-ratio:1;border-radius:12px;opacity:0;background:var(--pink) 50% 60%/cover;box-shadow:0 0 0 3px var(--pink),0 12px 22px -10px rgba(0,0,0,.6)}
-.is-near .shots__new{background-image:url("../img/plate-sky-mobile-sm.webp")}
+.is-near .shots__new{background-image:url("../img/tamu-lorong.webp"),url("../img/plate-sky-mobile-sm.webp")}
 .cnt{display:grid}
 .cnt span{grid-area:1 / 1;font:inherit!important}
 .cnt span + span{opacity:0}
@@ -864,33 +873,47 @@ main{overflow-x:clip}
   @keyframes gWorld{0%,22%{transform:scale(1.22)}48%,100%{transform:scale(1)}}
   @keyframes gCard{0%,38%{opacity:0;transform:translate3d(-50%,18px,0)}50%,86%{opacity:1;transform:translate3d(-50%,0,0)}93%,100%{opacity:0;transform:translate3d(-50%,0,0)}}
 
-  .about.is-live .say.is-on .dm__covers i:nth-child(2){animation:sPick 5s infinite both}
-  .about.is-live .say.is-on .dm--steps li:nth-child(2){animation:sDim2 5s infinite both}
-  .about.is-live .say.is-on .dm--steps li:nth-child(3){animation:sDim3 5s infinite both}
-  .about.is-live .say.is-on .dm__field span{animation:sType 5s steps(12) infinite both}
-  .about.is-live .say.is-on .dm__done svg{animation:sDone 5s var(--ease) infinite both}
-  .about.is-live .say.is-on .dm__line s{animation:sLine 5s var(--ease) infinite both}
-  @keyframes sPick{0%,6%{transform:translate3d(0,0,0)}12%,90%{transform:translate3d(0,-7px,0) scale(1.08)}100%{transform:none}}
-  @keyframes sDim2{0%,18%{opacity:.35}24%,92%{opacity:1}100%{opacity:.35}}
-  @keyframes sDim3{0%,52%{opacity:.35}58%,92%{opacity:1}100%{opacity:.35}}
-  @keyframes sType{0%,22%{opacity:0;transform:translate3d(-6px,0,0)}24%{opacity:1}44%,92%{opacity:1;transform:none}100%{opacity:0}}
-  @keyframes sDone{0%,56%{opacity:0;transform:scale(.4)}63%{opacity:1;transform:scale(1.12)}68%,92%{opacity:1;transform:none}100%{opacity:0;transform:scale(.6)}}
-  @keyframes sLine{0%,14%{transform:scaleX(0)}22%,46%{transform:scaleX(.5)}56%,92%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+  /* the three steps: one light runs along the line without stopping; each step springs up as it arrives,
+     and the whole demo breathes out together before it starts again (owner, 22 Nov 2026) */
+  .about.is-live .say.is-on .dm--steps{animation:sAll 6s linear infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(1) > div{animation:sPop1 6s infinite both}
+  .about.is-live .say.is-on .dm__covers i:nth-child(2){animation:sPick 6s infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(2){animation:sDim2 6s infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(2) > div{animation:sPop2 6s infinite both}
+  .about.is-live .say.is-on .dm--steps li:nth-child(3){animation:sDim3 6s infinite both}
+  .about.is-live .say.is-on .dm__field span{animation:sType 6s steps(12) infinite both}
+  .about.is-live .say.is-on .dm__done svg{animation:sDone 6s infinite both}
+  .about.is-live .say.is-on .dm__line s{animation:sLine 6s infinite both}
+  .about.is-live .say.is-on .dm__head{animation:sHead 6s infinite both}
+  @keyframes sAll{0%{opacity:0}4%,90%{opacity:1}98%,100%{opacity:0}}
+  @keyframes sPop1{0%{transform:scale(.7)}5%{transform:scale(1.1)}8%{transform:scale(.96)}11%,100%{transform:none}}
+  @keyframes sPick{0%,8%{transform:none}14%{transform:translate3d(0,-9px,0) scale(1.12)}18%,100%{transform:translate3d(0,-6px,0) scale(1.06)}}
+  @keyframes sDim2{0%,26%{opacity:.4}31%,100%{opacity:1}}
+  @keyframes sPop2{0%,28%{transform:none}32%{transform:scale(1.1)}36%{transform:scale(.97)}40%,100%{transform:none}}
+  @keyframes sDim3{0%,62%{opacity:.4}67%,100%{opacity:1}}
+  @keyframes sType{0%,34%{opacity:0;transform:translate3d(-6px,0,0)}36%{opacity:1}52%,100%{opacity:1;transform:none}}
+  @keyframes sDone{0%,64%{opacity:0;transform:scale(.3) rotate(-20deg)}69%{opacity:1;transform:scale(1.18) rotate(4deg)}73%{transform:scale(.93) rotate(0)}77%{transform:scale(1.04)}81%,100%{opacity:1;transform:none}}
+  /* scaleX of the fill and translateX of the head share one curve, so the light is always at the tip */
+  @keyframes sLine{0%,10%{transform:scaleX(0);animation-timing-function:cubic-bezier(.45,0,.25,1)}30%,50%{transform:scaleX(.5);animation-timing-function:cubic-bezier(.45,0,.25,1)}66%,100%{transform:scaleX(1)}}
+  @keyframes sHead{0%,8%{opacity:0;transform:translate3d(0,0,0)}10%{opacity:1;transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.45,0,.25,1)}30%{opacity:1;transform:translate3d(50%,0,0)}34%{opacity:.35}46%{opacity:.35}50%{opacity:1;transform:translate3d(50%,0,0);animation-timing-function:cubic-bezier(.45,0,.25,1)}66%{opacity:1;transform:translate3d(100%,0,0)}72%,100%{opacity:0;transform:translate3d(100%,0,0)}}
 
   /* services: each screen while it plays */
-  .services.is-live .scr.play .day li{animation:dRow 9s infinite both}
-  .services.is-live .scr.play .day li:nth-child(2){animation-delay:1.5s}
-  .services.is-live .scr.play .day li:nth-child(3){animation-delay:3s}
-  .services.is-live .scr.play .day li:nth-child(4){animation-delay:4.5s}
-  .services.is-live .scr.play .day li:nth-child(5){animation-delay:6s}
-  .services.is-live .scr.play .day li:nth-child(6){animation-delay:7.5s}
+  .services.is-live .scr.play .day li > div,.services.is-live .scr.play .day li > em{animation:dRow 9s infinite both}
+  .services.is-live .scr.play .day li:nth-child(2) > div,.services.is-live .scr.play .day li:nth-child(2) > em,.services.is-live .scr.play .day li:nth-child(2) > i{animation-delay:1.5s}
+  .services.is-live .scr.play .day li:nth-child(3) > div,.services.is-live .scr.play .day li:nth-child(3) > em,.services.is-live .scr.play .day li:nth-child(3) > i{animation-delay:3s}
+  .services.is-live .scr.play .day li:nth-child(4) > div,.services.is-live .scr.play .day li:nth-child(4) > em,.services.is-live .scr.play .day li:nth-child(4) > i{animation-delay:4.5s}
+  .services.is-live .scr.play .day li:nth-child(5) > div,.services.is-live .scr.play .day li:nth-child(5) > em,.services.is-live .scr.play .day li:nth-child(5) > i{animation-delay:6s}
+  .services.is-live .scr.play .day li:nth-child(6) > div,.services.is-live .scr.play .day li:nth-child(6) > em,.services.is-live .scr.play .day li:nth-child(6) > i{animation-delay:7.5s}
   .services.is-live .scr.play .day__dot{animation:dDot 9s var(--ease) infinite both}
   .services.is-live .scr.play .day__line i{animation:dLine 9s var(--ease) infinite both}
   @keyframes dRow{0%{opacity:.4}4%,96%{opacity:1}100%{opacity:.4}}
+  .services.is-live .scr.play .day li > i{animation:dIcon 9s infinite both}
+  @keyframes dIcon{0%{color:rgba(251,246,234,.45);box-shadow:inset 0 0 0 1px rgba(251,246,234,.22)}4%,96%{color:#fff;box-shadow:inset 0 0 0 1.5px var(--sun)}100%{color:rgba(251,246,234,.45);box-shadow:inset 0 0 0 1px rgba(251,246,234,.22)}}
   @keyframes dDot{0%{opacity:0;transform:translate3d(0,0,0) scale(.6)}3%{opacity:1;transform:translate3d(0,0,0)}
     16.6%{transform:translate3d(0,0,0)}19.6%,33.3%{transform:translate3d(0,var(--rh),0)}36.3%,50%{transform:translate3d(0,calc(var(--rh) * 2),0)}
     53%,66.6%{transform:translate3d(0,calc(var(--rh) * 3),0)}69.6%,83.3%{transform:translate3d(0,calc(var(--rh) * 4),0)}86.3%,95%{opacity:1;transform:translate3d(0,calc(var(--rh) * 5),0)}100%{opacity:0;transform:translate3d(0,calc(var(--rh) * 5),0)}}
-  @keyframes dLine{0%,3%{transform:scaleY(0)}86.3%,95%{transform:scaleY(1)}100%{transform:scaleY(0)}}
+  /* the line grows row by row on the dot's own stops, so it never runs ahead of the light */
+  @keyframes dLine{0%,16.6%{opacity:1;transform:scaleY(0)}19.6%,33.3%{transform:scaleY(.2)}36.3%,50%{transform:scaleY(.4)}53%,66.6%{transform:scaleY(.6)}69.6%,83.3%{transform:scaleY(.8)}86.3%,95%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
 
   .services.is-live .scr--invite.play .scr__btn .tap{animation:tap 6s .55s infinite both}
   .services.is-live .scr--invite.play > .scr__say .scr__btn{animation:iBtn 6s infinite both}
@@ -1015,3 +1038,54 @@ main{overflow-x:clip}
 .pop--denah .pop__head h2{font-size:1.375rem;padding-right:3.6rem}
 .denah__frame{flex:1;width:100%;border:0;display:block;background:#eef0f2}
 .pop--denah .pop__x{top:50%;margin-top:-24px}
+/* ---------- Every section as lively as the branches (owner, 22 Nov 2026) ----------
+   Each altitude gets something in front of the scenery and something alive in it: the sky a mossy branch
+   reaching in and two doves close to the camera, the arch foliage in the front corner and butterflies, the
+   treetops a band of leaves held at the bottom of the screen with fireflies and butterflies, the branches a
+   bigger log that sways, the flower hill a meadow that rises in front of the boulder. The front layers are
+   the scenery's own cut-outs, softer than the plates on purpose: near the camera, out of focus. */
+.fore{position:absolute;z-index:4;pointer-events:none}
+.fore img{display:block;width:100%;height:auto}
+.fore--hero{display:none}
+.flock--near{top:12%;z-index:4;width:420px;height:260px;animation-duration:30s;animation-delay:-9s}
+.fore--arch{left:-12vw;bottom:-2px;width:124vw;z-index:1;transform:translate3d(0,calc(var(--p,0) * -3vh),0);will-change:transform}
+.fore--arch img{transform-origin:50% 100%}
+.fore--arch,.fore--meadow,.svc-fore img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%)}
+.fore--meadow{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}
+.svc-fore img{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 55%),linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(180deg,transparent 0,#000 55%),linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-composite:intersect}
+.bflies--arch{z-index:1}
+.motes{position:absolute;inset:0;pointer-events:none}
+.motes i{position:absolute;left:var(--x);top:var(--y);width:7px;height:7px;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,#FFF6C8 0 28%,rgba(246,196,69,.7) 42%,rgba(246,196,69,0) 72%);box-shadow:0 0 12px 4px rgba(246,196,69,.38);
+  animation:mote var(--t,9s) ease-in-out infinite alternate;animation-delay:var(--d,0s);will-change:transform,opacity}
+@keyframes mote{0%{opacity:0;transform:translate3d(0,0,0)}25%{opacity:1}60%{opacity:.55}80%{opacity:.95}100%{opacity:0;transform:translate3d(3vw,-7vh,0)}}
+@media (max-width:899px){.motes i:nth-child(n+8){display:none}}
+.bflies--svc{z-index:1}
+.svc-fore{position:sticky;bottom:0;z-index:7;height:0;pointer-events:none}
+.svc-fore img{position:absolute;left:-6%;bottom:0;width:112%;height:14vh;object-fit:cover;object-position:50% 30%;transform-origin:50% 100%}
+.fore--meadow{left:-6%;right:-6%;bottom:-2px;z-index:1;transform:translate3d(0,calc((1 - var(--e,1)) * 14vh),0);will-change:transform}
+.themes__branch{z-index:7;right:-34vw;top:3%;width:118vw;transform:translate3d(calc((1 - var(--e,1)) * 10vw),calc(var(--p,0) * -8vh),0);will-change:transform}
+.themes__branch img{transform-origin:100% 40%}
+@media (min-width:900px){
+  .fore--hero{display:block;right:-12vw;top:-3vh;width:min(58vw,980px);z-index:4;transform:translate3d(0,calc(var(--p,0) * -14vh),0);will-change:transform}
+  .fore--hero img{transform:scaleX(-1) rotate(-7deg);transform-origin:50% 30%;filter:drop-shadow(0 30px 34px rgba(30,40,20,.35))}
+  .flock--near{top:6%}
+  .fore--arch{left:-6vw;width:66vw}
+  .svc-fore img{height:22vh}
+  .fore--meadow{left:-4%;right:-4%}
+  .themes__branch{right:-14vw;top:4%;width:min(60vw,1100px)}
+}
+[data-scroll]:not(.is-live) .motes i,[data-scroll]:not(.is-live) .fore img,[data-scroll]:not(.is-live) .svc-fore img,[data-scroll]:not(.is-live) .themes__branch img{animation-play-state:paused}
+@media (prefers-reduced-motion:no-preference){
+  .fore--arch img,.svc-fore img,.fore--meadow img{animation:fsway 7s ease-in-out infinite alternate}
+  .themes__branch img{animation:fsway 9s ease-in-out infinite alternate}
+  .fore--hero img{animation:fswayH 10s ease-in-out infinite alternate}
+  @keyframes fsway{from{transform:rotate(-.5deg) scale(1.005)}to{transform:rotate(.6deg) scale(1.015)}}
+  @keyframes fswayH{from{transform:scaleX(-1) rotate(-7deg)}to{transform:scaleX(-1) rotate(-4.5deg)}}
+}
+@media (prefers-reduced-motion:reduce){.motes,.flock--near{display:none}.fore,.themes__branch{transform:none}}
+/* room under the last services item, so the guided stop can centre it before the branches' light rises */
+.services__list{padding-bottom:18vh}
+@media (min-width:900px){.services__list{padding-bottom:30vh}}
+@media (max-width:899px){.flock--near{z-index:2;top:30%}}
