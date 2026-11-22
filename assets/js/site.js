@@ -1067,6 +1067,7 @@
       steps.forEach(function (s, n) { s.hidden = n !== k; s.classList.toggle('is-on', n === k); s.classList.toggle('is-back', n === k && !!goingBack); });
       count.textContent = String(k + 1);
       back.hidden = k === 0;
+      try { document.dispatchEvent(new CustomEvent('nawala-ask', { detail: k })); } catch (e) {}
       refresh();
       var f = $('input:not([type=checkbox]), select', steps[k]);
       if (f) try { f.focus({ preventScroll: true }); } catch (e) {}
@@ -1106,6 +1107,7 @@
         doneP.textContent = doneP.getAttribute('data-' + lang);
       }
       box.classList.add('is-done');
+      try { document.dispatchEvent(new CustomEvent('nawala-ask', { detail: 3 })); } catch (e) {}
       try { doneView.focus({ preventScroll: true }); } catch (e) {}
       replan();
     }
