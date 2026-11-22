@@ -485,14 +485,14 @@
         { t: 6.4, x: side + (D ? 6 : 0), y: D ? .62 * vh : 58, s: sideS, r: 0, pose: 'fly' },
         { t: 9.6 } ] },
       /* comes in from the right, flies straight into the tip of the branch, tumbles, gathers itself;
-         on desktop it never crosses the panel's writing, on phones it keeps to the top edge */
+         on desktop it never crosses the panel's writing or the carousel (it keeps to the right edge and the top), on phones it keeps to the top edge */
       themes: { loop: true, k: [
         { t: 0, x: D ? Math.min(vw - 90, tipX + vw * .24) : .8 * vw, y: D ? .2 * vh : .1 * vh, s: D ? .56 : .5, r: -8, pose: 'fly' },
         { t: 2, x: tipX + nwBase * .12, dy: tipY, s: D ? .56 : .5, r: 6, pose: 'fly', cue: 'bump' },
         { t: 2.15, x: tipX + nwBase * .16, dy: tipY + 8, s: D ? .56 : .5, r: 0, pose: 'tumble' },
-        { t: 3.9, x: D ? Math.min(vw - 120, Math.max(panR + 90, tipX + vw * .12)) : .84 * vw, y: D ? .7 * vh : .2 * vh, s: D ? .56 : .46, r: 400, pose: 'tumble' },
-        { t: 5.1, x: D ? Math.max(panR + 110, .76 * vw) : .8 * vw, y: D ? .54 * vh : .14 * vh, s: D ? .54 : .46, r: 720, pose: 'fly' },
-        { t: 8.6, x: D ? Math.max(panR + 100, .82 * vw) : .74 * vw, y: D ? .32 * vh : .09 * vh, s: D ? .56 : .48, r: 726, pose: 'tilt' },
+        { t: 3.9, x: D ? vw - 80 : .84 * vw, y: D ? .44 * vh : .2 * vh, s: D ? .56 : .46, r: 400, pose: 'tumble' },
+        { t: 5.1, x: D ? vw - 92 : .8 * vw, y: D ? .26 * vh : .14 * vh, s: D ? .54 : .46, r: 720, pose: 'fly' },
+        { t: 8.6, x: D ? Math.min(vw - 110, tipX + vw * .2) : .74 * vw, y: D ? .13 * vh : .09 * vh, s: D ? .56 : .48, r: 726, pose: 'tilt' },
         { t: 10.6 } ] },
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
@@ -848,14 +848,157 @@
       }
       river.innerHTML = html;
     };
-    if (river) nearJobs.push([themes, riverJob]);
+    /* the river gave way to the carousel (owner, 22 Nov 2026, 22:06); riverJob stays for the fallback lists only */
     /* when the database's themes arrive: redraw what is already on screen */
     themeWatchers.push(function () {
       if (river && river.innerHTML) riverJob();
       if (pops.themes && pops.themes.open && viewing < 0) build();
     });
 
-    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah') };
+    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah'), tema: $('#pop-tema') };
+    /* ---------- The theme carousel (owner, 22 Nov 2026, 22:06, after the "Glassy Carousel" reel) ----------
+       Every theme that has a working sample stands in a fan of glass cards: the front one lifted and lit, its
+       neighbours turned away and dimmer. Drag, swipe, the wheel sideways, or the arrow keys turn it; it drifts on
+       by itself while nobody touches it. The picture behind the section takes the front card's colour.
+       Tapping the front card: the others tuck in first, then the card grows into the panel (origin.js), where
+       the real sample invitation runs, with "Gunakan tema ini". Only transform and opacity move. */
+    (function carousel() {
+      var root = $('#crs'), stage = $('#crs-stage'), pop = pops.tema; if (!root || !stage) return;
+      var tint = $$('#crs-tint i'), nameEl = $('#crs-name'), metaEl = $('#crs-meta'), dotsEl = $('#crs-dots');
+      var list = [], cards = [], pos = 0, goal = 0, vel = 0, raf = 0, tuck = 0, tuckGoal = 0, live = false, hover = false, lastTouch = 0, tintAt = -1, tintK = 0;
+      var TIER = { dasar: ['Dasar', 'Basic'], premium: ['Premium', 'Premium'], eksklusif: ['Eksklusif', 'Exclusive'] };
+      function pick() {
+        var p = ALL.filter(function (th) { return ready(th) && !isOwned(slug(th)) && th[0] !== 'dasar'; });
+        var d = ALL.filter(function (th) { return ready(th) && th[0] === 'dasar'; });
+        /* the worlds first, then six Dasar themes spread over the list, so the fan shows both kinds */
+        var step = Math.max(1, Math.floor(d.length / 6)), out = p.slice(0, 10);
+        for (var i = 0; i < 6 && i * step < d.length; i++) out.splice(Math.min(out.length, 1 + i * 2), 0, d[(i * step + 3) % d.length]);
+        return out;
+      }
+      function build() {
+        list = pick(); if (!list.length) return;
+        stage.innerHTML = list.map(function (th, i) {
+          return '<button class="cc" type="button" data-k="' + i + '" tabindex="-1"><img src="' + cover(th, 'm') + '" alt="" loading="lazy" decoding="async" draggable="false"><span class="cc__sheen"></span><span class="cc__open">' + t('Buka undangan', 'Open the invitation') + '</span></button>';
+        }).join('');
+        cards = $$('.cc', stage);
+        dotsEl.innerHTML = list.map(function () { return '<i></i>'; }).join('');
+        root.setAttribute('aria-label', t('Tema yang bisa dibuka', 'Themes you can open'));
+        goal = pos = Math.min(2, list.length - 1); draw(); caption();
+      }
+      function n() { return list.length; }
+      function wrapD(d) { var N = n(); d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; }
+      function front() { var N = n(); return ((Math.round(pos) % N) + N) % N; }
+      function draw() {
+        var wide = desktop.matches, gap = wide ? 172 : 118, depth = wide ? 150 : 110;
+        cards.forEach(function (c, i) {
+          var d = wrapD(i - pos), a = Math.abs(d), show = a < 3.2;
+          var dx = d * gap * (1 - .18 * Math.min(a, 2) / 2) * (1 - tuck * .82);
+          var ry = Math.max(-1, Math.min(1, d)) * -38 * (1 - tuck), z = -Math.min(a, 3) * depth, lift = Math.max(0, 1 - a) * (wide ? -18 : -10);
+          c.style.transform = 'translate3d(' + dx.toFixed(1) + 'px,' + lift.toFixed(1) + 'px,' + z.toFixed(0) + 'px) rotateY(' + ry.toFixed(2) + 'deg)';
+          c.style.opacity = show ? String(Math.max(0, (1 - a * .26) * (a < .5 ? 1 : 1 - tuck)).toFixed(3)) : '0';
+          c.style.zIndex = String(100 - Math.round(a * 10));
+          c.style.visibility = show ? '' : 'hidden';
+          c.classList.toggle('is-front', a < .5);
+          c.tabIndex = a < .5 ? 0 : -1;
+        });
+      }
+      function caption() {
+        var th = list[front()]; if (!th) return;
+        nameEl.textContent = th[lang === 'en' ? 2 : 1];
+        var m = META && META[slug(th)], no = m && m.no ? ' ' + (th[0] === 'dasar' ? 'D' : th[0] === 'premium' ? 'P' : 'E') + '-' + String(m.no).padStart(3, '0') : '';
+        metaEl.textContent = (TIER[th[0]] || ['', ''])[lang === 'en' ? 1 : 0] + no;
+        $$('i', dotsEl).forEach(function (d, i) { d.classList.toggle('on', i === front()); });
+        /* the section takes the front card's colour: two layers crossfade (opacity only) */
+        if (tintAt !== front() && tint.length === 2) {
+          tintAt = front(); tintK = 1 - tintK;
+          tint[tintK].style.backgroundImage = 'url(' + cover(th, 's') + ')';
+          tint[tintK].classList.add('on'); tint[1 - tintK].classList.remove('on');
+        }
+      }
+      var lastF = -1;
+      function tick() {
+        raf = 0;
+        if (!drag) {
+          var k = calm ? 1 : .14; pos += (goal - pos) * k;
+          if (Math.abs(goal - pos) < .001) pos = goal;
+        }
+        tuck += (tuckGoal - tuck) * (calm ? 1 : .22); if (Math.abs(tuckGoal - tuck) < .002) tuck = tuckGoal;
+        draw();
+        if (front() !== lastF) { lastF = front(); caption(); }
+        if (drag || pos !== goal || tuck !== tuckGoal) raf = requestAnimationFrame(tick);
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+      function go(k) { goal = Math.round(goal) + k; kick(); }
+      function toCard(i) { goal = Math.round(pos) + wrapD(i - pos); kick(); }
+      /* drifts on every 4.5 s while on screen and untouched */
+      setInterval(function () {
+        if (!live || hover || calm || doc.hidden || (pop && pop.open) || Date.now() - lastTouch < 7000 || !n()) return;
+        go(1);
+      }, 4500);
+      /* drag and swipe (horizontal only, so the page still scrolls under a vertical swipe) */
+      var drag = false, sx = 0, sy = 0, sp = 0, moved = false, decided = false, lastX = 0, lastT = 0, v = 0;
+      stage.addEventListener('pointerdown', function (e) {
+        if (e.button) return;
+        drag = true; moved = false; decided = false; sx = lastX = e.clientX; sy = e.clientY; sp = pos; lastT = performance.now(); v = 0; lastTouch = Date.now();
+      });
+      window.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!decided) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; decided = true; if (Math.abs(dy) > Math.abs(dx)) { drag = false; return; } }
+        moved = true;
+        var now = performance.now(), gap = desktop.matches ? 172 : 118;
+        v = (e.clientX - lastX) / Math.max(1, now - lastT); lastX = e.clientX; lastT = now;
+        pos = sp - dx / gap; kick();
+      }, { passive: true });
+      window.addEventListener('pointerup', function () {
+        if (!drag) return; drag = false;
+        if (moved) { goal = Math.round(pos - v * 2.2); lastTouch = Date.now(); kick(); }
+      });
+      stage.addEventListener('touchmove', function (e) { if (drag && moved) e.preventDefault(); }, { passive: false });
+      stage.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        e.preventDefault(); lastTouch = Date.now();
+        if (Math.abs(e.deltaX) > 12 && !stage._w) { go(e.deltaX > 0 ? 1 : -1); stage._w = 1; setTimeout(function () { stage._w = 0; }, 380); }
+      }, { passive: false });
+      stage.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(1); lastTouch = Date.now(); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); lastTouch = Date.now(); }
+      });
+      root.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') hover = true; });
+      root.addEventListener('pointerleave', function () { hover = false; });
+      /* a tap: a side card comes to the front; the front card opens */
+      stage.addEventListener('click', function (e) {
+        var c = e.target.closest('.cc'); if (!c || moved) return;
+        var i = Number(c.getAttribute('data-k')); lastTouch = Date.now();
+        if (i !== front()) return toCard(i);
+        openTheme(list[i], c);
+      });
+      var openFor = null;
+      function url(th) { return (th[0] === 'dasar' ? 'undangan/dasar.html' : 'undangan/') + '?tema=' + encodeURIComponent(kitOf(th)) + '&to=Bapak+dan+Ibu+Santoso' + (lang === 'en' ? '&lang=en' : ''); }
+      function openTheme(th, card) {
+        if (!pop || !pop.showModal) { location.href = url(th); return; }
+        openFor = th;
+        $('#pt-h').textContent = th[lang === 'en' ? 2 : 1];
+        $('#pt-desc').textContent = th[lang === 'en' ? 4 : 3] || '';
+        $('#pt-meta').textContent = metaEl.textContent;
+        $('#pt-all').href = 'tema/?tier=' + th[0];
+        var fr = $('#pt-frame'); fr.title = t('Undangan contoh', 'Sample invitation');
+        pop.classList.toggle('is-dasar', th[0] === 'dasar');
+        /* the others tuck in first, then the card grows into the panel */
+        tuckGoal = 1; kick();
+        setTimeout(function () { fr.src = url(th); pop.showModal(); }, calm ? 0 : 240);
+      }
+      if (pop) pop.addEventListener('close', function () {
+        var fr = $('#pt-frame'); setTimeout(function () { fr.src = 'about:blank'; }, 400);   /* stops the invitation's music */
+        tuckGoal = 0; kick(); var c = cards[front()]; if (c) try { c.focus({ preventScroll: true }); } catch (e) {}
+      });
+      $('#pt-use') && $('#pt-use').addEventListener('click', function () { if (openFor) { chosen = openFor; showChosen(); goTo('kontak'); } });
+      nearJobs.push([themes, build]);
+      themeWatchers.push(function () { if (cards.length) build(); });
+      afterLang.push(function () { if (cards.length) build(); });
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { live = es[0].isIntersecting; }, { threshold: .25 }).observe(root);
+      desktop.addEventListener && desktop.addEventListener('change', draw);
+    })();
     var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), viewing = -1, tier = 'premium', builtFor = '';
     var tabs = $$('.tabs [data-tier]'), note = $('#tier-note'), custom = $('#tier-custom'), more = $('.pop__more');
     var coverEl = $('#detail-cover'), one = $('#detail-one'), saveBtn = $('#detail-save'), msg2 = $('#detail-msg');

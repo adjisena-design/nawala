@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261122v">
+<link rel="stylesheet" href="assets/css/site.css?v=20261122x">
 <link rel="stylesheet" href="assets/css/kit.css?v=20261121o">
 <link rel="stylesheet" href="assets/css/rasa.css?v=4">
 </head>
@@ -328,12 +328,12 @@ d.classList.add('js');})();
         <img src="assets/img/plate-branches-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
       </picture>
     </div>
-    <div class="river" id="river"></div>
+    <div class="crs-tint" id="crs-tint"><i></i><i></i></div>
     <div class="themes__shade"></div>
   </div>
   <div class="fade-top" aria-hidden="true"></div>
   <div class="themes__branch" id="branch" aria-hidden="true"><img src="assets/img/fx-branch.webp" width="1000" height="376" alt="" loading="lazy"></div>
-  <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:58%;--y:78%;--n:5;--s:0.7;--t:13s;--d:-6s"></i><i style="--x:92%;--y:18%;--n:6;--s:0.9;--t:17s;--d:-1s"></i><i style="--x:66%;--y:12%;--n:2;--s:0.65;--t:21s;--d:-12s"></i><i style="--x:78%;--y:86%;--n:7;--s:1.1;--t:14s;--d:-5s"></i><i style="--x:96%;--y:48%;--n:4;--s:0.75;--t:18s;--d:-8s"></i></div>
+  <div class="bflies" aria-hidden="true"><i style="--x:72%;--y:30%;--n:0;--s:1;--t:15s;--d:-3s"></i><i style="--x:84%;--y:62%;--n:3;--s:0.8;--t:19s;--d:-9s"></i><i style="--x:52%;--y:7%;--n:5;--s:0.7;--t:13s;--d:-6s"></i><i style="--x:92%;--y:18%;--n:6;--s:0.9;--t:17s;--d:-1s"></i><i style="--x:66%;--y:12%;--n:2;--s:0.65;--t:21s;--d:-12s"></i><i style="--x:97%;--y:74%;--n:7;--s:1.1;--t:14s;--d:-5s"></i><i style="--x:96%;--y:48%;--n:4;--s:0.75;--t:18s;--d:-8s"></i></div>
   <div class="themes__panel glass" id="themes-panel">
     <h2 data-en="Four ways to begin your invitation.">Empat cara memulai undangan kalian.</h2>
     <p data-en="From simple and safe to made only for you. Every one is a real scene in motion, never a flat paper template. These are opening scenes; the full invitations are ready in January 2027.">Dari yang sederhana dan aman sampai yang dibuat hanya untuk kalian. Semuanya adegan nyata yang bergerak, bukan templat kertas tempel. Ini adegan pembukanya; undangan lengkapnya siap Januari 2027.</p>
@@ -346,6 +346,11 @@ d.classList.add('js');})();
     <div class="themes__actions">
       <a class="btn btn--glow" href="tema/" data-en="See the Nawala theme collection">Lihat koleksi tema Nawala</a>
     </div>
+  </div>
+  <div class="crs" id="crs" role="region" aria-roledescription="carousel" aria-label="Tema yang bisa dibuka">
+    <div class="crs__stage" id="crs-stage" tabindex="0"></div>
+    <p class="crs__cap" aria-live="polite"><b id="crs-name"></b><span id="crs-meta"></span></p>
+    <div class="crs__dots" id="crs-dots" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -540,6 +545,23 @@ d.classList.add('js');})();
   </div>
 </dialog>
 
+<dialog class="pop pop--tema" id="pop-tema" aria-labelledby="pt-h">
+  <div class="pop__box pt">
+    <div class="pt__phone"><iframe id="pt-frame" title="Undangan contoh" allow="autoplay"></iframe></div>
+    <div class="pt__info">
+      <p class="pt__meta" id="pt-meta"></p>
+      <h2 id="pt-h"></h2>
+      <p class="pt__desc" id="pt-desc"></p>
+      <p class="pt__hint" data-en="This is a real sample invitation, running. Tap the envelope to open it, then walk it as a guest.">Ini undangan contoh yang berjalan sungguhan. Ketuk amplopnya, lalu jelajahi sebagai tamu.</p>
+      <div class="pt__actions">
+        <button class="btn btn--glow" type="button" id="pt-use" data-en="Use this theme">Gunakan tema ini</button>
+        <a class="btn btn--glass" id="pt-all" href="tema/" data-en="All themes">Semua tema</a>
+      </div>
+    </div>
+    <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+  </div>
+</dialog>
+
 <script src="assets/js/origin.js?v=2"></script>
 <script src="assets/js/db.js?v=20261121n" defer></script>
 <script src="assets/js/simpan.js?v=20261121n" defer></script>
@@ -547,6 +569,6 @@ d.classList.add('js');})();
 <script src="assets/js/rasa.js?v=1" defer></script>
 <script type="module" src="assets/js/garis.js?v=2"></script>
 <script src="assets/js/peraga.js?v=1" defer></script>
-<script src="assets/js/site.js?v=20261122k" defer></script>
+<script src="assets/js/site.js?v=20261122l" defer></script>
 </body>
 </html>
