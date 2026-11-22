@@ -32,7 +32,15 @@ window.NAWALA_DENAH = (function () {
     var rot = ' transform="rotate(' + (-(it.r || 0)) + ')"', fs;
     if (it.type === 'label') s += '<text font-size="' + r2(it.h * 0.62) + '" font-weight="600" fill="#1c2024"' + rot + '>' + esc(it.text) + '</text>';
     else if (it.type === 'rows') s += '<text font-size=".3" font-weight="600" y="' + (-it.h / 2 - 0.38) + '" fill="' + (hl ? '#D8436B' : '#1c2024') + '"' + rot + '>' + esc(it.name) + '</text>';
-    else { fs = tbl ? (Math.min(it.w, it.h) < 0.95 ? 0.24 : 0.3) : Math.max(0.24, Math.min(0.4, Math.min(it.w, it.h) * 0.22)); s += '<text font-size="' + r2(fs) + '" font-weight="600" fill="' + ink + '"' + rot + '>' + esc(it.name) + '</text>'; }
+    else {
+      /* labels fit inside their piece; rooms-within-rooms carry theirs at the top; tall narrow pieces run it along their length */
+      var L = Math.max(1, String(it.name || '').length), vert = !tbl && it.h > it.w * 1.8 && L * 0.56 * 0.3 > it.w * 0.88;
+      var avail = tbl ? (it.type === 'round' ? it.w * 0.8 : it.w * 0.9) : (vert ? it.h : it.w) * 0.88;
+      fs = tbl ? (Math.min(it.w, it.h) < 0.95 ? 0.24 : 0.3) : Math.max(0.24, Math.min(0.4, Math.min(it.w, it.h) * 0.22));
+      fs = Math.max(tbl ? 0.12 : 0.14, Math.min(fs, avail / (L * 0.56)));
+      var top = !tbl && !vert && ['pelaminan', 'stage', 'dance', 'standing', 'gazebo', 'shape'].indexOf(it.type) > -1 && it.h > 1.4, y = top ? r2(-it.h / 2 + fs * 0.85 + 0.14) : 0;
+      s += '<text font-size="' + r2(fs) + '" font-weight="600" fill="' + ink + '" transform="' + (vert ? 'rotate(-90)' : 'translate(0 ' + y + ') rotate(' + (-(it.r || 0)) + ')') + '">' + esc(it.name) + '</text>';
+    }
     return '<g transform="translate(' + r2(it.x) + ' ' + r2(it.y) + ') rotate(' + (it.r || 0) + ')">' + s + '</g>';
   }
   function svg(plan, o) {

@@ -65,7 +65,7 @@
           </defs>
           <g id="world"></g>
         </svg>
-        <div class="hint" id="hint" data-en="Drag a guest's name onto a chair or a table. Click anything to adjust it. Drag empty space to move around, scroll to zoom.">Seret nama tamu ke kursi atau meja. Klik benda untuk mengaturnya. Seret area kosong untuk bergeser, gulir untuk memperbesar.</div>
+        <div class="hint" id="hint" data-en="Drag a guest onto a chair or table. Click anything to adjust it. Move the plan with W A S D or by dragging empty space; pinch or scroll to zoom, 0 to fit.">Seret nama tamu ke kursi atau meja. Klik benda untuk mengaturnya. Geser denah dengan W A S D atau seret area kosong; cubit atau gulir untuk memperbesar, 0 untuk pas.</div>
         <div class="zoom"><button id="zOut" aria-label="Zoom out">&minus;</button><span id="zLbl">100%</span><button id="zIn" aria-label="Zoom in">+</button><button id="zFit" data-en="Fit">Pas</button></div>
       </div>
     </div>
@@ -258,9 +258,12 @@ function itemSVG(it,o){const warn=o.bad&&o.bad.has(it.id),cls=['it'];if(isTbl(it
   ch+=`<g class="ch" data-it="${it.id}" data-c="${i}"><circle class="chair${off?' off':''}${fill?' taken':''}" cx="${X}" cy="${Y}" r=".22" stroke-width=".03" ${fill?`style="fill:${fill}"`:''}>${g?`<title>${esc(g.name)}</title>`:''}</circle>${fill?`<text class="ini" x="${X}" y="${Y}" transform="rotate(${-it.r} ${X} ${Y})">${res?(i===0?'L':'B'):esc(initials(g.name))}</text>`:''}</g>`});
  const rot=` transform="rotate(${-it.r})"`;let tx='';
  if(it.type==='label')tx=`<text font-size="${r2(it.h*.62)}" font-weight="600"${rot}>${esc(it.text)}</text>`;
- else if(isTbl(it)&&it.type!=='rows')tx=`<text font-size="${Math.min(it.w,it.h)<.95?.24:.3}" font-weight="600" y="${it.type==='round'?-.1:0}"${rot}>${esc(it.name)}</text>`+(it.type==='round'?`<text font-size=".22" y=".22"${rot} style="fill:rgba(22,48,31,.62)">${usedSeats(it)}/${activeSeats(it)}</text>`:'');
+ else if(isTbl(it)&&it.type!=='rows'){const L=Math.max(1,(it.name||'').length),aw=it.type==='round'?it.w*.8:it.w*.9,fs=r2(Math.max(.12,Math.min(Math.min(it.w,it.h)<.95?.24:.3,aw/(L*.56))));
+  tx=`<text font-size="${fs}" font-weight="600" transform="translate(0 ${it.type==='round'?-.1:0}) rotate(${-it.r})">${esc(it.name)}</text>`+(it.type==='round'?`<text font-size="${r2(Math.min(.22,it.w*.12))}" transform="translate(0 ${r2(Math.min(.22,it.w*.13))}) rotate(${-it.r})" style="fill:rgba(22,48,31,.62)">${usedSeats(it)}/${activeSeats(it)}</text>`:'')}
  else if(it.type==='rows')tx=`<text font-size=".3" font-weight="600" y="${-it.h/2-.35}"${rot}>${esc(it.name)} ${usedSeats(it)}/${activeSeats(it)}</text>`;
- else{const fs=Math.max(.24,Math.min(.4,Math.min(it.w,it.h)*.22));tx=`<text font-size="${r2(fs)}" font-weight="600"${rot}>${esc(it.name)}</text>`+(it.type==='standing'?`<text font-size="${r2(fs*.8)}" y="${r2(fs*1.2)}"${rot} style="fill:rgba(22,48,31,.62)">${t('kapasitas','capacity')} ${it.cap}</text>`:'')}
+ else{const L=Math.max(1,(it.name||'').length),vert=it.h>it.w*1.8&&L*.56*.3>it.w*.88,avail=(vert?it.h:it.w)*.88,fs=r2(Math.max(.14,Math.min(Math.max(.24,Math.min(.4,Math.min(it.w,it.h)*.22)),avail/(L*.56)))),
+   top=!vert&&['pelaminan','stage','dance','standing','gazebo','shape'].includes(it.type)&&it.h>1.4,y=top?r2(-it.h/2+fs*.85+.14):0;
+  tx=`<text font-size="${fs}" font-weight="600" transform="${vert?'rotate(-90)':`translate(0 ${y}) rotate(${-it.r})`}">${esc(it.name)}</text>`+(it.type==='standing'?`<text font-size="${r2(fs*.8)}" transform="translate(0 ${r2(y+fs*1.2)}) rotate(${-it.r})" style="fill:rgba(22,48,31,.62)">${t('kapasitas','capacity')} ${it.cap}</text>`:'')}
  let hd='';
  if(o.sel===it.id&&!o.ro){const k=1/vp.s,ext=it.h/2+(isTbl(it)&&it.type!=='rows'?.6:.1);
   hd+=`<line x1="0" y1="${-ext}" x2="0" y2="${-ext-22*k}" stroke="#D8436B" stroke-width="${1.5*k}"/><circle class="hdl" data-h="rot" cy="${-ext-22*k}" r="${7*k}" stroke-width="${2*k}"/>`;
@@ -334,7 +337,7 @@ function toWorld(e){const r=svg.getBoundingClientRect();return[(e.clientX-r.left
 const sn=v=>snapOn?Math.round(v*4)/4:r2(v);
 let drag=null;
 const pickSel=id=>{sel=id;chairMode=false;render();renderProps();renderGuests()};
-svg.addEventListener('pointerdown',e=>{hidePop();$('#hint').style.display='none';const p=toWorld(e),h=e.target.closest('.hdl'),ch=e.target.closest('.ch'),g=e.target.closest('.it');
+svg.addEventListener('pointerdown',e=>{hidePop();e.preventDefault();try{getSelection().removeAllRanges()}catch(_){}$('#hint').style.display='none';const p=toWorld(e),h=e.target.closest('.hdl'),ch=e.target.closest('.ch'),g=e.target.closest('.it');
  if(ch){const it=L().items.find(i=>i.id===ch.dataset.it),c=+ch.dataset.c;
   if(ro()){if(it.seat[c])seatPop(it,c,e);return}
   if(chairMode&&sel===it.id){if(reserved(it,c))return;if(it.off.includes(c))it.off=it.off.filter(x=>x!==c);else{it.off.push(c);it.seat[c]=null}commit();return}
@@ -356,7 +359,7 @@ svg.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;canv
   const ch=tgt&&tgt.closest('.ch');if(ch){const x=L().items.find(i=>i.id===ch.dataset.it),c=+ch.dataset.c;if(x.off.includes(c)||reserved(x,c)){toast(t('Kursi itu tidak bisa dipakai.','That chair cannot be used.'));return}const other=x.seat[c];x.seat[c]=gid;d.it.seat[d.c]=other||null;commit();return}
   const g=tgt&&tgt.closest('#svg .it');if(g){const x=L().items.find(i=>i.id===g.dataset.id);if(isTbl(x)&&freeIdx(x).length){d.it.seat[d.c]=null;x.seat[freeIdx(x)[0]]=gid;commit()}else toast(t('Tidak ada kursi kosong di sana.','No free chair there.'))}return}
  if(d.kind!=='pan')commit()});
-canvas.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*(e.ctrlKey?.014:.0025)),e.clientX-r.left,e.clientY-r.top)},{passive:false});
 
 let gdrag=null;
 $('#gList').addEventListener('pointerdown',e=>{if(e.target.closest('.gedit'))return;const li=e.target.closest('li[data-g]');if(!li||ro())return;gdrag={id:li.dataset.g,x:e.clientX,y:e.clientY,on:false};li.setPointerCapture(e.pointerId)});
@@ -439,7 +442,12 @@ $('#viewSeg').addEventListener('click',e=>{const b=e.target.closest('button');if
 $('#gPick').addEventListener('change',renderGuestView);$('#showFull').addEventListener('change',e=>{if(ro()){e.target.checked=S.showPlan;return}S.showPlan=e.target.checked;commit();toast(t('Tersimpan. Berlaku untuk tamu setelah diterbitkan.','Saved. Guests see it after the next publish.'))});
 $('#uSearch').addEventListener('input',()=>{uPick=null;renderUsher()});
 $('#uRes').addEventListener('click',e=>{const li=e.target.closest('[data-u]');if(li){uPick=li.dataset.u;renderUsher()}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))){if(modal.classList.contains('on'))modal.classList.remove('on');else if(parent!==window)parent.postMessage('nawala-denah-close',location.origin);return}if(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))return;const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+document.addEventListener('keydown',e=>{if(view==='edit'&&!/input|select|textarea/i.test(e.target.tagName)&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const kk=e.key.toLowerCase(),hasSel=!!(sel&&L().items.find(i=>i.id===sel)&&!ro()),st=e.shiftKey?180:70,
+  mv={w:[0,1],a:[1,0],s:[0,-1],d:[-1,0]}[kk]||(!hasSel&&{arrowup:[0,1],arrowleft:[1,0],arrowdown:[0,-1],arrowright:[-1,0]}[kk]);
+  if(mv){e.preventDefault();vp.tx+=mv[0]*st;vp.ty+=mv[1]*st;render();$('#hint').style.display='none';return}
+  if(kk==='+'||kk==='='||kk==='-'||kk==='_'){e.preventDefault();const r=canvas.getBoundingClientRect();zoomAt(kk==='-'||kk==='_'?.8:1.25,r.width/2,r.height/2);return}
+  if(kk==='0'){e.preventDefault();fit();return}}
+ if(e.key==='Escape'&&(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))){if(modal.classList.contains('on'))modal.classList.remove('on');else if(parent!==window)parent.postMessage('nawala-denah-close',location.origin);return}if(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))return;const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(mod&&k==='y'){e.preventDefault();redo();return}
  if(e.key==='Escape'){const busy=sel||pop.classList.contains('on')||modal.classList.contains('on');if(!busy&&parent!==window)parent.postMessage('nawala-denah-close',location.origin);modal.classList.remove('on');sel=null;chairMode=false;hidePop();renderAll();return}
  const it=L().items.find(i=>i.id===sel);if(!it||ro())return;

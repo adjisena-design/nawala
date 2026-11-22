@@ -44,6 +44,9 @@ input[type=range]{accent-color:var(--rose);width:100%}
 .demo b{color:var(--ink);font-weight:650}
 .demo button{min-height:34px;padding:4px 12px;font-size:13px}
 .top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px 10px 16px}
+@media (min-width:900px){.top{flex-wrap:nowrap}.top>*{flex:none}.top>div:not(.sp){flex:0 1 auto;min-width:0}.crumb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+@media (min-width:900px) and (max-width:1380px){.top .crumb{display:none}.top>.status span{display:none}.top button{padding:6px 12px}.seg button{padding:4px 10px}}
+@media (min-width:900px) and (max-width:1180px){.top>.brand{display:none}.top h1{font-size:18px}}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .brand img{width:38px;height:38px;object-fit:contain}
 .crumb{font-size:12.5px;color:var(--mute)}
@@ -97,6 +100,7 @@ aside{overflow:auto;min-height:0}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:4px 12px 10px;border-bottom:1px solid var(--line)}
 .tabs>button{min-height:32px;padding:3px 11px;font-size:13px}
 .canvas{position:relative;overflow:hidden;min-height:0;background:rgba(237,242,238,.55);touch-action:none}
+.canvas,.canvas *,.glist,.glist *,.ghost{-webkit-user-select:none;user-select:none}
 .canvas>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .canvas.pan{cursor:grabbing}
 .zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(251,246,234,.92);box-shadow:0 8px 20px -10px rgba(22,48,31,.4),inset 0 0 0 1px var(--line)}
