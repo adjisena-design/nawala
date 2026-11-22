@@ -671,15 +671,17 @@
     }
     plans(); afterLang.push(plans);
     var current = 0;
-    /* Six screens: the day in one link (the lead), then the opening, guestbook, floor plan, souvenir, gallery.
+    /* Seven screens: the day in one link (the lead), then the opening, guestbook, floor plan, the couple's seating planner, souvenir, gallery.
        The tab bar belongs to the five wedding pages, so it hides on the first two. A screen plays its little
        hands-on loop (.play) only while it is the one in the desktop phone, or while its card is on a phone screen. */
     function setActive(i) {
       current = i;
       items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); });
       screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); if (desktop.matches && !calm) s.classList.toggle('play', k === i); });
-      tabs.forEach(function (tab, k) { tab.classList.toggle('is-on', k === i - 1); });
-      if (frame) frame.classList.toggle('is-cover', i <= 1);
+      /* the tab bar belongs to the guest's pages (data-tab); the lead, the opening and the couple's planner hide it */
+      var tab = items[i].getAttribute('data-tab');
+      tabs.forEach(function (el, k) { el.classList.toggle('is-on', String(k) === tab); });
+      if (frame) frame.classList.toggle('is-cover', i <= 1 || tab === null);
     }
     function place() {
       screens.forEach(function (s, i) {
@@ -819,7 +821,7 @@
       if (pops.themes && pops.themes.open && viewing < 0) build();
     });
 
-    var pops = { themes: $('#pop-themes'), login: $('#pop-login') };
+    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah') };
     var grid = $('#theme-grid'), list = $('#pop-list'), detail = $('#pop-detail'), viewing = -1, tier = 'premium', builtFor = '';
     var tabs = $$('.tabs [data-tier]'), note = $('#tier-note'), custom = $('#tier-custom'), more = $('.pop__more');
     var coverEl = $('#detail-cover'), one = $('#detail-one'), saveBtn = $('#detail-save'), msg2 = $('#detail-msg');
@@ -901,12 +903,16 @@
       }
       saveLabel(); builtFor = '';
     });
+    /* Esc inside the seating demo's frame stays in the frame; the demo passes it up */
+    addEventListener('message', function (e) { if (e.origin === location.origin && e.data === 'nawala-denah-close') closeAll(); });
     function closeAll() { Object.keys(pops).forEach(function (k) { if (pops[k] && pops[k].open) pops[k].close(); }); }
     function open(name, wantTier) {
       var d = pops[name]; if (!d || !d.showModal) { location.hash = name === 'themes' ? 'tema' : 'kontak'; return; }
       closeAll();
       if (name === 'themes') { if (wantTier) tier = wantTier; build(); showList(false); }
       if (name === 'login') { var m = $('#login-msg'); m.hidden = true; }
+      /* the seating planner demo loads only when asked for, in the page's language */
+      if (name === 'denah') { var f = $('.denah__frame', d), src = 'undangan/denah-demo.html' + (lang === 'en' ? '?lang=en' : ''); if (f.getAttribute('src') !== src) f.setAttribute('src', src); }
       d.showModal();
       /* the keyboard waits until the box has finished growing; on touch screens the visitor taps the field */
       if (name === 'login' && matchMedia('(pointer: fine)').matches) setTimeout(function () { try { $('#login-code').focus({ preventScroll: true }); } catch (e) {} }, 540);

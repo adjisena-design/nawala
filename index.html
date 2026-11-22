@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261121v">
+<link rel="stylesheet" href="assets/css/site.css?v=20261122d">
 <link rel="stylesheet" href="assets/css/kit.css?v=20261121o">
 </head>
 <body>
@@ -220,7 +220,7 @@ d.classList.add('js');})();
           </ol>
         </div>
       </li>
-      <li class="svc" data-svc="1">
+      <li class="svc" data-svc="1" data-tab="0">
         <div class="svc__screen scr scr--invite">
           <div class="scr__top"><b>Laras &amp; Bima</b><span data-en="Saturday, 12 June 2027">Sabtu, 12 Juni 2027</span></div>
           <img src="assets/img/nawala-open-720.webp" width="720" height="619" alt="" loading="lazy">
@@ -240,7 +240,7 @@ d.classList.add('js');})();
         <p data-en="A personal link for each guest, with their name on the envelope. RSVP, map, countdown and digital gift in one page.">Tautan pribadi untuk tiap tamu, dengan namanya di amplop pembuka. RSVP, peta, hitung mundur, dan amplop digital dalam satu halaman.</p>
         <a class="btn btn--quiet svc__link" href="undangan/?to=Bapak+dan+Ibu+Santoso" data-en="Open the sample invitation">Buka undangan contoh</a>
       </li>
-      <li class="svc" data-svc="2">
+      <li class="svc" data-svc="2" data-tab="1">
         <div class="svc__screen scr scr--qr">
           <div class="scr__top"><b data-en="Guestbook">Buku tamu</b><span>Laras &amp; Bima</span></div>
           <div class="pass">
@@ -252,7 +252,7 @@ d.classList.add('js');})();
         <h3 data-en="QR guestbook">Buku tamu QR</h3>
         <p data-en="Guests scan a code at the entrance. Attendance is recorded at once, with no queue to sign a book.">Tamu memindai kode di pintu masuk. Kehadiran tercatat seketika, tanpa antre menulis di buku.</p>
       </li>
-      <li class="svc" data-svc="3">
+      <li class="svc" data-svc="3" data-tab="2">
         <div class="svc__screen scr scr--seat">
           <div class="scr__top"><b data-en="Floor plan">Denah ruangan</b><span>Laras &amp; Bima</span></div>
           <div class="seat__find"><span>Dinda Larasati</span><s></s></div>
@@ -264,7 +264,28 @@ d.classList.add('js');})();
         <h3 data-en="Floor plan and seating">Denah dan tempat duduk</h3>
         <p data-en="Guests type their name and see their table on a map of the room.">Tamu mengetik namanya, lalu melihat mejanya di denah ruangan.</p>
       </li>
-      <li class="svc" data-svc="4">
+      <li class="svc svc--plan" data-svc="4">
+        <div class="svc__screen scr scr--plan">
+          <div class="scr__top"><b data-en="Plan the room">Susun denah</b><span data-en="In the couple's room">Di ruang pasangan</span></div>
+          <div class="pk" aria-hidden="true">
+            <div class="pk__side"><b data-en="Guests">Tamu</b></div>
+            <i class="pk__chip pk__chip--a">Dinda<em>2</em></i><i class="pk__chip" style="top:29%">Raka<em>1</em></i><i class="pk__chip" style="top:43%">Nadia<em>1</em></i>
+            <i class="pk__add" data-en="+ Table">+ Meja</i>
+            <div class="pk__stage"><span data-en="Stage">Pelaminan</span><s></s></div>
+            <div class="pk__t pk__t--1"><i class="pk__me" style="--a:0deg"></i><i style="--a:60deg"></i><i style="--a:120deg"></i><i style="--a:180deg"></i><i style="--a:240deg"></i><i style="--a:300deg"></i><b>1</b></div>
+            <div class="pk__t pk__t--2"><i style="--a:0deg"></i><i style="--a:60deg"></i><i style="--a:120deg"></i><i style="--a:180deg"></i><i style="--a:240deg"></i><i style="--a:300deg"></i><b>2</b></div>
+            <div class="pk__t pk__t--3"><i style="--a:0deg"></i><i style="--a:60deg"></i><i style="--a:120deg"></i><i style="--a:180deg"></i><i style="--a:240deg"></i><i style="--a:300deg"></i><b>3</b></div>
+            <span class="pk__got">Dinda</span>
+            <i class="pk__fly">Dinda</i>
+            <i class="tap pk__tap pk__tap--1"></i><i class="tap pk__tap pk__tap--2"></i><i class="tap pk__tap pk__tap--3"></i><i class="tap pk__tap pk__tap--4"></i>
+          </div>
+        </div>
+        <h3 data-en="Plan your own floor">Susun denah sendiri</h3>
+        <p data-en="Lay out the room at the venue's real size: round tables, the stage, a gazebo, food stalls. Then drag each guest onto a chair. For Exclusive and Custom themes.">Atur ruangan sesuai ukuran asli gedung: meja bundar, pelaminan, gazebo, gubukan. Lalu seret nama tamu ke kursinya. Untuk tema Eksklusif dan Kustom.</p>
+        <button class="btn btn--quiet svc__link svc__demo" type="button" data-open="denah" data-en="Try the live demo">Coba demo langsung</button>
+        <p class="svc__note" data-en="The live demo can be tried on a laptop or computer.">Demo langsungnya bisa dicoba dari laptop atau komputer.</p>
+      </li>
+      <li class="svc" data-svc="5" data-tab="3">
         <div class="svc__screen scr scr--gift">
           <div class="scr__top"><b data-en="Souvenir">Souvenir</b><span>Laras &amp; Bima</span></div>
           <div class="pass pass--ticket">
@@ -277,7 +298,7 @@ d.classList.add('js');})();
         <h3 data-en="Souvenirs">Souvenir</h3>
         <p data-en="Guests show the code in their invitation to our crew. Souvenirs can differ for each group of guests.">Tamu menunjukkan kode di undangannya kepada petugas kami. Souvenir bisa berbeda untuk tiap kelompok tamu.</p>
       </li>
-      <li class="svc" data-svc="5">
+      <li class="svc" data-svc="6" data-tab="4">
         <div class="svc__screen scr scr--photo">
           <div class="scr__top"><b data-en="Guest gallery">Galeri tamu</b><span>Laras &amp; Bima</span></div>
           <div class="shots"><i></i><i></i><i></i><i></i><i></i><i></i><u class="shots__new"></u></div>
@@ -502,9 +523,19 @@ d.classList.add('js');})();
   </div>
 </dialog>
 
+<dialog class="pop pop--denah" id="pop-denah" aria-labelledby="pop-denah-h">
+  <div class="pop__box">
+    <div class="pop__head">
+      <h2 id="pop-denah-h" data-en="Floor plan and seats, live demo">Denah dan kursi, demo langsung</h2>
+      <button class="pop__x" type="button" data-close><span class="sr" data-en="Close">Tutup</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <iframe class="denah__frame" title="Demo denah dan kursi"></iframe>
+  </div>
+</dialog>
+
 <script src="assets/js/origin.js?v=2"></script>
 <script src="assets/js/db.js?v=20261121n" defer></script>
 <script src="assets/js/simpan.js?v=20261121n" defer></script>
-<script src="assets/js/site.js?v=20261122a" defer></script>
+<script src="assets/js/site.js?v=20261122d" defer></script>
 </body>
 </html>
