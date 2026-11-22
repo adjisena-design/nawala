@@ -369,7 +369,7 @@
       return { list: out, last: out[out.length - 1], exit: exit };
     }
     /* the hero counts too: from the sky, one swipe glides down to the first message with the light rising in step */
-    function inside(y, S) { return y <= S.last + 6; }
+    function inside(y, S) { return y < S.exit - 6; }   // the stretch below the last step, up to the themes, is guided too
     function nearest(y, S) { var n = 0; for (var i = 1; i < S.list.length; i++) if (Math.abs(S.list[i] - y) < Math.abs(S.list[n] - y)) n = i; return n; }
     /* our own glide, eased and of a fixed length (a browser's smooth scroll is too quick on iOS and looks like a jump) */
     function glide(to) {
@@ -385,6 +385,7 @@
     function step(dir) {
       var S = stops(), y = window.scrollY, to;
       if (y < S.list[0] - 6) { if (dir > 0) glide(S.list[0]); return; }   // in the sky: down goes to the first message, up does nothing
+      if (y > S.last + 6) { glide(dir > 0 ? S.exit : S.last); return; }   // between the last step and the themes
       var i = nearest(y, S);
       if (dir > 0) to = i < S.list.length - 1 ? S.list[i + 1] : S.exit;
       else to = i > 0 ? S.list[i - 1] : 0;
@@ -402,8 +403,8 @@
       var y = window.scrollY;
       if (!gliding && !tOn && Date.now() > jumpUntil) {
         var S = stops();
-        if (lastY < S.list[0] - 6 && y >= S.list[0] - 6 && y < S.last) halt(S.list[0]);
-        else if (lastY > S.last + 6 && y <= S.last + 6 && y > S.list[0]) halt(S.last);
+        if (lastY < S.list[0] - 6 && y >= S.list[0] - 6 && y < S.exit - 6) halt(S.list[0]);
+        else if (lastY >= S.exit - 6 && y < S.exit - 6 && y > S.list[0]) halt(S.last);
       }
       lastY = y;
     }, { passive: true });
