@@ -20,10 +20,10 @@
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');window.NAWALA_BASE='../';})();
 </script>
-<link rel="stylesheet" href="../assets/css/tema.css?v=20261121o">
+<link rel="stylesheet" href="../assets/css/tema.css?v=20261122a">
 <link rel="stylesheet" href="../assets/css/kit.css?v=20261121o">
 </head>
-<body>
+<body class="tm">
 <a class="skip" href="#koleksi" data-en="Skip to the themes">Langsung ke tema</a>
 
 <!-- the sky of the home page's first screen; behind it, faintly, the theme nearest the middle of the screen -->
@@ -85,13 +85,17 @@ d.classList.add('js');window.NAWALA_BASE='../';})();
     </div>
     <div class="drawer" id="drawer" data-from="#saring" hidden>
       <div class="gbar fams" id="fams" aria-label="Keluarga tema" data-en-label="Theme families"></div>
-      <div class="gbar">
-        <button type="button" id="only-open" aria-pressed="false" data-en="Only ones I can open">Hanya yang bisa dibuka</button>
-      </div>
     </div>
   </div>
 
-  <p class="count" id="count" aria-live="polite"></p>
+  <div class="avail-row">
+    <div class="gbar avail" id="avail" role="group" aria-label="Ketersediaan" data-en-label="Availability">
+      <button type="button" data-a="all" aria-pressed="true" data-en="All">Semua</button>
+      <button type="button" data-a="ready" aria-pressed="false" data-en="Sample ready">Ada contohnya</button>
+      <button type="button" data-a="soon" aria-pressed="false" data-en="Coming soon">Segera</button>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </div>
   <div id="groups"></div>
 
   <!-- Custom: the four steps -->

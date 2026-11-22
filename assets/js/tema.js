@@ -80,7 +80,7 @@
   /* ---------- State ---------- */
   var TIERS = ['semua', 'dasar', 'premium', 'eksklusif', 'kustom', 'tersimpan'];
   var tier = TIERS.indexOf(query.get('tier')) > -1 ? query.get('tier') : 'semua';
-  var fam = '', words = '', onlyOpen = false;
+  var fam = '', words = '', avail = query.get('ada') === 'segera' ? 'soon' : query.get('ada') === 'contoh' ? 'ready' : 'all';   // all, ready (a sample to open), soon
   var tabs = $$('#tabs button'), groupsEl = $('#groups'), countEl = $('#count'), custom = $('#custom');
 
   function fams() {
@@ -95,7 +95,8 @@
   }
   function matches(th) {
     if (fam && th[5] !== fam) return false;
-    if (onlyOpen && (!ready(th) || owned(th))) return false;
+    if (avail === 'ready' && (!ready(th) || owned(th))) return false;
+    if (avail === 'soon' && ready(th)) return false;
     if (!words) return true;
     var hay = (numberOf(th) + ' ' + numberOf(th).replace('-', '') + ' ' + th[1] + ' ' + th[2] + ' ' + tagsOf(th).join(' ') + ' ' + famName(th)).toLowerCase();
     return words.split(/\s+/).every(function (w) { return hay.indexOf(w.replace(/^#/, '')) > -1; });
@@ -205,10 +206,13 @@
   $('#fams').addEventListener('click', function (e) { var b = e.target.closest('[data-fam]'); if (!b) return; fam = b.getAttribute('data-fam'); fams(); saringN(); render(); });
   var typing;
   $('#q').addEventListener('input', function (e) { clearTimeout(typing); var v = e.target.value; typing = setTimeout(function () { words = v.trim().toLowerCase(); render(); }, 180); });
-  $('#only-open').addEventListener('click', function (e) { onlyOpen = !onlyOpen; e.currentTarget.setAttribute('aria-pressed', String(onlyOpen)); saringN(); render(); });
+  /* availability: every theme, only those with a sample to open, or only those still coming */
+  function availBar() { $$('#avail button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-a') === avail)); }); }
+  $('#avail').addEventListener('click', function (e) { var b = e.target.closest('[data-a]'); if (!b) return; avail = b.getAttribute('data-a'); availBar(); render(); });
+  availBar();
   var drawer = $('#drawer'), saring = $('#saring');
   saring.addEventListener('click', function () { drawer.hidden = !drawer.hidden; saring.setAttribute('aria-expanded', String(!drawer.hidden)); });
-  function saringN() { var n = (fam ? 1 : 0) + (onlyOpen ? 1 : 0), b = $('#saring-n'); b.hidden = !n; b.textContent = n; }
+  function saringN() { var n = (fam ? 1 : 0), b = $('#saring-n'); b.hidden = !n; b.textContent = n; }
   $('#saved-chip').addEventListener('click', function () { setTier(tier === 'tersimpan' ? 'semua' : 'tersimpan', true); });
   $('#custom-wa').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Halo Nawala, saya ingin tema kustom. Saya akan kirim inspirasinya.');
 

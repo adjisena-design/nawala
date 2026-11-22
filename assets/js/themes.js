@@ -34,8 +34,8 @@ window.NAWALA = (function () {
      Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   var TIERS = {
     dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai foto. 12 foto dan 72 lukisan.', 'The familiar scroll invitation: one picture, readable cards and photo frames. 12 photographs and 72 paintings.'],
-    premium: ['Premium', 'Premium', 'Kamera membawa tamu masuk ke dalam adegan pembuka. Tujuh keluarga, 28 tema.', 'The camera carries your guest into the opening scene. Seven families, 28 themes.'],
-    eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again.'],
+    premium: ['Premium', 'Premium', 'Kamera membawa tamu masuk ke dalam adegan pembuka. Tujuh keluarga, 32 tema.', 'The camera carries your guest into the opening scene. Seven families, 32 themes.'],
+    eksklusif: ['Eksklusif', 'Exclusive', 'Enam dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Six worlds. Each belongs to one couple only: once chosen, we never use it again.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
   };
   var BASIC = [
@@ -151,9 +151,12 @@ window.NAWALA = (function () {
   ];
 
   /* every theme as one list: [tier, name, English name, description, English description, family] */
+  var WORLDS = { 'Istana Awan': 'royal', 'Teater Tua': 'era', 'Kapal Bulan': 'alam', 'Seribu Lentera': 'nusa' };
   var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
     .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
-    .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
+    /* the built immersive worlds are Premium (owner, 22 Nov 2026); Exclusive keeps the covers still to be built */
+    .concat(EXCLUSIVE.filter(function (e) { return WORLDS[e[0]]; }).map(function (e) { return ['premium'].concat(e, [WORLDS[e[0]]]); }))
+    .concat(EXCLUSIVE.filter(function (e) { return !WORLDS[e[0]]; }).map(function (e) { return ['eksklusif'].concat(e); }));
   function hasFilm(th) { var m = META && META[slug(th)]; return m ? !!m.film : FILMS.indexOf(' ' + slug(th) + ' ') > -1; }
   function film(th) { var m = META && META[slug(th)]; return m && m.film && m.film !== 'repo' ? m.film : BASE + 'assets/video/' + slug(th) + '.mp4'; }
 

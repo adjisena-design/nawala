@@ -45,8 +45,8 @@
   var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto seribu-lentera ';
   var TIERS = {
     dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai untuk foto kalian. 12 foto dan 72 lukisan dengan bunga di sudut kartu; semuanya sudah bisa dibuka.', 'The familiar scroll invitation: one picture, cards that read easily, and frames for your photos. 12 photographs and 72 paintings with flowers on the card corners; every one can be opened.'],
-    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, Akad Putih, dan Kyoto sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa, Akad Putih and Kyoto can be opened now; the other worlds are being built one by one.'],
-    eksklusif: ['Eksklusif', 'Exclusive', 'Sepuluh dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi. Istana Awan, Teater Tua, dan Kapal Bulan sudah bisa dibuka sebagai contoh.', 'Ten worlds. Each belongs to one couple only: once chosen, we never use it again. Istana Awan, Teater Tua and Kapal Bulan can be opened as samples.'],
+    premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, Akad Putih, Kyoto, Istana Awan, Teater Tua, Kapal Bulan, dan Seribu Lentera sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa, Akad Putih, Kyoto, Istana Awan, Teater Tua, Kapal Bulan and Seribu Lentera can be opened now; the other worlds are being built one by one.'],
+    eksklusif: ['Eksklusif', 'Exclusive', 'Enam dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi. Semuanya masih dalam pengerjaan.', 'Six worlds. Each belongs to one couple only: once chosen, we never use it again. All of them are still being built.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
   };
   var BASIC = [
@@ -763,9 +763,12 @@
   var chosen = null, showChosen = function () {};
   function turn(i) { return Math.floor(i / 7); }
   /* every theme as one list: [tier, name, English name, description, English description, family] */
+  var WORLDS = { 'Istana Awan': 'royal', 'Teater Tua': 'era', 'Kapal Bulan': 'alam', 'Seribu Lentera': 'nusa' };
   var ALL = BASIC.map(function (b) { return ['dasar'].concat(b); })
     .concat(THEMES.map(function (th) { var f = FAMILIES[th[0]]; return ['premium', th[1], th[2], f[2], f[3], th[0]]; }))
-    .concat(EXCLUSIVE.map(function (e) { return ['eksklusif'].concat(e); }));
+    /* the built immersive worlds are Premium (owner, 22 Nov 2026); Exclusive keeps the covers still to be built */
+    .concat(EXCLUSIVE.filter(function (e) { return WORLDS[e[0]]; }).map(function (e) { return ['premium'].concat(e, [WORLDS[e[0]]]); }))
+    .concat(EXCLUSIVE.filter(function (e) { return !WORLDS[e[0]]; }).map(function (e) { return ['eksklusif'].concat(e); }));
   /* a theme whose sample invitation can really be opened: every Dasar theme, and the worlds in BUILT.
      Once the database has answered, the themes table decides (kit: the world behind it; owned: sold to a couple). */
   function kitOf(th) { var sl = slug(th), m = META && META[sl]; return m ? m.kit : (th[0] === 'dasar' || BUILT.indexOf(' ' + sl + ' ') > -1 ? sl : null); }

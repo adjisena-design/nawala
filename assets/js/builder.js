@@ -35,7 +35,7 @@ window.NAWALA_BUILDER = (function () {
     b.giftAddress = str(d.giftAddress, 200);
     b.whatsapp = str(d.whatsapp, 20);
     var ph = obj(d.photos);
-    b.photos = { cover: DB.isMedia(ph.cover) ? ph.cover : '', bride: DB.isMedia(ph.bride) ? ph.bride : '', groom: DB.isMedia(ph.groom) ? ph.groom : '',
+    b.photos = { cover: DB.isMedia(ph.cover) ? ph.cover : '', bride: DB.isMedia(ph.bride) ? ph.bride : '', groom: DB.isMedia(ph.groom) ? ph.groom : '', side: DB.isMedia(ph.side) ? ph.side : '',
       gallery: arr(ph.gallery).filter(DB.isMedia).slice(0, GALLERY) };
     /* the design (undangan/sunting.html) travels with the draft; the invitation shapes it again (assets/js/desain.js) */
     if (d.design && typeof d.design === 'object' && !Array.isArray(d.design)) b.design = d.design;
@@ -95,7 +95,7 @@ window.NAWALA_BUILDER = (function () {
       story: d.story.filter(function (s) { return s.title || s.text; }).map(function (s) { return { when: pair(s.when), title: pair(s.title), text: pair(s.text) }; }),
       gifts: d.gifts.filter(function (g) { return g.number; }),
       wishes: [],
-      photos: { cover: d.photos.cover, bride: d.photos.bride, groom: d.photos.groom, gallery: d.photos.gallery.slice() },
+      photos: { cover: d.photos.cover, bride: d.photos.bride, groom: d.photos.groom, side: d.photos.side, gallery: d.photos.gallery.slice() },
       design: d.design || undefined
     };
     if (!out.events.length && preview) out.events = [{ kind: 'reception', start: '10:00', end: '12:00', place: '(tempat acara)', address: '', map: '' }];
@@ -185,7 +185,8 @@ window.NAWALA_BUILDER = (function () {
           }, t('Tambah acara', 'Add an event'), 4) + '</section>' +
         '<section class="bf__sec"><h3>' + t('Foto', 'Photos') + '</h3><p class="small muted">' + t('Foto diperkecil otomatis sebelum dikirim. Ruang yang kosong diisi Nawala.', 'Photos are made smaller before they are sent. Empty spaces show Nawala.') + '</p>' +
           '<div class="ph-grid">' + slot('cover', d.photos.cover, t('Sampul, berdua', 'Cover, the two of you'), true) +
-          slot('bride', d.photos.bride, t('Mempelai wanita', 'The bride')) + slot('groom', d.photos.groom, t('Mempelai pria', 'The groom')) + '</div>' +
+          slot('bride', d.photos.bride, t('Mempelai wanita', 'The bride')) + slot('groom', d.photos.groom, t('Mempelai pria', 'The groom')) +
+          slot('side', d.photos.side, t('Gambar di samping undangan (layar komputer, mendatar)', 'Picture beside the invitation (computer screens, landscape)'), true) + '</div>' +
           '<h4>' + t('Galeri', 'Gallery') + ' <span class="muted">(' + d.photos.gallery.length + '/' + GALLERY + ')</span></h4><div class="ph-grid">' +
           d.photos.gallery.map(function (u, i) { return slot('gallery.' + i, u, t('Foto ', 'Photo ') + (i + 1)); }).join('') +
           (d.photos.gallery.length < GALLERY ? '<div class="ph ph--add"><label class="btn btn--line btn--sm">' + t('Tambah foto', 'Add photos') + '<input type="file" accept="image/*" multiple data-photo="gallery.new" hidden></label></div>' : '') +

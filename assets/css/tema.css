@@ -155,8 +155,9 @@ p{text-wrap:pretty}
 /* ---------- Sheets ---------- */
 .sheet{padding:0;border:0;background:none;max-width:none;max-height:none;width:100%;height:100%;color:var(--ink)}
 .sheet::backdrop{background:rgba(12,29,19,.45)}
-.sheet__box{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,62rem);max-height:94svh;overflow:auto;border-radius:28px 28px 0 0;background:var(--ivory);padding:22px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px -20px rgba(12,29,19,.5)}
-@media (min-width:900px){.sheet__box{top:50%;bottom:auto;transform:translate(-50%,-50%);border-radius:30px;padding:30px}}
+.sheet__box{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(100%,62rem);max-height:94svh;overflow:auto;border-radius:28px 28px 0 0;background:var(--ivory);padding:22px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px -20px rgba(12,29,19,.5)}
+/* centred without a transform, so the opening animation (which moves the box with transform) starts from the card, not from the corner */
+@media (min-width:900px){.sheet__box{top:0;bottom:0;margin:auto;height:fit-content;max-height:92svh;border-radius:30px;padding:30px}}
 .sheet--small .sheet__box{width:min(100%,30rem)}
 .sheet[open] .sheet__box{animation:up .45s var(--ease)}
 @keyframes up{from{opacity:0;translate:0 30px}to{opacity:1;translate:0 0}}
@@ -188,3 +189,29 @@ p{text-wrap:pretty}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   .col{transform:none!important}
 }
+
+/* ---------- Availability ---------- */
+.avail-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:1rem 0 .4rem}
+.avail-row .count{margin:0 4px}
+.avail{flex-wrap:wrap}
+
+/* ---------- White and pink, like the couple's room (owner, 22 Nov 2026): no green on this page ---------- */
+body.tm{--kg:rgba(255,255,255,.8);--kg-ink:var(--forest-deep);--kg-hover:rgba(244,166,192,.22);--kg-pick:var(--pink);--kg-pick-ink:var(--forest-deep);
+  --kg-edge:inset 0 1px 0 rgba(255,255,255,.95),inset 0 0 0 1px rgba(216,67,107,.14),0 18px 40px -26px rgba(120,40,70,.35);--muted:rgba(29,36,31,.68)}
+.tm .sky{background-color:#FBF7F4}
+.tm .sky__veil{background:linear-gradient(180deg,rgba(255,252,250,.62),rgba(255,250,248,.78) 45%,rgba(253,244,244,.9))}
+.tm .top__bar{background:rgba(255,255,255,.86);color:var(--forest-deep);box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(216,67,107,.14),0 24px 60px -30px rgba(120,40,70,.35)}
+@media (min-width:900px){.tm .top__bar{background:rgba(255,255,255,.66)}}
+.tm .top__brand,.tm .item{color:var(--forest-deep)}
+.tm .item:hover svg{background:rgba(244,166,192,.22)}
+.tm .item--key svg,.tm .item--key:hover svg{background:var(--pink);color:var(--forest-deep)}
+.tm .lang button{color:var(--forest-deep)}
+.tm .lang button[aria-pressed="true"]{background:var(--pink);color:var(--forest-deep)}
+.tm .card__no,.tm .d__no{color:var(--rose)}
+.tm .card{background:rgba(255,255,255,.9)}
+.tm .sheet::backdrop{background:rgba(90,40,60,.32)}
+.tm .sheet__box{background:#FFFDFB}
+.tm .d__msg{background:rgba(244,166,192,.16)}
+.tm .custom,.tm .unlock{background:rgba(255,255,255,.92)}
+.tm .search input{background:rgba(255,255,255,.95);box-shadow:inset 0 0 0 1px rgba(216,67,107,.18)}
+.tm .lang button{background:rgba(29,36,31,.06)}
