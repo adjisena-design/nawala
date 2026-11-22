@@ -233,7 +233,7 @@ Rules specific to the invitation:
 - Not built: the wedding-day tabs (guestbook QR, seating, souvenir, photos), couples' own photos, desktop-size scenery (desktop shows the phone column).
 
 ## Changes of 22 Nov 2026, evening (owner's six points on tema/)
-- **Worlds to Premium.** Istana Awan (royal), Teater Tua (era), Kapal Bulan (alam), Seribu Lentera (nusa) are Premium; the number trigger gives them P-029 onward. Premium 32, Eksklusif 6.
+- **Worlds to Premium.** Istana Awan (royal), Teater Tua (era), Kapal Bulan (alam), Seribu Lentera (nusa) are Premium; the number trigger gives them P-029 onward. Premium 32, Eksklusif 6. Run by Claude through the owner's Chrome on 22 Nov 2026: Seribu Lentera P-029, Istana Awan P-030, Kapal Bulan P-031, Teater Tua P-032; the live tema/ page shows them under Premium.
 - **tema/ availability.** A glass bar under the search: Semua, Ada contohnya (`ready()` and not owned), Segera (no sample). `?ada=contoh` or `?ada=segera` opens on one. The old "Hanya yang bisa dibuka" switch is gone.
 - **tema/ sheet.** `.sheet__box` is centred with margins (`margin:auto`, `height:fit-content` on desktop), never with a transform, so origin.js's grow-from-the-card animation is not overridden into the corner.
 - **tema/ colour.** `body.tm`: white and pink like the couple's room. The kit.css glass is re-tinted there (`--kg` white, `--kg-pick` pink); no green on that page.
