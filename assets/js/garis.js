@@ -3,7 +3,7 @@
    Nawala's pink as the highlight on dark ground, deep green on light ground (CSS in rasa.css).
    The contact box's plug comes one step nearer the socket with each answer (event "nawala-ask").
    Library: assets/js/vendor/hairline.js (@lucasmarkes/hairline, MIT). */
-import * as H from './vendor/hairline.js?v=1';
+import * as H from './vendor/hairline.js?v=2';
 const LABEL = {
   relay: ['Satu pusat yang menghubungkan semuanya', 'One hub linking everything'],
   phosphor: ['Titik-titik yang bisa dilukis seperti kode QR', 'A dot matrix you paint like a QR code'],

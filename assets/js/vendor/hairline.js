@@ -5948,3 +5948,103 @@ export {
   turntable,
   vault
 };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "amplop", an addressed envelope
+   (flap swings back and the guest's name card rises as the pointer nears). Built 22 Nov 2026 on the
+   package's own kernel with its hairline-create workflow; checked with look.mjs. */
+TABLE.amplop = [22, 34, 46];
+var amplop = (() => {
+
+
+const W = 60, Z0 = 9, ZT = 84, YB = -4, YC = -1.2, YF = 2.2, FL = 38, REST = 0.14;
+const BX = 80, BY = 24, BZ = 9;
+
+/** A flat outline in a vertical plane y = yy, rounded, as projected points. */
+function plate(P, pts, yy, r) { return fillet(pts, pts.map(() => r)).map(([u, v]) => P(u, yy, v)); }
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let lift = value;
+
+  const C = Cam(45, 0.5, 1.5);
+  fit(C, [[-BX, -BY, 0], [BX, BY, 0], [BX, -BY, 0], [-BX, BY, 0], [-W, YB, ZT + FL], [W, YB, ZT + FL], [0, YC, 74 + 46]], 200, 170);
+  const P = proj(C), front = facing(C);
+
+  const g = mk("g", {}, svg);
+  // the tray: a low rounded plinth with a slot where the envelope stands
+  const [ring, inner] = rings(-BX, -BY, BX, BY, 10, 1.6);
+  put(solid(g), prism(P, front, ring, inner, 0, BZ));
+  mk("path", { d: poly(plate(P, [[-W - 3, 0], [W + 3, 0], [W + 3, 2], [-W - 3, 2]], 0, 1).map((p) => p)), class: "nf lo" }, g);
+
+  const flapG = mk("g", {}, g);
+  const flap = mk("path", { class: "sil" }, flapG), seal = mk("path", { class: "hi" }, flapG), sealIn = mk("path", { class: "nf lo" }, flapG);
+  const back = mk("path", { d: poly(plate(P, [[-W, Z0], [W, Z0], [W, ZT], [-W, ZT]], YB, 4)), class: "sil" }, g);
+  const cardG = mk("g", {}, g);
+  const card = mk("path", { class: "sil" }, cardG), cardTop = mk("path", { class: "nf" }, cardG), lines = mk("path", { class: "nf lo" }, cardG);
+  const frontP = mk("path", { d: poly(plate(P, [[-W, Z0], [W, Z0], [W, ZT - 2], [-W, ZT - 2]], YF, 4)), class: "sil" }, g);
+  // the pocket's two seams, meeting under the flap
+  mk("path", { d: seg(P(-W + 3, YF, Z0 + 3), P(0, YF, 46)) + seg(P(W - 3, YF, Z0 + 3), P(0, YF, 46)), class: "nf lo" }, g);
+  const frontEnd = mk("g", {}, g);
+
+  const o = spring(REST);
+  let drawn = -1, isFront = null, named = false;
+
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0005) return;
+    drawn = t;
+    // flap: a triangle hinged on the back panel's top edge; 0 lies folded down in front, 1 stands back over the hinge
+    const phi = rad(lerp(4, 172, t)), vy = 3.2, vz = -FL;
+    const ty = YB + vy * Math.cos(phi) - vz * Math.sin(phi), tz = ZT + vy * Math.sin(phi) + vz * Math.cos(phi);
+    const tri = fillet([[-W, 0], [W, 0], [0, 1]], [2, 2, 7]).map(([u, k]) => {
+      const f = k; return P(u * (1 - f), lerp(YB, ty, f), lerp(ZT, tz, f));
+    });
+    flap.setAttribute("d", poly(tri));
+    // the seal sits near the flap's tip, in the flap's own plane
+    const cy = lerp(YB, ty, 0.78), cz = lerp(ZT, tz, 0.78), dy = (ty - YB) / FL, dz = (tz - ZT) / FL;
+    const circle = (r) => Array.from({ length: 18 }, (_, i) => { const a = (i / 18) * Math.PI * 2; return P(Math.cos(a) * r, cy + Math.sin(a) * r * dy, cz + Math.sin(a) * r * dz); });
+    seal.setAttribute("d", poly(circle(6.2)));
+    sealIn.setAttribute("d", poly(circle(3.6)));
+    const nowFront = ty > YC + 1;
+    if (nowFront !== isFront) { isFront = nowFront; if (nowFront) frontEnd.appendChild(flapG); else g.insertBefore(flapG, back); }
+    // the card rises out of the pocket with the flap
+    const up = lerp(0, lift, clamp((t - 0.18) / 0.82, 0, 1)), b = 15 + up, h = 72 + up;
+    card.setAttribute("d", poly(plate(P, [[-W + 9, b], [W - 9, b], [W - 9, h], [-W + 9, h]], YC, 3)));
+    cardTop.setAttribute("d", open([P(-W + 12, YC, h), P(W - 12, YC, h)]));
+    lines.setAttribute("d", [h - 9, h - 15, h - 21].map((z, i) => seg(P(-W + 18, YC, z), P(i === 0 ? 8 : W - 26 - i * 8, YC, z))).join(""));
+    const lit = t > 0.55;
+    if (lit !== named) {
+      named = lit;
+      seal.classList.toggle("hi", !lit); seal.classList.toggle("sil", lit); cardTop.classList.toggle("hi", lit);
+      read.textContent = lit ? "untuk Dinda" : "rest";
+    }
+  }
+  read.textContent = "rest";
+  draw(REST);
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); return m; });
+  bag.add(B.unregister);
+
+  // hit test on the ground plane, which never moves: how near the envelope's foot the pointer is
+  function near([sx, sy]) {
+    const [x, y] = unproj(C, sx, sy, 0);
+    const d = Math.hypot(x / 1.3, y);
+    return clamp(1 - (d - 26) / 70, REST, 1);
+  }
+  bag.add(pointer(stage, { move: (p) => { o.t = near(p); B.wake(); }, leave: () => { o.t = REST; B.wake(); } }));
+  bag.add(() => svg.replaceChildren());
+
+  return { set: (v) => { lift = v; drawn = -1; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function amplop(el, options) {
+    return create({
+      id: "amplop",
+      label: "An addressed envelope: as the pointer nears, the flap swings back and the guest's name card rises out.",
+      rest: "rest",
+      engine: mount,
+      tour: [[200, 120], [150, 190], [300, 230], null]
+    }, el, options);
+  };
+})();
+export { amplop };

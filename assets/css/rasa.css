@@ -17,8 +17,8 @@
 
 /* ---------- Garis: Hairline figures (assets/js/garis.js) ---------- */
 .garis{display:block;position:relative;aspect-ratio:5/4;
-  --hairline-plate:transparent;--hairline-hi:#F4A6C0;--hairline-edge:#FBF6EA;--hairline-mid:rgba(251,246,234,.78);--hairline-lo:rgba(251,246,234,.34);--hairline-stroke:1.1}
-.garis[data-garis-light]{--hairline-hi:#D8436B;--hairline-edge:#16301F;--hairline-mid:rgba(22,48,31,.72);--hairline-lo:rgba(22,48,31,.3)}
+  --hairline-plate:#14291C;--hairline-hi:#F4A6C0;--hairline-edge:#FBF6EA;--hairline-mid:rgba(251,246,234,.78);--hairline-lo:rgba(251,246,234,.34);--hairline-stroke:1.1}
+.garis[data-garis-light]{--hairline-plate:#FBF6EA;--hairline-hi:#D8436B;--hairline-edge:#16301F;--hairline-mid:rgba(22,48,31,.72);--hairline-lo:rgba(22,48,31,.3)}
 .garis svg{display:block;width:100%;height:100%;overflow:visible}
 /* tier doors: the figure stands on top of each door, the name and count under it */
 .tiers a{grid-template-columns:minmax(0,1fr);align-content:start;position:relative;padding-top:.4rem}
