@@ -274,6 +274,16 @@
   function show(th) {
     viewing = th; var sl = slug(th), can = ready(th) && !owned(th), isX = th[0] === 'eksklusif';
     var cv = $('#d-cover'); cv.className = 'd__cover' + (th[0] === 'premium' ? ' is-wide' : ''); cv.style.backgroundImage = 'url(' + cover(th, 't') + ')';
+    /* a theme with a working sample runs it live in the sheet (owner, 22 Nov 2026): the cover is only its poster */
+    cv.innerHTML = '';
+    if (can) {
+      cv.className = 'd__cover is-live';
+      var fr = document.createElement('iframe');
+      fr.title = t('Undangan contoh', 'Sample invitation'); fr.loading = 'eager';
+      fr.src = '../undangan/' + (th[0] === 'dasar' ? 'dasar.html' : '') + '?tema=' + encodeURIComponent(kitOf(th)) + '&to=Bapak+dan+Ibu+Santoso' + (lang === 'en' ? '&lang=en' : '');
+      fr.addEventListener('load', function () { fr.classList.add('on'); });
+      setTimeout(function () { if (sheet.open && viewing === th) cv.appendChild(fr); }, 260);
+    }
     $('#d-no').textContent = numberOf(th);
     $('#d-name').textContent = t(th[1], th[2]);
     $('#d-fam').textContent = tierName(th[0]) + (famName(th) ? ', ' + famName(th) : '');
@@ -289,6 +299,7 @@
     $('#d-save').hidden = owned(th) || !SAVE; saveLabel(); tell('');
     if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', '');
   }
+  sheet.addEventListener('close', function () { setTimeout(function () { if (!sheet.open) $('#d-cover').innerHTML = ''; }, 400); });
   groupsEl.addEventListener('click', function (e) {
     var c = e.target.closest('.card'); if (!c || c.closest('.locked')) return;
     var th = N.ALL.filter(function (x) { return slug(x) === c.getAttribute('data-slug'); })[0]; if (th) show(th);
