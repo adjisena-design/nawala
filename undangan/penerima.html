@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Penerima tamu, Nawala</title>
+<style>
+/* The ushers' page (22 Nov 2026): ?u=<address>&k=<usher key>, made in the seating editor (Bagikan).
+   Type a name, see the table and its place on the published plan. Read-only, phone first. */
+@font-face{font-family:"Jakarta";src:url("../assets/fonts/jakarta.woff2") format("woff2");font-weight:200 800;font-display:swap}
+:root{--bg:#eef0f2;--ink:#1c2024;--mute:#5f666e;--line:#dde1e5;--acc:#2f55d4;--acc2:#e7ecfb}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 Jakarta,system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:14px}
+header h1{margin:0;font-size:24px;line-height:1.15}
+header p{margin:2px 0 0;color:var(--mute);font-size:15px}
+input{font:inherit;width:100%;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:inherit}
+input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.grid{display:grid;gap:14px}
+@media(min-width:860px){.grid{grid-template-columns:360px minmax(0,1fr);align-items:start}}
+.res{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:62vh;overflow:auto}
+.res button{width:100%;display:flex;justify-content:space-between;gap:10px;align-items:center;text-align:left;font:inherit;color:inherit;min-height:56px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.res button[aria-pressed=true]{border-color:var(--acc);background:var(--acc2)}
+.res small{display:block;color:var(--mute);font-size:14px}
+.res b{white-space:nowrap;font-size:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:10px}
+.got{display:grid;gap:2px}
+.got span{color:var(--mute);font-size:14px}
+.got b{font-size:28px;line-height:1.1}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:15px;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:inherit;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--acc2);border-color:var(--acc);color:var(--acc);font-weight:600}
+.plan svg{width:100%;height:auto;max-height:70vh;display:block}
+.msg{padding:24px;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1 id="h">Penerima tamu</h1><p id="sub"></p></header>
+  <input type="search" id="q" placeholder="Ketik nama tamu" autocomplete="off" aria-label="Nama tamu">
+  <div class="grid">
+    <ul class="res" id="res"></ul>
+    <div class="card">
+      <div class="got" id="got"></div>
+      <div class="tabs" id="tabs"></div>
+      <div class="plan" id="plan"></div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/db.js?v=20261122s"></script>
+<script src="denah-lihat.js?v=20261122s"></script>
+<script>
+{
+const EN=/[?&]lang=en\b/.test(location.search)||(()=>{try{return localStorage.getItem('nawala-lang')==='en'}catch(e){return false}})();
+const t=(a,b)=>EN?b:a,$=s=>document.querySelector(s),V=window.NAWALA_DENAH,esc=V.esc;
+const P={};try{new URLSearchParams(location.search).forEach((v,k)=>{P[k]=v})}catch(e){}
+let D=null,pick=null,plan=0,seatOf={};
+document.documentElement.lang=EN?'en':'id';
+$('#q').placeholder=t('Ketik nama tamu','Type a guest\'s name');
+function fail(m){$('#h').textContent=t('Penerima tamu','Ushers');$('#sub').textContent='';document.querySelector('.grid').innerHTML='<div class="msg card">'+esc(m)+'</div>';$('#q').hidden=true}
+function index(){seatOf={};D.plans.forEach((l,p)=>(l.items||[]).forEach(it=>{if(Array.isArray(it.seat))it.seat.forEach(v=>{if(!v)return;(seatOf[v]=seatOf[v]||[]);const e=seatOf[v].find(x=>x.it===it);if(e)e.n++;else seatOf[v].push({p,it,n:1})})}))}
+function list(){const q=$('#q').value.trim().toLowerCase(),rows=D.guests.filter(g=>!q||g.name.toLowerCase().includes(q));
+ $('#res').innerHTML=rows.length?rows.map(g=>{const s=seatOf[g.id]||[];return `<li><button data-g="${g.id}" aria-pressed="${pick===g.id}"><span>${esc(g.name)}<small>${g.party} ${t('orang','people')}${g.grp?', '+esc(g.grp):''}</small></span><b>${s.length?s.map(x=>esc(x.it.name)).join(', '):t('belum ada meja','no table')}</b></button></li>`}).join(''):`<li class="msg">${t('Nama tidak ditemukan.','No such name.')}</li>`}
+function show(){const g=pick&&D.guests.find(x=>x.id===pick),s=g?(seatOf[g.id]||[]):[];if(s.length&&!s.some(x=>x.p===plan))plan=s[0].p;
+ $('#got').innerHTML=g?(s.length?`<span>${esc(g.name)}</span><b>${s.map(x=>esc(x.it.name)+(D.plans.length>1?' ('+esc(D.plans[x.p].name)+')':'')).join(', ')}</b><span>${s.map(x=>x.n+' '+t('kursi','chairs')+'. '+V.where(D.plans[x.p],x.it,EN)).join(' / ')}</span>`:`<span>${esc(g.name)}</span><b style="font-size:20px">${t('Belum ada meja','No table yet')}</b>`):`<span>${t('Pilih nama untuk melihat mejanya.','Pick a name to see their table.')}</span>`;
+ $('#tabs').innerHTML=D.plans.length>1?D.plans.map((l,i)=>`<button data-p="${i}" aria-pressed="${i===plan}">${esc(l.name)}</button>`).join(''):'';
+ const hit=s.find(x=>x.p===plan),colors={};(D.groups||[]).forEach(x=>colors[x.name]=x.color);const byId={};D.guests.forEach(x=>byId[x.id]=x);
+ $('#plan').innerHTML=D.plans[plan]?V.svg(D.plans[plan],{hl:hit&&hit.it.id,mine:pick,colors,guests:byId}):''}
+$('#q').addEventListener('input',list);
+$('#res').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b)return;pick=b.dataset.g;list();show();if(innerWidth<860)$('#got').scrollIntoView({behavior:'smooth',block:'start'})});
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){plan=+b.dataset.p;show()}});
+if(!P.u||!P.k)fail(t('Tautan ini tidak lengkap. Minta tautan penerima tamu dari pasangan atau tim Nawala.','This link is incomplete. Ask the couple or the Nawala team for the ushers\' link.'));
+else window.NAWALA_DB.rpc('usher_data',{p_slug:P.u,p_key:P.k}).then(d=>{
+ if(!d)return fail(t('Tautan ini tidak berlaku lagi, atau denahnya belum diterbitkan.','This link no longer works, or the plan is not published yet.'));
+ D=d;$('#h').textContent=d.couple;$('#sub').textContent=t('Penerima tamu: cari nama, lihat mejanya.','Ushers: find a name, see the table.');document.title=t('Penerima tamu, ','Ushers, ')+d.couple;index();list();show()
+},()=>fail(t('Database Nawala tidak terjangkau. Periksa sambungan, lalu muat ulang.','The Nawala database is out of reach. Check the connection, then reload.')));
+}
+</script>
+</body>
+</html>

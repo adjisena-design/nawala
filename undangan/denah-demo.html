@@ -551,6 +551,7 @@ pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return
 
 /* controls */
 function addItem(type){const lay=L(),r=canvas.getBoundingClientRect(),o={x:sn((r.width/2-vp.tx)/vp.s),y:sn((r.height/2-vp.ty)/vp.s)};
+ for(let k=0;k<40&&lay.items.some(i=>Math.abs(i.x-o.x)<1.2&&Math.abs(i.y-o.y)<1.2);k++){o.x=r2(o.x+2.75);if(o.x>lay.room.w-1.5){o.x=1.75;o.y=r2(o.y+3)}}
  if(TYPES[type].table&&type!=='couple'&&type!=='rows')o.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);
  const it=mk(type,o);lay.items.push(it);sel=it.id;chairMode=false;commit()}
 function dupItem(){const lay=L(),it=lay.items.find(i=>i.id===sel);if(!it)return;const c=JSON.parse(JSON.stringify(it));c.id=nid('i');c.x=r2(it.x+1);c.y=r2(it.y+1);if(c.seat)c.seat=c.seat.map(()=>null);if(TBLRX.test(c.name))c.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);lay.items.push(c);sel=c.id;commit()}

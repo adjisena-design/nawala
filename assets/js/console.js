@@ -53,6 +53,7 @@ window.K = (function () {
     chat: '<path d="M5 5h14v11H10l-5 4z"/>',
     pulse: '<path d="M3 12h4l2.500-6 4 12 2.500-6H21"/>',
     shield: '<path d="M12 3 5 6v6c0 4.200 3 7.500 7 9 4-1.500 7-4.800 7-9V6z"/>',
+    seat: '<circle cx="12" cy="12" r="4"/><circle cx="12" cy="3.500" r="1.400"/><circle cx="12" cy="20.500" r="1.400"/><circle cx="3.500" cy="12" r="1.400"/><circle cx="20.500" cy="12" r="1.400"/>',
     video: '<rect x="3" y="6" width="13" height="12" rx="3"/><path d="m16 10 5-3v10l-5-3"/>'
   };
   function ic(name) { return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + (ICON[name] || '') + '</svg>'; }

@@ -349,6 +349,7 @@
   /* a design the couple (or the team) changed since the last publish: it waits for the team's check */
   function designWaiting(o) { var dz = (o.draft || {}).design; return !!(dz && dz.at && (!o.published_at || dz.at > o.published_at)); }
   function editorLink(o) { return '../undangan/sunting.html?as=tim&u=' + encodeURIComponent(o.slug); }
+  function seatLink(o) { return '../undangan/denah.html?as=tim&u=' + encodeURIComponent(o.slug); }
   function head(o) {
     var s = OSTAT[o.status], live = o.status === 'tayang';
     $('#o-title').textContent = o.couple;
@@ -356,7 +357,7 @@
       (live ? '<a class="link" target="_blank" rel="noopener" href="https://' + esc(addr(o)) + '">' + esc(addr(o)) + '</a>' : '<span class="muted">' + esc(addr(o)) + ' ' + t('(belum tayang)', '(not live yet)') + '</span>');
     var miss = B.missing(B.norm(o.draft)), r = B.route(o.theme, themeRows());
     var dasar = B.route(o.theme, themeRows()).route === 'dasar' && o.theme;
-    var designBits = (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
+    var designBits = '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + seatLink(o) + '">' + t('Denah & kursi', 'Floor plan & seats') + '</a>' + (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
       (designWaiting(o) ? '<p class="small" style="width:100%"><span class="pill pill--pink">' + t('Desain baru menunggu persetujuan', 'New design waiting for approval') + '</span> ' +
         t('Periksa di Pratinjau, lalu terbitkan untuk menyetujuinya.', 'Check it in Preview, then publish to approve it.') + '</p>' : '');
     if (!sup()) {
@@ -413,7 +414,7 @@
         '<p class="small muted">' + t('Disusun pasangan di ruang mereka. Tautan pribadi tiap tamu aktif setelah undangan tayang.', 'Made by the couple in their room. Each guest\'s link works once the invitation is live.') + '</p><div class="rows">' +
         (r.guests.length ? r.guests.map(function (g) {
           var a = g.answer && ans[g.answer];
-          return '<div class="row"><div class="row__t"><b>' + esc(g.name) + '</b><span>' + (g.phone ? esc(local(g.phone)) + ', ' : '') + (g.sent_at ? t('sudah dikirim', 'sent') : t('belum dikirim', 'not sent yet')) + '</span></div>' +
+          return '<div class="row"><div class="row__t"><b>' + esc(g.name) + '</b><span>' + (g.party || 1) + ' ' + t('orang', 'people') + (g.grp ? ', ' + esc(g.grp) : '') + ', ' + (g.phone ? esc(local(g.phone)) + ', ' : '') + (g.sent_at ? t('sudah dikirim', 'sent') : t('belum dikirim', 'not sent yet')) + '</span></div>' +
             (a ? '<span class="pill pill--' + a[1] + '">' + a[0] + '</span>' : '<span class="small muted">' + t('belum menjawab', 'no answer yet') + '</span>') +
             '<button type="button" class="round" style="width:44px;height:44px" data-copy="https://' + esc(addr(o)) + '?to=' + esc(encodeURIComponent(g.name)) + '" aria-label="' + t('Salin tautan', 'Copy the link') + '">' + K.ic('copy') + '</button></div>';
         }).join('') : '<div class="empty">' + t('Belum ada tamu di daftar.', 'No guests on the list yet.') + '</div>') + '</div></div>' +

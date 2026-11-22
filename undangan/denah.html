@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Denah &amp; Kursi, Nawala</title>
+<style>
+/* Denah & Kursi, the real seating planner (22 Nov 2026). ?as=ruang (the couple, code from "nawala-code") or
+   ?as=tim&u=<address> (the team, token from "nawala-tim"). Loads and saves through the seating_* functions in
+   supabase/migrations/20261122_seating.sql: one editor at a time (a lock refreshed every 30 s, stale after 90 s),
+   saved about a second after each change, guests and ushers see only what was published.
+   Same editor as undangan/denah-demo.html; neutral planner look, Jakarta, console density. Editing needs 900 px. */
+@font-face{font-family:"Jakarta";src:url("../assets/fonts/jakarta.woff2") format("woff2");font-weight:200 800;font-display:swap}
+:root{color-scheme:light;--bg:#eef0f2;--panel:#fff;--paper:#fff;--ink:#1c2024;--mute:#5f666e;--line:#dde1e5;--grid:#e9ecef;--grid2:#d6dbe0;--acc:#2f55d4;--acc2:#e7ecfb;--warn:#c9342a;--warnbg:#fdecea;--ok:#2a8a5c;--chair:#fff;--chairline:#9aa3ad}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Jakarta,system-ui,sans-serif;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 11px;min-height:36px}
+button:hover:not(:disabled){border-color:var(--chairline)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,.filebtn:focus-within{outline:2px solid var(--acc);outline-offset:1px}
+.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.pri:hover:not(:disabled){filter:brightness(1.08);border-color:var(--acc)}
+input[type=text],input[type=number],input[type=search],select{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 9px;min-height:36px;width:100%}
+h1,h2{margin:0;line-height:1.15;font-weight:700}
+.app{display:flex;flex-direction:column;height:100vh}
+.app>.view.on{flex:1}
+.demo{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:6px 16px;font-size:13px;color:var(--mute);background:#f7f8fa;border-bottom:1px solid var(--line)}
+.demo button{min-height:30px;padding:3px 10px;font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;min-height:30px;padding:4px 11px;background:transparent;font-size:13px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--acc2);color:var(--acc);font-weight:600}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.crumb{font-size:12.5px;color:var(--mute)}
+.top h1{font-size:19px}
+.tier{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--acc2);color:var(--acc);font-weight:600;white-space:nowrap}
+.sp{flex:1}
+.status{font-size:13px;color:var(--mute);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+.status.draft i{background:#d9962a}
+.ico{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px}
+.ico svg{width:17px;height:17px}
+.view{display:none;min-height:0}
+.view.on{display:grid}
+#v-edit{grid-template-columns:270px minmax(0,1fr) 280px}
+aside{background:var(--panel);overflow:auto;min-height:0}
+#guests{border-right:1px solid var(--line);display:flex;flex-direction:column}
+#props{border-left:1px solid var(--line);padding:14px 16px 24px}
+.pad{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.pad h2,#props h2{font-size:15.5px}
+.row{display:flex;gap:8px;align-items:center}
+.lbl{font-size:12.5px;color:var(--mute)}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--acc)}
+.groups{display:flex;flex-wrap:wrap;gap:6px}
+.gchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:3px 9px;min-height:28px;background:var(--paper)}
+.gchip i{width:9px;height:9px;border-radius:50%}
+.gchip[aria-pressed=false]{opacity:.45}
+.glist{list-style:none;margin:0;padding:6px 8px 16px;overflow:auto;flex:1}
+.glist li{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px;border-radius:8px;cursor:grab;user-select:none;touch-action:none}
+.glist li:hover{background:var(--bg)}
+.glist li.hl{background:var(--acc2)}
+.glist li i{width:10px;height:10px;border-radius:50%}
+.glist .nm{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glist .sub{font-size:12px;color:var(--mute)}
+.cnt{font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--mute);white-space:nowrap}
+.cnt.full{color:var(--ok);font-weight:600}
+.tag{font-size:11px;padding:1px 6px;border-radius:99px;border:1px solid var(--line);margin-left:4px}
+.tag.no{color:var(--warn);border-color:currentColor}
+.tag.q{color:#9a6a10;border-color:currentColor}
+.empty{padding:20px 12px;color:var(--mute);font-size:13.5px;text-align:center;display:block!important;cursor:default!important}
+.stage{position:relative;display:grid;grid-template-rows:auto 1fr;min-height:0}
+.palette{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);align-items:center}
+.pal{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 7px;min-height:32px;font-size:13px;background:var(--paper)}
+.pal svg{width:18px;height:18px;flex:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.canvas{position:relative;overflow:hidden;min-height:0;background:var(--bg);touch-action:none}
+.canvas>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.canvas.pan{cursor:grabbing}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.zoom button{border:0;min-height:32px}
+.zoom span{font-size:12.5px;min-width:44px;text-align:center;align-self:center;font-variant-numeric:tabular-nums}
+.hint{position:absolute;left:12px;bottom:12px;font-size:13px;color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 11px;max-width:min(520px,60%)}
+.room{fill:var(--paper);stroke:var(--ink)}
+.dim{font-size:.42px;fill:var(--mute);font-family:Jakarta,sans-serif;text-anchor:middle}
+.it .body{stroke:var(--chairline)}
+.it.tbl .body{fill:var(--paper);stroke:var(--ink)}
+.it text{font-family:Jakarta,sans-serif;text-anchor:middle;dominant-baseline:central;fill:var(--ink);pointer-events:none}
+.it.sel .body{stroke:var(--acc)}
+.it.warn .body{stroke:var(--warn)}
+.chair{fill:var(--chair);stroke:var(--chairline)}
+.chair.off{fill:none;stroke-dasharray:.06 .05;opacity:.6}
+.chair.taken{stroke:rgba(0,0,0,.25)}
+.chair.drop{stroke:var(--acc);stroke-width:.06}
+.ini{font-size:.16px;font-weight:700;fill:#fff!important}
+.hdl{fill:#fff;stroke:var(--acc);cursor:pointer}
+.it.hi .body{fill:var(--acc)!important;stroke:var(--acc)!important}
+.it.hi text{fill:#fff!important}
+.ghost{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:#fff;font-size:13px;padding:6px 10px;border-radius:8px;transform:translate(12px,8px);white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+#props section{display:grid;gap:9px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+#props section:last-child{border-bottom:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f{display:grid;gap:4px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{min-width:36px;padding:4px}
+.step output{min-width:36px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{width:26px;height:26px;min-height:26px;padding:0;border-radius:50%}
+.sw button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
+.sw input{width:26px;height:26px;padding:0;border:0;background:none}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--bg);border-radius:10px;padding:9px 10px}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--mute)}
+.warns{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.warns li{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:7px 9px;font-size:13px;cursor:pointer}
+.warns li.info{background:var(--bg);color:var(--mute);cursor:default}
+.seated{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.seated li{display:flex;gap:8px;align-items:center;font-size:13.5px}
+.seated li i{width:9px;height:9px;border-radius:50%;flex:none}
+.seated li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seated button{min-height:28px;padding:2px 8px;font-size:12.5px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.danger{color:var(--warn)}
+.kbd{font-size:12px;color:var(--mute);margin:0}
+.filebtn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;min-height:36px;cursor:pointer;background:var(--panel)}
+.filebtn input{position:absolute;opacity:0;width:1px;height:1px}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+.pop{position:fixed;z-index:15;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;min-width:220px;gap:4px}
+.pop.on{display:grid}
+.pop button{text-align:left}
+.pop .pal{border:0}
+.modal{position:fixed;inset:0;background:rgba(15,18,22,.45);display:none;place-items:center;z-index:30;padding:16px}
+.modal.on{display:grid}
+.card{background:var(--panel);border-radius:14px;padding:20px;width:min(520px,100%);display:grid;gap:12px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.card h2{font-size:18px}
+.card p{margin:0;color:var(--mute);font-size:14px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:8px}
+textarea{width:100%;min-height:180px;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:8px;font:12.5px/1.5 ui-monospace,Menlo,monospace;color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:#fff;padding:9px 14px;border-radius:10px;font-size:13.5px;z-index:40;transition:transform .2s,opacity .2s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1;transform:translateX(-50%)}
+#v-guest,#v-usher{grid-template-columns:minmax(0,1fr) 320px;overflow:auto}
+.showcase{display:grid;place-items:center;padding:24px}
+.phone{width:340px;height:700px;border-radius:44px;background:#111;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.25)}
+.screen{width:100%;height:100%;border-radius:34px;background:#faf9f7;overflow:auto;padding:28px 20px;display:grid;align-content:start;gap:14px}
+.screen .who{font-size:12.5px;color:#6b7178;text-align:center}
+.screen h3{font-size:22px;text-align:center;margin:0}
+.mytable{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:16px;text-align:center;display:grid;gap:4px}
+.mytable span{font-size:12.5px;color:#6b7178}
+.mytable b{font-size:30px}
+.miniplan{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:8px}
+.miniplan svg,.bigplan svg{width:100%;height:auto;display:block}
+.bigplan svg{max-height:62vh}
+.side{background:var(--panel);border-left:1px solid var(--line);padding:18px;display:grid;align-content:start;gap:14px}
+.side p{margin:0;font-size:13.5px;color:var(--mute)}
+.usher{padding:24px;display:grid;gap:14px;align-content:start}
+.usher input{font-size:18px;min-height:50px;padding:10px 14px}
+.res{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.res li{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);cursor:pointer}
+.res li.on{border-color:var(--acc);background:var(--acc2)}
+.res b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.bigplan{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px}
+.narrow{display:none}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--mute);text-decoration:none;font-size:13px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.back:hover{color:var(--ink)}
+.save{font-size:12.5px;color:var(--mute);white-space:nowrap}
+.save.err{color:var(--warn)}
+.banner{display:none;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 16px;background:#fff7e6;border-bottom:1px solid #f1dfb8;font-size:13.5px;color:#6b4e12}
+.banner.on{display:flex}
+.banner button{min-height:30px;padding:3px 10px;font-size:13px}
+.gate{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);padding:20px}
+.gate[hidden]{display:none}
+.gate .card a{justify-self:start;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:8px;background:var(--acc);color:#fff;text-decoration:none;font-weight:600}
+.gedit{border:0;background:none;min-height:28px;min-width:28px;padding:2px;color:var(--mute);border-radius:6px}
+.gedit:hover{background:var(--line);color:var(--ink)}
+.glist li{grid-template-columns:10px minmax(0,1fr) auto auto}
+#printOut{display:none}
+@media print{
+ body{overflow:visible;background:#fff}
+ .app,.pop,.modal,.toast,.gate{display:none!important}
+ #printOut{display:block;font:11pt/1.4 Jakarta,system-ui,sans-serif;color:#000}
+ #printOut h1{font-size:16pt;margin:0 0 4pt}
+ #printOut .pp{page-break-after:always}
+ #printOut svg{width:100%;height:auto;max-height:24cm}
+ #printOut table{width:100%;border-collapse:collapse;margin-top:8pt}
+ #printOut td,#printOut th{border-bottom:.5pt solid #999;padding:3pt 4pt;text-align:left;vertical-align:top}
+}
+@media (max-width:1180px){#v-edit{grid-template-columns:240px minmax(0,1fr) 250px}}
+@media (max-width:899px){
+ #v-edit{grid-template-columns:minmax(0,1fr)}
+ #guests,#props,.palette,.hint{display:none}
+ .narrow{display:block;margin:10px 12px 0;padding:10px 12px;border-radius:10px;background:var(--acc2);color:var(--acc);font-size:13.5px}
+ #v-guest,#v-usher{grid-template-columns:minmax(0,1fr)}
+ .side{border-left:0;border-top:1px solid var(--line)}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="banner" id="lockBar"><span id="lockMsg"></span><button id="lockTry" data-en="Try to take a turn">Coba ambil giliran</button></div>
+  <div class="top">
+    <a class="back" id="back" href="../ruang/#tamu" data-en="Back">Kembali</a>
+    <div>
+      <div class="crumb" id="crumb"></div>
+      <div class="row"><h1 data-en="Floor plan &amp; seats">Denah &amp; Kursi</h1><span class="save" id="save"></span></div>
+    </div>
+    <span class="seg" id="viewSeg">
+      <button data-view="edit" aria-pressed="true" data-en="Plan">Denah</button>
+      <button data-view="guest" aria-pressed="false" data-en="Guest view">Tampilan tamu</button>
+      <button data-view="usher" aria-pressed="false" data-en="Ushers">Penerima tamu</button>
+    </span>
+    <span class="sp"></span>
+    <button class="ico" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+    <button class="ico" id="redo" aria-label="Redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+    <span class="status" id="status"><i></i><span></span></span>
+    <button id="exportBtn" data-en="Export">Ekspor</button>
+    <button id="shareBtn" data-en="Share">Bagikan</button>
+    <button class="pri" id="publish" data-en="Publish changes">Terbitkan perubahan</button>
+  </div>
+
+  <div class="view on" id="v-edit">
+    <aside id="guests">
+      <div class="pad">
+        <div class="row"><h2 style="flex:1" data-en="Guests">Tamu</h2><span class="cnt" id="gTotal"></span></div>
+        <input type="search" id="gSearch" placeholder="Cari nama tamu" data-en-ph="Search a guest">
+        <span class="seg" id="seatSeg" style="width:100%">
+          <button data-s="all" aria-pressed="false" style="flex:1" data-en="All">Semua</button>
+          <button data-s="un" aria-pressed="true" style="flex:1" data-en="Not seated">Belum duduk</button>
+          <button data-s="in" aria-pressed="false" style="flex:1" data-en="Seated">Sudah duduk</button>
+        </span>
+        <label class="chk"><input type="checkbox" id="rsvpOnly"> <span data-en="Only those who said yes">Hanya yang menjawab hadir</span></label>
+        <div class="row"><span class="lbl" style="flex:1" data-en="Groups">Grup</span><button id="groupsBtn" style="min-height:28px;padding:2px 8px;font-size:12.5px" data-en="Edit groups">Kelola grup</button></div>
+        <div class="groups" id="gChips"></div>
+        <button id="autoSeat" data-en="Seat automatically by group">Dudukkan otomatis per grup</button>
+      </div>
+      <ul class="glist" id="gList"></ul>
+    </aside>
+    <div class="stage">
+      <div>
+        <div class="palette" id="palette"></div>
+        <div class="tabs" id="layTabs"></div>
+        <div class="narrow" data-en="Editing the plan needs a wider screen. Here you can look around the plan, the guest view and the usher search.">Menyunting denah butuh layar yang lebih lebar. Di sini Anda bisa melihat denah, tampilan tamu, dan pencarian penerima tamu.</div>
+      </div>
+      <div class="canvas" id="canvas">
+        <svg id="svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="g1" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="#e9ecef" stroke-width=".025"/></pattern>
+            <pattern id="g5" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="url(#g1)"/><path d="M5 0H0V5" fill="none" stroke="#d6dbe0" stroke-width=".04"/></pattern>
+          </defs>
+          <g id="world"></g>
+        </svg>
+        <div class="hint" id="hint" data-en="Drag a guest's name onto a chair or a table. Click anything to adjust it. Drag empty space to move around, scroll to zoom.">Seret nama tamu ke kursi atau meja. Klik benda untuk mengaturnya. Seret area kosong untuk bergeser, gulir untuk memperbesar.</div>
+        <div class="zoom"><button id="zOut" aria-label="Zoom out">&minus;</button><span id="zLbl">100%</span><button id="zIn" aria-label="Zoom in">+</button><button id="zFit" data-en="Fit">Pas</button></div>
+      </div>
+    </div>
+    <aside id="props"><fieldset id="propsFs"></fieldset></aside>
+  </div>
+
+  <div class="view" id="v-guest">
+    <div class="showcase"><div class="phone"><div class="screen" id="gScreen"></div></div></div>
+    <div class="side">
+      <h2 style="font-size:16px" data-en="What guests see">Yang dilihat tamu</h2>
+      <p data-en="Once a guest has answered the RSVP, their invitation shows their table. Only the published version is shown.">Setelah tamu menjawab RSVP, undangannya menunjukkan meja mereka. Hanya versi yang sudah diterbitkan yang tampil.</p>
+      <div class="f"><span class="lbl" data-en="See it as">Lihat sebagai tamu</span><select id="gPick"></select></div>
+      <label class="chk"><input type="checkbox" id="showFull" checked> <span data-en="Show guests the whole plan">Tampilkan denah lengkap ke tamu</span></label>
+      <p data-en="When this is off, guests only see the table's name and where it is, in words.">Jika dimatikan, tamu hanya melihat nama meja dan letaknya dalam kata-kata.</p>
+    </div>
+  </div>
+
+  <div class="view" id="v-usher">
+    <div class="usher">
+      <h2 style="font-size:18px" data-en="Find a guest at the entrance">Cari tamu di pintu masuk</h2>
+      <input type="search" id="uSearch" placeholder="Ketik nama tamu" data-en-ph="Type a guest's name">
+      <div class="bigplan" id="uPlan"></div>
+    </div>
+    <div class="side">
+      <p data-en="For the ushers on the day. View only, from the published version.">Untuk penerima tamu di hari H. Hanya bisa melihat, dari versi yang sudah diterbitkan.</p>
+      <ul class="res" id="uRes"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="gate" id="gate" hidden><div class="card"><h2 id="gate-h"></h2><p id="gate-p"></p><a id="gate-a" href="#"></a></div></div>
+<div id="printOut"></div>
+<div class="pop" id="pop"></div>
+<div class="modal" id="modal"><div class="card" id="mCard"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="../assets/js/db.js?v=20261122s"></script>
+<script>
+{
+const EN=/[?&]lang=en\b/.test(location.search)||(()=>{try{return (localStorage.getItem('nawala-lang')||'')==='en'}catch(e){return false}})();
+const t=(id,en)=>EN?en:id;
+document.documentElement.lang=EN?'en':'id';
+if(EN){document.title='Floor plan & seats, Nawala';document.querySelectorAll('[data-en]').forEach(el=>{el.innerHTML=el.getAttribute('data-en')});document.querySelectorAll('[data-en-ph]').forEach(el=>{el.placeholder=el.getAttribute('data-en-ph')})}
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const r2=v=>Math.round(v*100)/100;
+let uid=1000;const nid=p=>p+(++uid);
+const TBL=t('Meja','Table'),TBLRX=new RegExp('^'+TBL+' \\d+$');
+
+const TYPES={
+ round:{l:['Meja bundar','Round table'],w:1.8,h:1.8,seats:8,table:true},
+ rect:{l:['Meja persegi','Long table'],w:2.4,h:0.9,seats:8,table:true},
+ couple:{l:['Meja pengantin','Couple\'s table'],w:1.8,h:0.7,seats:2,table:true,one:true},
+ head:{l:['Meja utama','Head table'],w:5,h:0.8,seats:10,table:true,one:true},
+ rows:{l:['Kursi baris','Rows of chairs'],rows:3,cols:6,table:true},
+ pelaminan:{l:['Pelaminan','Pelaminan (stage)'],w:8,h:3.6,color:'#f1e2b8'},
+ stage:{l:['Panggung','Stage'],w:6,h:4,color:'#e8dcc9'},
+ gazebo:{l:['Gazebo','Gazebo'],w:3.5,h:3.5,color:'#dbe7d6'},
+ dance:{l:['Lantai dansa','Dance floor'],w:6,h:6,color:'#efe8dc'},
+ standing:{l:['Area berdiri','Standing area'],w:7,h:5,cap:60,color:'#e4ebf7'},
+ buffet:{l:['Prasmanan','Buffet'],w:6.6,h:1.5,color:'#e7e2d8'},
+ stall:{l:['Gubukan','Food stall'],w:2.2,h:2.2,color:'#eee0cf'},
+ gift:{l:['Meja kado','Gift table'],w:3.8,h:1.5,color:'#e7e2d8'},
+ band:{l:['Band / DJ','Band / DJ'],w:3.5,h:2.5,color:'#e2def0'},
+ booth:{l:['Photo booth','Photo booth'],w:2.5,h:2.5,color:'#f1dde3'},
+ entry:{l:['Pintu masuk','Entrance'],w:3.2,h:0.6,color:'#cdd8ea'},
+ mushola:{l:['Mushola','Prayer room'],w:4,h:4,color:'#d9e6e3'},
+ toilet:{l:['Toilet','Toilets'],w:3,h:3,color:'#e0e3e8'},
+ label:{l:['Teks','Text'],w:3,h:0.7},
+ shape:{l:['Bentuk bebas','Free shape'],w:3,h:2,color:'#e3e3e3'}
+};
+const lb=k=>TYPES[k].l[EN?1:0];
+const PAL=[[t('Meja dan kursi','Tables and chairs'),['round','rect','couple','head','rows']],[t('Panggung dan area','Stage and areas'),['pelaminan','stage','gazebo','dance','standing']],[t('Fasilitas','Facilities'),['buffet','stall','gift','band','booth','entry','mushola','toilet']],[t('Lainnya','Other'),['label','shape']]];
+const SWATCH=['#f1e2b8','#e8dcc9','#dbe7d6','#e4ebf7','#e2def0','#f1dde3','#f2d4dc','#e3e3e3'];
+const icon=k=>{const s='fill="none" stroke="currentColor" stroke-width="1.6"';const m={
+ round:`<circle cx="12" cy="12" r="5" ${s}/>`+[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<circle cx="${12+Math.cos(a)*8.5}" cy="${12+Math.sin(a)*8.5}" r="1.6" fill="currentColor"/>`}).join(''),
+ rect:`<rect x="4" y="9" width="16" height="6" rx="1" ${s}/>`+[7,12,17].map(x=>`<circle cx="${x}" cy="5.5" r="1.5" fill="currentColor"/><circle cx="${x}" cy="18.5" r="1.5" fill="currentColor"/>`).join(''),
+ couple:`<rect x="5" y="11" width="14" height="6" rx="1" ${s}/><circle cx="9.5" cy="7" r="2" fill="#d6517a"/><circle cx="14.5" cy="7" r="2" fill="#3f7fd1"/>`,
+ head:`<rect x="2" y="11" width="20" height="5" rx="1" ${s}/>`+[5,9.5,14.5,19].map(x=>`<circle cx="${x}" cy="7" r="1.5" fill="currentColor"/>`).join(''),
+ rows:[6,12,18].map(y=>[5,10,15,20].map(x=>`<rect x="${x-1.8}" y="${y-1.8}" width="3.6" height="3.6" rx=".8" fill="currentColor"/>`).join('')).join(''),
+ pelaminan:`<path d="M3 18h18M5 18V9l7-4 7 4v9" ${s}/>`,
+ gazebo:`<path d="M12 3 21 9H3z" ${s}/><rect x="5" y="9" width="14" height="11" ${s}/>`,
+ standing:`<rect x="3" y="4" width="18" height="16" rx="2" ${s} stroke-dasharray="3 2"/>`,
+ buffet:`<path d="M3 15h18M6 15a6 6 0 0 1 12 0M12 7V5" ${s}/>`,
+ label:`<path d="M5 6h14M12 6v13" ${s}/>`,
+ entry:`<path d="M4 20V5h10v15M14 12h6m-2-2 2 2-2 2" ${s}/>`
+};return `<svg viewBox="0 0 24 24" aria-hidden="true">${m[k]||`<rect x="3.5" y="6" width="17" height="12" rx="2" ${s}/>`}</svg>`};
+
+/* data: the order's guests, its saved plan (or one plain room), groups from the plan or from the guest list */
+const COLORS=['#d6517a','#3f7fd1','#c98a12','#23927f','#7a5bc8','#7d8443','#c4622d','#4f6d7a','#b0487d','#2f7d5b'];
+const RSVP={hadir:'hadir',tidak:'tidak',ragu:'belum'};
+function mk(type,o){const T=TYPES[type];const it=Object.assign({id:nid('i'),type,x:0,y:0,r:0,w:T.w,h:T.h,color:T.color||null,name:lb(type)},o||{});
+ if(type==='rows'){it.rows=it.rows||T.rows;it.cols=it.cols||T.cols;fitRows(it)}
+ if(T.table){it.seats=type==='rows'?it.rows*it.cols:(it.seats||T.seats);it.seat=Array(it.seats).fill(null);it.off=[]}
+ if(type==='standing')it.cap=it.cap||T.cap;
+ if(type==='label'){it.text=it.text||lb('label');it.color=null}
+ return it}
+function fitRows(it){it.w=r2(it.cols*.6);it.h=r2(it.rows*.65)}
+const plainRoom=()=>({id:nid('L'),name:t('Resepsi','Reception'),room:{w:20,h:20},bg:null,bgOn:true,bgOp:.35,items:[]});
+function fromServer(d){const sv=d.seating||{},guests=(d.guests||[]).map(g=>({id:g.id,name:g.name,size:g.party||1,group:g.grp||'',rsvp:RSVP[g.answer]||'belum'}));
+ const groups=Array.isArray(sv.groups)?sv.groups.filter(g=>g&&g.name).map(g=>({id:g.name,name:g.name,color:g.color||'#8a8f99'})):[];
+ guests.forEach(g=>{if(g.group&&!groups.some(x=>x.id===g.group))groups.push({id:g.group,name:g.group,color:COLORS[groups.length%COLORS.length]})});
+ const layouts=Array.isArray(sv.layouts)&&sv.layouts.length?sv.layouts:[plainRoom()];
+ const ids=new Set(guests.map(g=>g.id));
+ layouts.forEach(l=>(l.items||[]).forEach(it=>{if(Array.isArray(it.seat))it.seat=it.seat.map(x=>x&&ids.has(x)?x:null);if(!Array.isArray(it.off)&&isTblType(it.type))it.off=[]}));
+ return{groups,guests,active:0,layouts,showPlan:sv.showPlan!==false}}
+const isTblType=k=>!!(TYPES[k]&&TYPES[k].table);
+let S={groups:[],guests:[],active:0,layouts:[plainRoom()],showPlan:true};
+
+/* helpers */
+const L=()=>S.layouts[S.active];
+const T=it=>TYPES[it.type];
+const G=id=>S.guests.find(g=>g.id===id);
+const GR=id=>S.groups.find(g=>g.id===id)||{color:'#9aa3ad',name:t('Tanpa grup','No group')};
+const isTbl=it=>!!T(it).table;
+const reserved=(it,i)=>it.type==='couple'&&i<2;
+function seatedCount(gid,lay=L()){let n=0;for(const it of lay.items)if(it.seat)for(const s of it.seat)if(s===gid)n++;return n}
+const remaining=g=>Math.max(0,g.size-seatedCount(g.id));
+const freeIdx=it=>it.seat.map((s,i)=>(!s&&!it.off.includes(i)&&!reserved(it,i))?i:-1).filter(i=>i>=0);
+const activeSeats=it=>it.seats-it.off.length-(it.type==='couple'?Math.min(2,it.seats):0);
+const usedSeats=it=>it.seat.filter(Boolean).length;
+function initials(n){const w=n.replace(/\(.*?\)/g,'').replace(/&.*/,'').split(/\s+/).filter(x=>x&&!/^(bpk\.?|ibu|kel\.?|om|tante|pak|bude|pakde|mas|mbak|prof\.?|h\.|rt|keluarga)$/i.test(x));return ((w[0]||'?')[0]+((w[1]||'')[0]||'')).toUpperCase()}
+function chairs(it){const n=it.seats,o=[];
+ if(it.type==='round'){const R=it.w/2+.32;for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;o.push([Math.cos(a)*R,Math.sin(a)*R])}}
+ else if(it.type==='rows'){for(let r=0;r<it.rows;r++)for(let c=0;c<it.cols;c++)o.push([-it.w/2+.3+c*.6,-it.h/2+.325+r*.65])}
+ else if(T(it).one){for(let i=0;i<n;i++)o.push([-it.w/2+it.w*(i+.5)/n,-(it.h/2+.3)])}
+ else{const top=Math.ceil(n/2),bot=n-top;for(let i=0;i<top;i++)o.push([-it.w/2+it.w*(i+.5)/top,-(it.h/2+.3)]);for(let i=0;i<bot;i++)o.push([-it.w/2+it.w*(i+.5)/bot,it.h/2+.3])}
+ return o}
+function setSeats(it,n){n=Math.max(1,Math.min(30,n));const s=it.seat.slice(0,n);while(s.length<n)s.push(null);it.seat=s;it.seats=n;it.off=it.off.filter(i=>i<n)}
+function corners(it){const c=Math.cos(it.r*Math.PI/180),s=Math.sin(it.r*Math.PI/180),pad=isTbl(it)&&it.type!=='rows'?.5:0,w=it.w/2+(it.type==='round'?pad:0),h=it.h/2+pad;return[[-w,-h],[w,-h],[w,h],[-w,h]].map(([x,y])=>[it.x+x*c-y*s,it.y+x*s+y*c])}
+function aabb(it){const p=corners(it);return{x0:Math.min(...p.map(q=>q[0])),x1:Math.max(...p.map(q=>q[0])),y0:Math.min(...p.map(q=>q[1])),y1:Math.max(...p.map(q=>q[1]))}}
+function warnings(lay=L()){const W=[],bad=new Set(),items=lay.items.filter(i=>i.type!=='label');
+ for(const it of items){const b=aabb(it);if(b.x0<-.01||b.y0<-.01||b.x1>lay.room.w+.01||b.y1>lay.room.h+.01){W.push({id:it.id,t:t(`${it.name} keluar dari batas ruangan`,`${it.name} goes outside the room`)});bad.add(it.id)}}
+ const soft=['shape','standing'];
+ for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){const a=items[i],b=items[j];if(soft.includes(a.type)||soft.includes(b.type))continue;const A=aabb(a),B=aabb(b);
+  if(!(A.x0<B.x1-.05&&B.x0<A.x1-.05&&A.y0<B.y1-.05&&B.y0<A.y1-.05))continue;
+  const inside=(P,Q)=>P.x0>=Q.x0-.05&&P.x1<=Q.x1+.05&&P.y0>=Q.y0-.05&&P.y1<=Q.y1+.05;if(inside(A,B)||inside(B,A))continue;
+  W.push({id:a.id,t:t(`${a.name} bertabrakan dengan ${b.name}`,`${a.name} overlaps ${b.name}`)});bad.add(a.id);bad.add(b.id)}
+ return{W,bad}}
+
+/* seating */
+function placeAt(it,start,gid,count){const free=freeIdx(it);if(!free.length)return 0;const ord=free.filter(i=>i>=start).concat(free.filter(i=>i<start));let k=0;for(const i of ord){if(k>=count)break;it.seat[i]=gid;k++}return k}
+function unseat(gid,lay=L()){for(const it of lay.items)if(it.seat)it.seat=it.seat.map(s=>s===gid?null:s)}
+function dropGuest(gid,it,idx){const g=G(gid);if(!isTbl(it)){toast(t(`${it.name} bukan meja. Taruh di meja atau kursi.`,`${it.name} is not a table. Drop it on a table or a chair.`));return}
+ if(idx!=null&&(it.off.includes(idx)||reserved(it,idx))){toast(t('Kursi itu tidak bisa dipakai.','That chair cannot be used.'));return}
+ let need=remaining(g);if(!need){unseat(gid);need=g.size}
+ const start=idx!=null?idx:(freeIdx(it)[0]??0);const got=placeAt(it,start,gid,need);
+ if(!got)toast(t(`${it.name} sudah penuh.`,`${it.name} is full.`));else if(got<need)toast(t(`${got} dari ${need} orang duduk di ${it.name}. Sisa ${need-got} belum dapat kursi.`,`${got} of ${need} seated at ${it.name}. ${need-got} still need a chair.`));
+ commit()}
+let quiet=false;
+function autoSeat(){const lay=L(),tables=lay.items.filter(i=>isTbl(i)&&i.type!=='couple');
+ const list=visibleGuests(true).filter(g=>remaining(g)>0).sort((a,b)=>a.group.localeCompare(b.group)||b.size-a.size);
+ let ok=0,split=0,left=0;
+ for(const g of list){let need=remaining(g);
+  const gname=GR(g.group).name.toLowerCase(),named=x=>x.name.toLowerCase()===gname?1:0,grp=x=>x.seat.some(id=>id&&G(id)&&G(id).group===g.group)?1:0,empty=x=>usedSeats(x)===0?1:0,fr=x=>freeIdx(x).length;
+  const foreign=x=>S.groups.some(q=>q.id!==g.group&&q.name.toLowerCase()===x.name.toLowerCase());
+  const fit=tables.filter(x=>fr(x)>=need&&!foreign(x)).sort((a,b)=>named(b)-named(a)||grp(b)-grp(a)||empty(b)-empty(a)||fr(a)-fr(b));
+  if(fit[0]){placeAt(fit[0],0,g.id,need);ok++;continue}
+  for(const x of tables.filter(x=>fr(x)>0&&!foreign(x)).sort((a,b)=>named(b)-named(a)||grp(b)-grp(a)||fr(b)-fr(a))){if(!need)break;need-=placeAt(x,0,g.id,need)}
+  if(need)left+=need;else split++}
+ commit();if(quiet)return;
+ toast(list.length?t(`${ok} rombongan duduk utuh${split?`, ${split} terpisah`:''}${left?`, ${left} orang belum dapat kursi`:''}.`,`${ok} parties seated together${split?`, ${split} split up`:''}${left?`, ${left} people still need a chair`:''}.`):t('Semua tamu yang terlihat sudah duduk.','Every guest shown is already seated.'))}
+
+/* history and publishing */
+const snap=()=>JSON.stringify({l:S.layouts,g:S.groups,p:S.showPlan});
+let cur=snap(),pub=null,past=[],future=[],unpub=false;
+function restore(j){const o=JSON.parse(j);S.layouts=o.l;S.groups=o.g;S.showPlan=o.p!==false;unpub=true;queueSave();if(S.active>=S.layouts.length)S.active=0;if(sel&&!L().items.find(i=>i.id===sel))sel=null;renderAll()}
+function commit(){const j=snap();if(j!==cur){past.push(cur);if(past.length>150)past.shift();cur=j;future=[];unpub=true;queueSave()}renderAll()}
+function undo(){if(!past.length||ro())return;future.push(cur);cur=past.pop();restore(cur)}
+function redo(){if(!future.length||ro())return;past.push(cur);cur=future.pop();restore(cur)}
+
+let sel=null,chairMode=false,snapOn=true,view='edit';
+let filt={seat:'un',rsvp:false,q:'',hide:new Set()};
+const vp={s:30,tx:40,ty:40};
+const narrow=()=>matchMedia('(max-width:899px)').matches;
+let mine=false;
+const ro=()=>narrow()||!mine;
+const svg=$('#svg'),world=$('#world'),canvas=$('#canvas');
+
+/* drawing */
+function itemSVG(it,o){const warn=o.bad&&o.bad.has(it.id),cls=['it'];if(isTbl(it))cls.push('tbl');if(o.sel===it.id)cls.push('sel');if(warn)cls.push('warn');if(o.hl===it.id)cls.push('hi');
+ const sw=o.sel===it.id||warn?.07:.035;let b='';
+ if(it.type==='round')b=`<circle class="body" r="${it.w/2}" stroke-width="${sw}"/>`;
+ else if(it.type==='gazebo'){const r=it.w/2,h=it.h/2,k=.29;b=`<polygon class="body" points="${-r*k},${-h} ${r*k},${-h} ${r},${-h*k} ${r},${h*k} ${r*k},${h} ${-r*k},${h} ${-r},${h*k} ${-r},${-h*k}" fill="${it.color}" stroke-width="${sw}"/>`}
+ else if(it.type==='label')b=`<rect class="body" x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" fill="transparent" stroke="${o.sel===it.id?'#2f55d4':'none'}" stroke-width="${sw}" stroke-dasharray=".1 .08"/>`;
+ else if(it.type==='rows')b=`<rect class="body" x="${-it.w/2-.08}" y="${-it.h/2-.08}" width="${it.w+.16}" height="${it.h+.16}" rx=".12" fill="transparent" stroke-width="${o.sel===it.id||warn?sw:0}"/>`;
+ else b=`<rect class="body" x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" rx="${isTbl(it)?.08:.18}" ${it.color?`fill="${it.color}"`:''} stroke-width="${sw}" ${it.type==='standing'?'stroke-dasharray=".25 .15"':''}/>`;
+ let ch='';
+ if(isTbl(it))chairs(it).forEach(([x,y],i)=>{const off=it.off.includes(i),gid=it.seat[i],g=gid&&G(gid),res=reserved(it,i),fill=res?(i===0?'#d6517a':'#3f7fd1'):g?GR(g.group).color:null,X=r2(x),Y=r2(y);
+  ch+=`<g class="ch" data-it="${it.id}" data-c="${i}"><circle class="chair${off?' off':''}${fill?' taken':''}" cx="${X}" cy="${Y}" r=".22" stroke-width=".03" ${fill?`style="fill:${fill}"`:''}>${g?`<title>${esc(g.name)}</title>`:''}</circle>${fill?`<text class="ini" x="${X}" y="${Y}" transform="rotate(${-it.r} ${X} ${Y})">${res?(i===0?'L':'B'):esc(initials(g.name))}</text>`:''}</g>`});
+ const rot=` transform="rotate(${-it.r})"`;let tx='';
+ if(it.type==='label')tx=`<text font-size="${r2(it.h*.62)}" font-weight="600"${rot}>${esc(it.text)}</text>`;
+ else if(isTbl(it)&&it.type!=='rows')tx=`<text font-size="${Math.min(it.w,it.h)<.95?.24:.3}" font-weight="600" y="${it.type==='round'?-.1:0}"${rot}>${esc(it.name)}</text>`+(it.type==='round'?`<text font-size=".22" y=".22"${rot} style="fill:#5f666e">${usedSeats(it)}/${activeSeats(it)}</text>`:'');
+ else if(it.type==='rows')tx=`<text font-size=".3" font-weight="600" y="${-it.h/2-.35}"${rot}>${esc(it.name)} ${usedSeats(it)}/${activeSeats(it)}</text>`;
+ else{const fs=Math.max(.24,Math.min(.4,Math.min(it.w,it.h)*.22));tx=`<text font-size="${r2(fs)}" font-weight="600"${rot}>${esc(it.name)}</text>`+(it.type==='standing'?`<text font-size="${r2(fs*.8)}" y="${r2(fs*1.2)}"${rot} style="fill:#5f666e">${t('kapasitas','capacity')} ${it.cap}</text>`:'')}
+ let hd='';
+ if(o.sel===it.id&&!o.ro){const k=1/vp.s,ext=it.h/2+(isTbl(it)&&it.type!=='rows'?.6:.1);
+  hd+=`<line x1="0" y1="${-ext}" x2="0" y2="${-ext-22*k}" stroke="#2f55d4" stroke-width="${1.5*k}"/><circle class="hdl" data-h="rot" cy="${-ext-22*k}" r="${7*k}" stroke-width="${2*k}"/>`;
+  if(it.type!=='rows')hd+=`<rect class="hdl" data-h="size" x="${it.w/2+.08-6*k}" y="${it.h/2+.08-6*k}" width="${12*k}" height="${12*k}" rx="${2*k}" stroke-width="${2*k}" style="cursor:nwse-resize"/>`}
+ return `<g class="${cls.join(' ')}" data-id="${it.id}" transform="translate(${r2(it.x)} ${r2(it.y)}) rotate(${it.r})" style="cursor:${o.ro?'default':'move'}">${b}${ch}${tx}${hd}</g>`}
+function planSVG(lay,o){const R=lay.room;let s=`<rect class="room" x="0" y="0" width="${R.w}" height="${R.h}" stroke-width=".06"/>`;
+ if(o.grid)s+=`<rect x="0" y="0" width="${R.w}" height="${R.h}" fill="url(#g5)" pointer-events="none"/>`;
+ if(lay.bg&&lay.bgOn)s+=`<image href="${lay.bg}" x="0" y="0" width="${R.w}" height="${R.h}" preserveAspectRatio="none" opacity="${lay.bgOp}" pointer-events="none"/>`;
+ if(o.dims)s+=`<text class="dim" x="${R.w/2}" y="-.4">${R.w} m</text><text class="dim" x="-.5" y="${R.h/2}" transform="rotate(-90 -.5 ${R.h/2})">${R.h} m</text>`;
+ const order=it=>['shape','standing','dance','pelaminan','stage'].includes(it.type)?0:1;
+ for(const it of [...lay.items].sort((a,b)=>order(a)-order(b)))s+=itemSVG(it,o);return s}
+function render(){const lay=L(),{bad}=warnings(lay);world.setAttribute('transform',`translate(${vp.tx} ${vp.ty}) scale(${vp.s})`);world.innerHTML=planSVG(lay,{grid:true,dims:true,sel,bad,ro:ro()});$('#zLbl').textContent=Math.round(vp.s/30*100)+'%'}
+function fit(){const r=canvas.getBoundingClientRect(),R=L().room;if(!r.width)return;vp.s=Math.min(r.width/(R.w+3),r.height/(R.h+3));vp.tx=(r.width-R.w*vp.s)/2;vp.ty=(r.height-R.h*vp.s)/2;render()}
+function zoomAt(f,cx,cy){const n=Math.max(6,Math.min(160,vp.s*f));vp.tx=cx-(cx-vp.tx)*n/vp.s;vp.ty=cy-(cy-vp.ty)*n/vp.s;vp.s=n;render()}
+
+/* panels */
+function visibleGuests(ignoreSeat){return S.guests.filter(g=>{if(filt.rsvp&&g.rsvp!=='hadir')return false;if(filt.hide.has(g.group))return false;if(filt.q&&!g.name.toLowerCase().includes(filt.q))return false;if(!ignoreSeat){const r=remaining(g);if(filt.seat==='un'&&!r)return false;if(filt.seat==='in'&&r===g.size)return false}return true})}
+function renderGuests(){const all=S.guests.filter(g=>!filt.rsvp||g.rsvp==='hadir'),ppl=all.reduce((a,g)=>a+g.size,0),seated=all.reduce((a,g)=>a+g.size-remaining(g),0);
+ $('#gTotal').textContent=t(`${seated}/${ppl} orang duduk`,`${seated}/${ppl} seated`);
+ $('#gChips').innerHTML=S.groups.map(g=>`<button class="gchip" data-g="${g.id}" aria-pressed="${!filt.hide.has(g.id)}"><i style="background:${g.color}"></i>${esc(g.name)}</button>`).join('');
+ const list=visibleGuests(),selIt=L().items.find(i=>i.id===sel);
+ $('#gList').innerHTML=list.length?list.map(g=>{const n=g.size-remaining(g),hl=selIt&&selIt.seat&&selIt.seat.includes(g.id);
+  return `<li data-g="${g.id}" class="${hl?'hl':''}"><i style="background:${GR(g.group).color}"></i><div><div class="nm">${esc(g.name)}</div><div class="sub">${g.size} ${t('orang','people')}${g.rsvp==='hadir'?'':`<span class="tag ${g.rsvp==='tidak'?'no':'q'}">${g.rsvp==='tidak'?t('tidak hadir','not coming'):t('belum jawab','no answer yet')}</span>`}</div></div><span class="cnt ${n===g.size?'full':''}">${n}/${g.size}</span><button class="gedit" data-ge="${g.id}" aria-label="${t('Ubah jumlah dan grup','Change size and group')}">&#8942;</button></li>`}).join(''):`<li class="empty">${filt.seat==='un'?t('Semua tamu di daftar ini sudah duduk.','Everyone in this list is seated.'):t('Tidak ada tamu yang cocok.','No guest matches.')}</li>`}
+const stepper=(id,val,l)=>`<div class="f"><span class="lbl">${l}</span><div class="step"><button data-st="${id}" data-d="-1" aria-label="-">&minus;</button><output>${val}</output><button data-st="${id}" data-d="1" aria-label="+">+</button></div></div>`;
+function renderProps(){const lay=L(),it=lay.items.find(i=>i.id===sel),fs=$('#propsFs');fs.disabled=ro();
+ if(!it){const tables=lay.items.filter(isTbl),seats=tables.reduce((a,x)=>a+activeSeats(x),0),used=tables.reduce((a,x)=>a+usedSeats(x),0),stand=lay.items.filter(i=>i.type==='standing').reduce((a,i)=>a+i.cap,0);
+  const ppl=S.guests.filter(g=>!filt.rsvp||g.rsvp==='hadir').reduce((a,g)=>a+g.size,0),notes=[...warnings(lay).W];
+  if(ppl>seats+stand)notes.push({t:t(`Tamu (${ppl}) lebih banyak dari kursi dan area berdiri (${seats+stand}).`,`More guests (${ppl}) than chairs and standing room (${seats+stand}).`)});
+  fs.innerHTML=`<section><h2>${t('Ruangan','Room')}</h2>
+   <div class="f"><span class="lbl">${t('Nama denah','Plan name')}</span><input type="text" id="pName" value="${esc(lay.name)}"></div>
+   <div class="two"><div class="f"><span class="lbl">${t('Lebar (m)','Width (m)')}</span><input type="number" id="pRW" min="4" max="200" step=".5" value="${lay.room.w}"></div><div class="f"><span class="lbl">${t('Panjang (m)','Length (m)')}</span><input type="number" id="pRH" min="4" max="200" step=".5" value="${lay.room.h}"></div></div>
+   <label class="chk"><input type="checkbox" id="pSnap" ${snapOn?'checked':''}> ${t('Rapatkan ke kisi 25 cm','Snap to a 25 cm grid')}</label></section>
+   <section><h2>${t('Denah asli gedung','The venue\'s own plan')}</h2><p class="kbd">${t('Unggah foto atau gambar denah dari gedung, lalu susun benda di atasnya.','Upload a photo or drawing of the venue\'s plan, then lay things out on top of it.')}</p>
+   <label class="filebtn">${lay.bg?t('Ganti gambar','Replace picture'):t('Unggah gambar denah','Upload a plan')}<input type="file" id="pBg" accept="image/*"></label>
+   ${lay.bg?`<label class="chk"><input type="checkbox" id="pBgOn" ${lay.bgOn?'checked':''}> ${t('Tampilkan','Show')}</label><div class="f"><span class="lbl">${t('Kepekatan','Strength')}</span><input type="range" id="pBgOp" min=".1" max=".9" step=".05" value="${lay.bgOp}"></div><button id="pBgDel" class="danger">${t('Hapus gambar','Remove picture')}</button>`:''}</section>
+   <section><h2>${t('Ringkasan','Summary')}</h2><div class="stats"><div class="stat"><b>${seats}</b><span>${t('kursi aktif','chairs')}</span></div><div class="stat"><b>${used}</b><span>${t('kursi terisi','taken')}</span></div><div class="stat"><b>${tables.length}</b><span>${t('meja dan baris','tables and rows')}</span></div><div class="stat"><b>${stand}</b><span>${t('kapasitas berdiri','standing room')}</span></div></div></section>
+   <section><h2>${t('Perlu dicek','To check')}</h2>${notes.length?`<ul class="warns">${notes.map(n=>`<li ${n.id?`data-sel="${n.id}"`:'class="info"'}>${esc(n.t)}</li>`).join('')}</ul>`:`<p class="kbd">${t('Tidak ada yang bertabrakan atau keluar ruangan.','Nothing overlaps or goes outside the room.')}</p>`}</section>
+   <section><h2>${t('Denah ini','This plan')}</h2><div class="acts"><button id="layDup">${t('Duplikat denah','Duplicate plan')}</button>${S.layouts.length>1?`<button id="layDel" class="danger">${t('Hapus denah','Delete plan')}</button>`:''}</div></section>`;return}
+ const tbl=isTbl(it);
+ const sizeF=it.type==='rows'?'':it.type==='round'?`<div class="f"><span class="lbl">${t('Diameter (m)','Diameter (m)')}</span><input type="number" data-k="w" step=".1" min=".6" value="${it.w}"></div><div></div>`:it.type==='label'?`<div class="f"><span class="lbl">${t('Tinggi huruf (m)','Letter height (m)')}</span><input type="number" data-k="h" step=".1" min=".3" value="${it.h}"></div><div></div>`:`<div class="f"><span class="lbl">${t('Lebar (m)','Width (m)')}</span><input type="number" data-k="w" step=".1" min=".3" value="${it.w}"></div><div class="f"><span class="lbl">${t('Panjang (m)','Length (m)')}</span><input type="number" data-k="h" step=".1" min=".3" value="${it.h}"></div>`;
+ let seated='';if(tbl){const ids=[...new Set(it.seat.filter(Boolean))];seated=`<section><h2>${t('Duduk di sini','Seated here')}</h2>${ids.length?`<ul class="seated">${ids.map(id=>{const g=G(id);return `<li><i style="background:${GR(g.group).color}"></i><span>${esc(g.name)}</span><span class="cnt" style="flex:none">${it.seat.filter(s=>s===id).length}</span><button data-un="${id}">${t('Lepas','Remove')}</button></li>`}).join('')}</ul><button id="clearT">${t('Kosongkan meja','Clear the table')}</button>`:`<p class="kbd">${t('Belum ada tamu. Seret nama dari daftar kiri.','No guests yet. Drag names from the list on the left.')}</p>`}</section>`}
+ fs.innerHTML=`<section><div class="row"><h2 style="flex:1">${lb(it.type)}</h2><button class="ico" id="desel" aria-label="${t('Tutup','Close')}">&times;</button></div>
+  <div class="f"><span class="lbl">${it.type==='label'?t('Teks','Text'):t('Nama','Name')}</span><input type="text" id="pItName" value="${esc(it.type==='label'?it.text:it.name)}"></div>
+  ${tbl?(it.type==='rows'?`<div class="two">${stepper('rows',it.rows,t('Baris','Rows'))}${stepper('cols',it.cols,t('Kursi per baris','Chairs per row'))}</div>`:stepper('seats',it.seats,t('Jumlah kursi','Chairs')))+`<label class="chk"><input type="checkbox" id="pChair" ${chairMode?'checked':''}> ${t('Atur kursi satu per satu','Edit single chairs')}</label>${chairMode?`<p class="kbd">${t('Klik kursi untuk menghapus atau mengembalikannya.','Click a chair to remove it or bring it back.')}</p>`:''}`:''}
+  ${it.type==='standing'?`<div class="f"><span class="lbl">${t('Kapasitas (orang)','Capacity (people)')}</span><input type="number" data-k="cap" min="1" step="5" value="${it.cap}"></div>`:''}
+  <div class="two">${sizeF}</div>
+  <div class="f"><span class="lbl">${t('Putar','Rotate')}</span><div class="row"><button data-rot="-15">&minus;15&deg;</button><input type="number" data-k="r" step="1" value="${Math.round(it.r)}" aria-label="${t('Sudut','Angle')}"><button data-rot="15">+15&deg;</button></div></div>
+  ${tbl||it.type==='label'?'':`<div class="f"><span class="lbl">${t('Warna','Colour')}</span><div class="sw">${SWATCH.map(c=>`<button data-col="${c}" style="background:${c}" aria-label="${c}" aria-pressed="${it.color===c}"></button>`).join('')}<input type="color" id="pCol" value="${it.color||'#e3e3e3'}" aria-label="${t('Warna lain','Other colour')}"></div></div>`}
+  <div class="acts"><button id="dup">${t('Duplikat','Duplicate')}</button><button id="del" class="danger">${t('Hapus','Delete')}</button></div>
+  <p class="kbd">${t('Ctrl+D duplikat, Delete hapus, panah menggeser 10 cm.','Ctrl+D duplicates, Delete removes, arrows move 10 cm.')}</p></section>${seated}`}
+function renderTabs(){$('#layTabs').innerHTML=`<span class="lbl">${t('Denah:','Plans:')}</span><span class="seg">${S.layouts.map((l,i)=>`<button data-lay="${i}" aria-pressed="${i===S.active}">${esc(l.name)}</button>`).join('')}</span><button id="layAdd" style="min-height:30px;padding:3px 9px;font-size:13px" ${ro()?'disabled':''}>${t('+ Denah baru','+ New plan')}</button><span class="kbd" style="margin-left:auto">${L().room.w} &times; ${L().room.h} m</span>`}
+function renderPalette(){$('#palette').innerHTML=`<span class="lbl">${t('Tambah:','Add:')}</span>`+PAL.map(([n,ks],i)=>`<button class="pal" data-pg="${i}">${icon(ks[0])}${n} <span aria-hidden="true" style="color:#5f666e">&#9662;</span></button>`).join('')+`<span class="kbd" style="margin-left:auto">${t('Benda baru muncul di tengah layar.','New things appear in the middle of the view.')}</span>`}
+function renderStatus(){const d=unpub;$('#status').classList.toggle('draft',d);$('#status span').textContent=d?t('Ada perubahan belum terbit','Unpublished changes'):pub?t('Sudah terbit','Published'):t('Belum pernah terbit','Not published yet');$('#publish').disabled=!d||ro();$('#undo').disabled=!past.length||ro();$('#redo').disabled=!future.length||ro()}
+function renderAll(){render();renderGuests();renderProps();renderTabs();renderStatus();if(view==='guest')renderGuestView();if(view==='usher')renderUsher()}
+
+/* read-only views, from the published version */
+const pubLayout=()=>{const o=JSON.parse(pub||'null');return o&&o.l&&o.l[0]||null};
+function pubSeat(lay,gid){for(const it of lay.items)if(it.seat&&it.seat.includes(gid))return{it,n:it.seat.filter(s=>s===gid).length};return null}
+const staticPlan=(lay,hl)=>`<svg viewBox="-1 -1.2 ${lay.room.w+2} ${lay.room.h+2.2}" role="img" aria-label="${esc(lay.name)}">${planSVG(lay,{hl,ro:true})}</svg>`;
+function where(lay,it){const R=lay.room,h=it.x<R.w*.4?0:it.x>R.w*.6?2:1,v=it.y<R.h*.35?0:it.y>R.h*.7?2:1;return [t('Sisi kiri','Left side'),t('Tengah','Middle'),t('Sisi kanan','Right side')][h]+', '+[t('dekat pelaminan','near the stage'),t('bagian tengah ruangan','middle of the room'),t('dekat pintu masuk','near the entrance')][v]}
+function renderGuestView(){const lay=pubLayout(),pk=$('#gPick');if(!lay){$('#gScreen').innerHTML=`<div class="mytable"><b style="font-size:20px">${t('Belum ada denah yang terbit','No plan published yet')}</b><span>${t('Tekan Terbitkan perubahan agar tamu melihat mejanya.','Press Publish changes so guests can see their table.')}</span></div>`;return}if(!S.guests.some(g=>g.rsvp==='hadir')&&!pk.options.length){pk.innerHTML=S.guests.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}if(!pk.options.length)pk.innerHTML=S.guests.filter(g=>g.rsvp==='hadir').map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+ const g=G(pk.value);if(!g){$('#gScreen').innerHTML=`<div class="mytable"><b style="font-size:20px">${t('Belum ada tamu','No guests yet')}</b><span>${t('Tambahkan tamu di daftar tamu ruang pasangan.','Add guests in the couple\'s guest list.')}</span></div>`;return}const p=pubSeat(lay,g.id),full=S.showPlan;
+ $('#gScreen').innerHTML=`<div class="who">${t('Kepada Yth.','Dear')}</div><h3>${esc(g.name)}</h3><div class="who">${t('Resepsi Laras &amp; Bima','Laras &amp; Bima\'s reception')}</div>`+(p?`<div class="mytable"><span>${t('Meja Anda','Your table')}</span><b>${esc(p.it.name)}</b><span>${t(`${p.n} kursi disiapkan`,`${p.n} chairs set`)}. ${where(lay,p.it)}</span></div>${full?`<div class="miniplan">${staticPlan(lay,p.it.id)}</div>`:''}`:`<div class="mytable"><span>${t('Meja Anda','Your table')}</span><b style="font-size:20px">${t('Belum ditentukan','Not set yet')}</b><span>${t('Silakan tanyakan penerima tamu di pintu masuk.','Please ask the ushers at the entrance.')}</span></div>`)}
+let uPick=null;
+function renderUsher(){const lay=pubLayout();if(!lay){$('#uPlan').innerHTML='';$('#uRes').innerHTML=`<li style="cursor:default">${t('Belum ada denah yang terbit.','No plan published yet.')}</li>`;return}const q0=0,q=$('#uSearch').value.trim().toLowerCase(),rows=S.guests.filter(g=>!q||g.name.toLowerCase().includes(q)).map(g=>({g,p:pubSeat(lay,g.id)}));
+ $('#uRes').innerHTML=rows.length?rows.map(({g,p})=>`<li data-u="${g.id}" class="${uPick===g.id?'on':''}"><span>${esc(g.name)}</span><b>${p?esc(p.it.name):t('belum ada meja','no table yet')}</b></li>`).join(''):`<li style="cursor:default">${t('Nama tidak ditemukan.','No such name.')}</li>`;
+ const pk2=uPick&&pubSeat(lay,uPick);$('#uPlan').innerHTML=staticPlan(lay,pk2&&pk2.it.id)}
+
+/* canvas */
+function toWorld(e){const r=svg.getBoundingClientRect();return[(e.clientX-r.left-vp.tx)/vp.s,(e.clientY-r.top-vp.ty)/vp.s]}
+const sn=v=>snapOn?Math.round(v*4)/4:r2(v);
+let drag=null;
+const pickSel=id=>{sel=id;chairMode=false;render();renderProps();renderGuests()};
+svg.addEventListener('pointerdown',e=>{hidePop();$('#hint').style.display='none';const p=toWorld(e),h=e.target.closest('.hdl'),ch=e.target.closest('.ch'),g=e.target.closest('.it');
+ if(ch){const it=L().items.find(i=>i.id===ch.dataset.it),c=+ch.dataset.c;
+  if(ro()){if(it.seat[c])seatPop(it,c,e);return}
+  if(chairMode&&sel===it.id){if(reserved(it,c))return;if(it.off.includes(c))it.off=it.off.filter(x=>x!==c);else{it.off.push(c);it.seat[c]=null}commit();return}
+  if(it.seat[c]){drag={kind:'seat',it,c,x0:e.clientX,y0:e.clientY,moved:false};svg.setPointerCapture(e.pointerId);return}}
+ if(h&&!ro()){drag={kind:h.dataset.h,it:L().items.find(i=>i.id===sel)};svg.setPointerCapture(e.pointerId);return}
+ if(g){const it=L().items.find(i=>i.id===g.dataset.id);if(sel!==it.id)pickSel(it.id);if(!ro()){drag={kind:'move',it,dx:p[0]-it.x,dy:p[1]-it.y};svg.setPointerCapture(e.pointerId)}return}
+ if(sel)pickSel(null);
+ drag={kind:'pan',x:e.clientX,y:e.clientY,tx:vp.tx,ty:vp.ty};canvas.classList.add('pan');svg.setPointerCapture(e.pointerId)});
+svg.addEventListener('pointermove',e=>{if(!drag)return;const p=toWorld(e),it=drag.it;
+ if(drag.kind==='pan'){vp.tx=drag.tx+e.clientX-drag.x;vp.ty=drag.ty+e.clientY-drag.y;render();return}
+ if(drag.kind==='move'){it.x=sn(p[0]-drag.dx);it.y=sn(p[1]-drag.dy);render();return}
+ if(drag.kind==='rot'){let a=Math.atan2(p[1]-it.y,p[0]-it.x)*180/Math.PI+90;a=e.shiftKey?Math.round(a):Math.round(a/15)*15;it.r=((a%360)+360)%360;render();return}
+ if(drag.kind==='size'){const c=Math.cos(-it.r*Math.PI/180),s=Math.sin(-it.r*Math.PI/180),dx=p[0]-it.x,dy=p[1]-it.y,lx=Math.abs(dx*c-dy*s),ly=Math.abs(dx*s+dy*c),q=v=>Math.round(v*20)/10;
+  if(it.type==='round')it.w=it.h=Math.max(.6,q(Math.max(lx,ly)));else{it.w=Math.max(.4,q(lx));it.h=Math.max(.3,q(ly))}render();return}
+ if(drag.kind==='seat'){if(!drag.moved&&Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<5)return;if(!drag.moved){drag.moved=true;ghostOn(G(it.seat[drag.c]).name+t(' (1 kursi)',' (1 chair)'))}ghostMove(e);markDrop(e)}});
+svg.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;canvas.classList.remove('pan');
+ if(d.kind==='seat'){ghostOff();clearDrop();if(!d.moved){seatPop(d.it,d.c,e);return}const gid=d.it.seat[d.c],tgt=document.elementFromPoint(e.clientX,e.clientY);
+  if(tgt&&tgt.closest('#guests')){d.it.seat[d.c]=null;commit();return}
+  const ch=tgt&&tgt.closest('.ch');if(ch){const x=L().items.find(i=>i.id===ch.dataset.it),c=+ch.dataset.c;if(x.off.includes(c)||reserved(x,c)){toast(t('Kursi itu tidak bisa dipakai.','That chair cannot be used.'));return}const other=x.seat[c];x.seat[c]=gid;d.it.seat[d.c]=other||null;commit();return}
+  const g=tgt&&tgt.closest('#svg .it');if(g){const x=L().items.find(i=>i.id===g.dataset.id);if(isTbl(x)&&freeIdx(x).length){d.it.seat[d.c]=null;x.seat[freeIdx(x)[0]]=gid;commit()}else toast(t('Tidak ada kursi kosong di sana.','No free chair there.'))}return}
+ if(d.kind!=='pan')commit()});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+
+let gdrag=null;
+$('#gList').addEventListener('pointerdown',e=>{if(e.target.closest('.gedit'))return;const li=e.target.closest('li[data-g]');if(!li||ro())return;gdrag={id:li.dataset.g,x:e.clientX,y:e.clientY,on:false};li.setPointerCapture(e.pointerId)});
+$('#gList').addEventListener('pointermove',e=>{if(!gdrag)return;if(!gdrag.on){if(Math.hypot(e.clientX-gdrag.x,e.clientY-gdrag.y)<5)return;gdrag.on=true;const g=G(gdrag.id);ghostOn(`${g.name} (${remaining(g)||g.size} ${t('orang','people')})`)}ghostMove(e);markDrop(e)});
+$('#gList').addEventListener('pointerup',e=>{if(!gdrag)return;const d=gdrag;gdrag=null;ghostOff();clearDrop();
+ if(!d.on){const it=L().items.find(i=>i.seat&&i.seat.includes(d.id));if(it)pickSel(it.id);else toast(t('Seret nama ini ke meja atau kursi.','Drag this name onto a table or a chair.'));return}
+ const tgt=document.elementFromPoint(e.clientX,e.clientY),ch=tgt&&tgt.closest('.ch');if(ch){dropGuest(d.id,L().items.find(i=>i.id===ch.dataset.it),+ch.dataset.c);return}
+ const g=tgt&&tgt.closest('#svg .it');if(g)dropGuest(d.id,L().items.find(i=>i.id===g.dataset.id),null)});
+const ghost=document.createElement('div');ghost.className='ghost';
+const ghostOn=x=>{ghost.textContent=x;document.body.appendChild(ghost)};
+const ghostMove=e=>{ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px'};
+const ghostOff=()=>ghost.remove();
+const clearDrop=()=>$$('.chair.drop').forEach(c=>c.classList.remove('drop'));
+function markDrop(e){clearDrop();ghost.style.display='none';const x=document.elementFromPoint(e.clientX,e.clientY);ghost.style.display='';const ch=x&&x.closest('.ch');if(ch)ch.querySelector('.chair').classList.add('drop')}
+
+const pop=$('#pop');
+$('#gList').addEventListener('click',e=>{const b=e.target.closest('.gedit');if(!b)return;const g=G(b.dataset.ge),r=b.getBoundingClientRect();
+ pop.innerHTML=`<b>${esc(g.name)}</b>${ro()?`<span class="kbd">${g.size} ${t('orang','people')}, ${esc(GR(g.group).name)}</span>`:`<span class="lbl">${t('Jumlah orang','People')}</span><div class="step"><button data-gp="-1">&minus;</button><output>${g.size}</output><button data-gp="1">+</button></div><span class="lbl">${t('Grup','Group')}</span><select id="gGrp"><option value="">${t('Tanpa grup','No group')}</option>${S.groups.map(x=>`<option ${x.id===g.group?'selected':''}>${esc(x.name)}</option>`).join('')}<option value="+">${t('+ Grup baru','+ New group')}</option></select>`}`;
+ pop.dataset.g=g.id;pop.dataset.it='';at(r.left,r.bottom+4)});
+pop.addEventListener('change',e=>{if(e.target.id!=='gGrp'||ro())return;const g=G(pop.dataset.g);let v=e.target.value;
+ if(v==='+'){let n=t('Grup baru','New group'),k=2;while(S.groups.some(x=>x.id===n))n=t('Grup baru ','New group ')+k++;S.groups.push({id:n,name:n,color:COLORS[S.groups.length%COLORS.length]});v=n;hidePop();toast(t('Grup dibuat. Ganti namanya di Kelola grup.','Group made. Rename it under Edit groups.'))}
+ g.group=v;patchGuest(g);commit()});
+function at(x,y){pop.classList.add('on');pop.style.left=Math.min(innerWidth-240,x)+'px';pop.style.top=Math.min(innerHeight-pop.offsetHeight-8,y)+'px'}
+function seatPop(it,c,e){const g=G(it.seat[c]);if(!g)return;const n=it.seat.filter(s=>s===g.id).length;
+ pop.innerHTML=`<b>${esc(g.name)}</b><span class="kbd">${esc(GR(g.group).name)}, ${t(`${n} dari ${g.size} kursi di ${esc(it.name)}`,`${n} of ${g.size} chairs at ${esc(it.name)}`)}</span>`+(ro()?'':`<button data-pa="one">${t('Lepas dari kursi ini','Remove from this chair')}</button><button data-pa="all">${t('Lepas seluruh rombongan','Remove the whole party')}</button>`);
+ pop.dataset.it=it.id;pop.dataset.c=c;at(e.clientX+10,e.clientY+10)}
+const hidePop=()=>pop.classList.remove('on');
+pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.add){hidePop();addItem(b.dataset.add);return}
+ if(b.dataset.gp){if(ro())return;const g=G(pop.dataset.g);g.size=Math.max(1,Math.min(20,g.size+ +b.dataset.gp));const over=seatedCount(g.id)-g.size;if(over>0){let k=over;S.layouts[S.active].items.forEach(it=>{if(it.seat)for(let i=it.seat.length-1;i>=0&&k>0;i--)if(it.seat[i]===g.id){it.seat[i]=null;k--}})}b.parentNode.querySelector('output').textContent=g.size;patchGuest(g);commit();return}const it=L().items.find(i=>i.id===pop.dataset.it),c=+pop.dataset.c;if(b.dataset.pa==='one')it.seat[c]=null;else unseat(it.seat[c]);hidePop();commit()});
+
+/* controls */
+function addItem(type){const lay=L(),r=canvas.getBoundingClientRect(),o={x:sn((r.width/2-vp.tx)/vp.s),y:sn((r.height/2-vp.ty)/vp.s)};
+ for(let k=0;k<40&&lay.items.some(i=>Math.abs(i.x-o.x)<1.2&&Math.abs(i.y-o.y)<1.2);k++){o.x=r2(o.x+2.75);if(o.x>lay.room.w-1.5){o.x=1.75;o.y=r2(o.y+3)}}
+ if(TYPES[type].table&&type!=='couple'&&type!=='rows')o.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);
+ const it=mk(type,o);lay.items.push(it);sel=it.id;chairMode=false;commit()}
+function dupItem(){const lay=L(),it=lay.items.find(i=>i.id===sel);if(!it)return;const c=JSON.parse(JSON.stringify(it));c.id=nid('i');c.x=r2(it.x+1);c.y=r2(it.y+1);if(c.seat)c.seat=c.seat.map(()=>null);if(TBLRX.test(c.name))c.name=TBL+' '+(lay.items.filter(i=>TBLRX.test(i.name)).length+1);lay.items.push(c);sel=c.id;commit()}
+function delItem(){const lay=L();lay.items=lay.items.filter(i=>i.id!==sel);sel=null;commit()}
+$('#palette').addEventListener('click',e=>{const b=e.target.closest('[data-pg]');if(!b||ro())return;const r=b.getBoundingClientRect();pop.innerHTML=PAL[+b.dataset.pg][1].map(k=>`<button class="pal" data-add="${k}">${icon(k)}${lb(k)}</button>`).join('');at(r.left,r.bottom+6)});
+$('#layTabs').addEventListener('click',e=>{const b=e.target.closest('[data-lay]');if(b){S.active=+b.dataset.lay;sel=null;renderAll();fit()}
+ if(e.target.id==='layAdd'){S.layouts.push({id:nid('L'),name:t('Denah ','Plan ')+(S.layouts.length+1),room:{w:20,h:20},bg:null,bgOn:true,bgOp:.35,items:[]});S.active=S.layouts.length-1;sel=null;commit();fit()}});
+$('#props').addEventListener('click',e=>{const b=e.target.closest('button,li[data-sel]');if(!b||ro())return;const it=L().items.find(i=>i.id===sel);
+ if(b.dataset.sel){sel=b.dataset.sel;renderAll();return}
+ if(b.id==='desel'){sel=null;chairMode=false;renderAll();return}
+ if(b.id==='dup')return dupItem();if(b.id==='del')return delItem();
+ if(b.dataset.st){const d=+b.dataset.d;if(b.dataset.st==='seats')setSeats(it,it.seats+d);else{it[b.dataset.st]=Math.max(1,Math.min(20,it[b.dataset.st]+d));fitRows(it);setSeats(it,it.rows*it.cols)}return commit()}
+ if(b.dataset.rot){it.r=((it.r+ +b.dataset.rot)%360+360)%360;return commit()}
+ if(b.dataset.col){it.color=b.dataset.col;return commit()}
+ if(b.dataset.un){unseat(b.dataset.un);return commit()}
+ if(b.id==='clearT'){it.seat=it.seat.map(()=>null);return commit()}
+ if(b.id==='pBgDel'){L().bg=null;return commit()}
+ if(b.id==='layDup'){const c=JSON.parse(JSON.stringify(L()));c.id=nid('L');c.name=L().name+t(' (salinan)',' (copy)');S.layouts.push(c);S.active=S.layouts.length-1;commit();fit();return}
+ if(b.id==='layDel'){S.layouts.splice(S.active,1);S.active=0;sel=null;commit();fit()}});
+$('#props').addEventListener('change',e=>{if(ro())return;const x=e.target,lay=L(),it=lay.items.find(i=>i.id===sel);
+ if(x.id==='pName'){lay.name=x.value.trim()||lay.name;return commit()}
+ if(x.id==='pRW'||x.id==='pRH'){lay.room[x.id==='pRW'?'w':'h']=Math.max(4,Math.min(200,+x.value||0));commit();fit();return}
+ if(x.id==='pSnap'){snapOn=x.checked;return}
+ if(x.id==='pBgOn'){lay.bgOn=x.checked;return commit()}
+ if(x.id==='pBgOp'){lay.bgOp=+x.value;return commit()}
+ if(x.id==='pBg'&&x.files[0]){shrink(x.files[0]).then(url=>{lay.bg=url;lay.bgOn=true;commit();toast(t('Denah gedung dipasang di belakang. Sesuaikan lebar dan panjang ruangan agar pas.','The venue plan sits behind. Set the room\'s width and length so it fits.'))},()=>toast(t('Gambar ini tidak bisa dibaca.','This picture cannot be read.')));return}
+ if(x.id==='pChair'){chairMode=x.checked;renderProps();return}
+ if(x.id==='pCol'){it.color=x.value;return commit()}
+ if(x.id==='pItName'){if(it.type==='label')it.text=x.value||lb('label');else it.name=x.value.trim()||it.name;return commit()}
+ if(x.dataset.k){let v=+x.value;if(isNaN(v))return renderProps();const k=x.dataset.k;if(k==='r')v=((v%360)+360)%360;else if(k==='cap')v=Math.max(1,Math.round(v));else v=Math.max(.3,r2(v));it[k]=v;if(it.type==='round'&&k==='w')it.h=v;commit()}});
+$('#props').addEventListener('input',e=>{if(e.target.id==='pBgOp'&&!ro()){L().bgOp=+e.target.value;render()}});
+$('#gSearch').addEventListener('input',e=>{filt.q=e.target.value.trim().toLowerCase();renderGuests()});
+$('#rsvpOnly').addEventListener('change',e=>{filt.rsvp=e.target.checked;renderGuests();renderProps()});
+$('#seatSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filt.seat=b.dataset.s;$$('#seatSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGuests()});
+$('#gChips').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b)return;const id=b.dataset.g;filt.hide.has(id)?filt.hide.delete(id):filt.hide.add(id);renderGuests()});
+$('#autoSeat').addEventListener('click',()=>{if(!ro())autoSeat()});
+$('#undo').onclick=undo;$('#redo').onclick=redo;
+$('#zIn').onclick=()=>{const r=canvas.getBoundingClientRect();zoomAt(1.25,r.width/2,r.height/2)};
+$('#zOut').onclick=()=>{const r=canvas.getBoundingClientRect();zoomAt(.8,r.width/2,r.height/2)};
+$('#zFit').onclick=fit;
+$('#publish').onclick=()=>{if(ro())return;$('#publish').disabled=true;flush().then(()=>DB.rpc('seating_publish',{p_who:WHO,p_slug:SLUG,p_key:KEY})).then(r=>{
+  if(r&&r.ok){pub=JSON.stringify({l:S.layouts,g:[],p:S.showPlan});unpub=false;usher=r.usher;renderStatus();toast(t('Terbit. Tamu yang menjawab hadir kini melihat mejanya.','Published. Guests who said yes now see their table.'))}
+  else if(r&&r.lock)lost(r.lock);else{toast(t('Belum bisa terbit. Coba lagi.','Could not publish. Try again.'));renderStatus()}
+ },()=>{toast(t('Database Nawala tidak terjangkau. Coba lagi.','The Nawala database is out of reach. Try again.'));renderStatus()})};
+function setView(v){view=v;$$('#viewSeg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.view===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));renderAll();if(v==='edit')requestAnimationFrame(fit)}
+$('#viewSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setView(b.dataset.view)});
+$('#gPick').addEventListener('change',renderGuestView);$('#showFull').addEventListener('change',e=>{if(ro()){e.target.checked=S.showPlan;return}S.showPlan=e.target.checked;commit();toast(t('Tersimpan. Berlaku untuk tamu setelah diterbitkan.','Saved. Guests see it after the next publish.'))});
+$('#uSearch').addEventListener('input',()=>{uPick=null;renderUsher()});
+$('#uRes').addEventListener('click',e=>{const li=e.target.closest('[data-u]');if(li){uPick=li.dataset.u;renderUsher()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))){if(modal.classList.contains('on'))modal.classList.remove('on');else if(parent!==window)parent.postMessage('nawala-denah-close',location.origin);return}if(view!=='edit'||/input|select|textarea/i.test(e.target.tagName))return;const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+ if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(mod&&k==='y'){e.preventDefault();redo();return}
+ if(e.key==='Escape'){const busy=sel||pop.classList.contains('on')||modal.classList.contains('on');if(!busy&&parent!==window)parent.postMessage('nawala-denah-close',location.origin);modal.classList.remove('on');sel=null;chairMode=false;hidePop();renderAll();return}
+ const it=L().items.find(i=>i.id===sel);if(!it||ro())return;
+ if(mod&&k==='d'){e.preventDefault();dupItem();return}
+ if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();delItem();return}
+ const st=e.shiftKey?1:.1,mv={arrowleft:[-st,0],arrowright:[st,0],arrowup:[0,-st],arrowdown:[0,st]}[k];if(mv){e.preventDefault();it.x=r2(it.x+mv[0]);it.y=r2(it.y+mv[1]);commit()}});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#pop')&&!e.target.closest('#svg')&&!e.target.closest('[data-pg]'))hidePop()});
+
+/* boxes */
+const modal=$('#modal'),mCard=$('#mCard');
+function openM(h){mCard.innerHTML=h+`<div class="acts" style="justify-content:flex-end"><button data-close>${t('Tutup','Close')}</button></div>`;modal.classList.add('on')}
+modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))modal.classList.remove('on')});
+async function copy(x,msg){try{await navigator.clipboard.writeText(x);toast(msg)}catch(_){toast(t('Tidak bisa menyalin di sini. Pilih teksnya lalu salin manual.','Copying is not allowed here. Select the text and copy it yourself.'))}}
+const usherUrl=()=>usher?'https://nawalainvite.com/undangan/penerima.html?u='+encodeURIComponent(SLUG)+'&k='+usher:'';
+$('#shareBtn').onclick=()=>openM(`<h2>${t('Bagikan denah','Share the plan')}</h2>
+ <div class="box"><b>${t('Halaman penerima tamu','The ushers\' page')}</b><p>${t('Untuk penerima tamu, WO atau pihak gedung: cari nama tamu dan lihat mejanya. Hanya bisa melihat, dari versi yang sudah diterbitkan.','For ushers, your organiser or the venue: search a guest\'s name and see their table. View only, from the published version.')}</p>
+ ${usher?`<input type="text" readonly value="${esc(usherUrl())}" id="uLink"><div class="acts"><button id="uCopy">${t('Salin tautan','Copy the link')}</button><a class="filebtn" target="_blank" rel="noopener" href="${esc(usherUrl())}">${t('Buka','Open')}</a>${ro()?'':`<button id="uNew">${t('Buat tautan baru','Make a new link')}</button>`}</div><p class="kbd">${t('Tautan baru langsung menutup tautan lama.','A new link closes the old one at once.')}</p>`:`<p class="kbd">${t('Tautan muncul setelah denah pertama kali diterbitkan.','The link appears once the plan has been published.')}</p>`}</div>
+ <div class="box"><b>${t('Token sunting untuk WO atau gedung','Edit token for the organiser or venue')}</b><p>${t('Menyusul: mereka ikut menyusun denah, bergantian dengan kalian.','Coming later: they help lay out the plan, taking turns with you.')}</p></div>`);
+const tableList=()=>L().items.filter(isTbl).map(it=>{const ids=[...new Set(it.seat.filter(Boolean))];return `${it.name} (${usedSeats(it)}/${activeSeats(it)})\n`+(ids.length?ids.map(id=>`  - ${G(id).name}, ${it.seat.filter(s=>s===id).length} ${t('kursi','chairs')}`).join('\n'):t('  (kosong)','  (empty)'))}).join('\n\n');
+function csv(){const rows=[[t('Denah','Plan'),t('Meja','Table'),t('Tamu','Guest'),t('Grup','Group'),t('Kursi','Chairs')]];
+ S.layouts.forEach(l=>l.items.filter(isTbl).forEach(it=>{const ids=[...new Set(it.seat.filter(Boolean))];if(!ids.length)rows.push([l.name,it.name,'','',0]);ids.forEach(id=>{const g=G(id);rows.push([l.name,it.name,g.name,g.group,it.seat.filter(s=>s===id).length])})}));
+ S.guests.filter(g=>remaining(g)>0).forEach(g=>rows.push(['',t('(belum duduk)','(not seated)'),g.name,g.group,remaining(g)]));
+ return '\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\r\n')}
+function printPlan(){const out=$('#printOut');out.innerHTML=S.layouts.map(l=>`<div class="pp"><h1>${esc(l.name)}, ${esc(COUPLE)}</h1><p>${l.room.w} &times; ${l.room.h} m</p><svg viewBox="-1 -1.2 ${l.room.w+2} ${l.room.h+2.2}">${planSVG(l,{ro:true})}</svg></div><div class="pp"><h1>${esc(l.name)}: ${t('daftar per meja','list per table')}</h1><table><tr><th>${t('Meja','Table')}</th><th>${t('Tamu','Guests')}</th></tr>${l.items.filter(isTbl).map(it=>`<tr><td>${esc(it.name)} (${usedSeats(it)}/${activeSeats(it)})</td><td>${[...new Set(it.seat.filter(Boolean))].map(id=>esc(G(id).name)+' ('+it.seat.filter(s=>s===id).length+')').join(', ')||'-'}</td></tr>`).join('')}</table></div>`).join('');setTimeout(()=>window.print(),50)}
+$('#exportBtn').onclick=()=>openM(`<h2>${t('Ekspor','Export')}</h2><p>${t('Denah untuk dicetak atau disimpan sebagai PDF (pilih Simpan sebagai PDF di jendela cetak), dan daftar per meja untuk Excel.','The plan to print or save as a PDF (choose Save as PDF in the print window), and the list per table for Excel.')}</p><div class="acts"><button id="expPrint">${t('Cetak atau simpan PDF','Print or save as PDF')}</button><button id="expCsv">${t('Unduh daftar (Excel, CSV)','Download the list (Excel, CSV)')}</button></div><textarea id="expTxt" readonly>${esc(tableList())}</textarea><button id="expCopy">${t('Salin daftar per meja','Copy the list per table')}</button>`);
+$('#groupsBtn').onclick=()=>openM(`<h2>${t('Kelola grup','Edit groups')}</h2><p>${t('Warna grup tampil di kursi dan di daftar tamu.','Group colours show on the chairs and in the guest list.')}</p>${S.groups.map((g,i)=>`<div class="row"><input type="color" data-gi="${i}" value="${g.color}" aria-label="${t('Warna','Colour')}" style="width:40px;height:36px;border:0;background:none;padding:0"><input type="text" data-gi="${i}" value="${esc(g.name)}"></div>`).join('')}<button id="grpAdd" ${ro()?'disabled':''}>${t('+ Tambah grup','+ Add a group')}</button>`);
+mCard.addEventListener('click',e=>{const id=e.target.id;
+ if(id==='expPrint'){modal.classList.remove('on');printPlan();return}
+ if(id==='expCsv'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv()],{type:'text/csv'}));a.download='denah-'+SLUG+'.csv';document.body.appendChild(a);a.click();a.remove();return}
+ if(id==='uCopy'){copy(usherUrl(),t('Tautan disalin.','Link copied.'));return}
+ if(id==='uNew'){DB.rpc('seating_usher_renew',{p_who:WHO,p_slug:SLUG}).then(k=>{if(k){usher=k;$('#shareBtn').click();toast(t('Tautan baru dibuat. Tautan lama tidak berlaku lagi.','A new link is made. The old one no longer works.'))}});return}
+ if(e.target.id==='expCopy')copy($('#expTxt').value,t('Daftar per meja disalin.','List copied.'));if(e.target.id==='grpAdd'&&!ro()){let n=t('Grup baru','New group'),k=2;while(S.groups.some(x=>x.id===n))n=t('Grup baru ','New group ')+k++;S.groups.push({id:n,name:n,color:COLORS[S.groups.length%COLORS.length]});commit();$('#groupsBtn').click()}});
+mCard.addEventListener('change',e=>{if(ro())return;const gi=e.target.dataset.gi;if(gi==null)return;const g=S.groups[+gi];if(e.target.type==='color'){g.color=e.target.value;return commit()}
+ const nm=e.target.value.trim().slice(0,40);if(!nm||nm===g.name)return;if(S.groups.some(x=>x!==g&&x.id===nm)){toast(t('Nama grup itu sudah ada.','That group name is taken.'));e.target.value=g.name;return}
+ S.guests.forEach(x=>{if(x.group===g.id){x.group=nm;patchGuest(x)}});const old=g.id;g.id=g.name=nm;if(filt.hide.has(old)){filt.hide.delete(old);filt.hide.add(nm)}commit()});
+
+let tt;function toast(m){const x=$('#toast');x.textContent=m;x.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>x.classList.remove('on'),3400)}
+
+/* who is asking, loading, the lock, saving */
+const P={};try{new URLSearchParams(location.search).forEach((v,k)=>{P[k]=v})}catch(e){}
+const AS=P.as==='tim'?'tim':'ruang';let SLUG=P.u||'';
+const stored=k=>{try{return sessionStorage.getItem(k)||localStorage.getItem(k)||''}catch(e){return ''}};
+const WHO=stored(AS==='tim'?'nawala-tim':'nawala-code');
+const KEY=(()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return 'k'+[...a].map(x=>x.toString(16).padStart(2,'0')).join('')})();
+let COUPLE='',usher=null,saveTimer=0,saving=null,dirty=false,guestPatch={};
+const DB=window.NAWALA_DB;
+$('#back').href=AS==='tim'?'../tim/#undangan':'../ruang/#tamu';
+function gate(h,p,href,label){$('#gate-h').textContent=h;$('#gate-p').textContent=p;$('#gate-a').href=href;$('#gate-a').textContent=label;$('#gate').hidden=false}
+function setSave(x,err){const el=$('#save');el.textContent=x;el.classList.toggle('err',!!err)}
+function patchGuest(g){guestPatch[g.id]={id:g.id,party:g.size,grp:g.group||''};queueSave()}
+function queueSave(){if(!mine)return;dirty=true;setSave(t('Menyimpan...','Saving...'));clearTimeout(saveTimer);saveTimer=setTimeout(save,1000)}
+function body(){return{layouts:S.layouts,groups:S.groups.map(g=>({name:g.name,color:g.color})),showPlan:S.showPlan}}
+function save(){clearTimeout(saveTimer);if(!dirty||!mine)return Promise.resolve();dirty=false;const gp=Object.values(guestPatch);guestPatch={};
+ saving=DB.rpc('seating_save',{p_who:WHO,p_slug:SLUG,p_key:KEY,p_seating:body(),p_guests:gp.length?gp:null}).then(r=>{saving=null;
+  if(r&&r.ok){setSave(t('Tersimpan','Saved'));renderStatus();return}
+  if(r&&r.lock){gp.forEach(x=>guestPatch[x.id]=x);lost(r.lock);return}
+  if(r&&r.error==='bentuk'){setSave(t('Terlalu besar untuk disimpan. Kecilkan gambar denah gedung.','Too large to save. Use a smaller venue picture.'),true);return}
+  dirty=true;gp.forEach(x=>guestPatch[x.id]=x);setSave(t('Belum tersimpan','Not saved yet'),true);
+  if(r===null)gate(t('Akses tidak berlaku','Access no longer works'),t('Masuk lagi, lalu buka denah dari sana.','Log in again, then open the plan from there.'),$('#back').href,t('Kembali','Back'));
+ },()=>{saving=null;dirty=true;gp.forEach(x=>guestPatch[x.id]=x);setSave(t('Belum tersimpan, mencoba lagi...','Not saved yet, trying again...'),true);saveTimer=setTimeout(save,4000)});return saving}
+function flush(){return (saving||Promise.resolve()).then(()=>dirty?save():null)}
+function lost(l){mine=false;showLock(l);renderAll();setSave(t('Hanya melihat','View only'),true)}
+function showLock(l){const bar=$('#lockBar');if(mine||narrow()){bar.classList.remove('on');return}
+ let when='';try{when=new Date(l.at).toLocaleTimeString(EN?'en-GB':'id-ID',{hour:'2-digit',minute:'2-digit'})}catch(e){}
+ $('#lockMsg').textContent=t(`${l.who||'Orang lain'} sedang menyunting denah ini${when?' sejak '+when:''}. Kalian melihat tanpa mengubah; giliran terbuka 90 detik setelah ia menutupnya.`,`${l.who||'Someone else'} is editing this plan${when?' since '+when:''}. You can look but not change it; your turn opens 90 seconds after they close it.`);bar.classList.add('on')}
+function hold(){if(!WHO||!SLUG)return;DB.rpc('seating_hold',{p_who:WHO,p_slug:SLUG,p_key:KEY}).then(l=>{if(!l)return;const was=mine;mine=!!l.mine;
+ if(mine&&!was){toast(t('Giliran kalian. Silakan menyunting.','Your turn. You can edit now.'));$('#lockBar').classList.remove('on');reload()}else if(!mine)showLock(l);if(was!==mine)renderAll()},()=>{})}
+setInterval(()=>{if(document.visibilityState==='visible')hold()},30000);
+$('#lockTry').onclick=hold;
+addEventListener('pagehide',()=>{if(dirty&&mine){try{DB.rpc('seating_save',{p_who:WHO,p_slug:SLUG,p_key:KEY,p_seating:body(),p_guests:Object.values(guestPatch)},true)}catch(e){}}
+ if(mine)try{DB.rpc('seating_release',{p_who:WHO,p_slug:SLUG,p_key:KEY},true)}catch(e){}});
+function shrink(file){return new Promise((ok,no)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL('image/jpeg',.72))};img.onerror=no;img.src=u})}
+function load(d){COUPLE=d.couple;SLUG=d.slug;usher=d.usher;S=fromServer(d);mine=!!(d.lock&&d.lock.mine);
+ $('#crumb').textContent=(AS==='tim'?t('Konsol tim, ','Team console, '):t('Ruang pasangan, ','Couple\'s room, '))+d.couple;document.title=t('Denah, ','Plan, ')+d.couple;
+ cur=snap();past=[];future=[];sel=null;chairMode=false;uPick=null;$('#gPick').innerHTML='';
+ pub=d.live?JSON.stringify({l:fromServer({seating:d.live,guests:d.guests}).layouts,g:[],p:d.live.showPlan!==false}):null;
+ unpub=!!(d.seating&&(!d.pub_at||d.at>d.pub_at));$('#showFull').checked=S.showPlan;
+ setSave(mine?(d.at?t('Tersimpan','Saved'):t('Belum ada denah: mulai dari ruangan kosong 20 x 20 m','No plan yet: start from an empty 20 x 20 m room')):t('Hanya melihat','View only'),!mine&&!narrow());
+ showLock(d.lock||{});renderAll();fit()}
+function reload(){return DB.rpc('seating_open',{p_who:WHO,p_slug:SLUG,p_key:KEY}).then(d=>{if(!d)return gate(t('Akses tidak berlaku','Access no longer works'),AS==='tim'?t('Masuk lagi di konsol tim, lalu buka denah dari pesanan.','Log in again in the team console, then open the plan from the order.'):t('Kode kalian tidak berlaku lagi. Hubungi kami lewat WhatsApp dan kami perpanjang.','Your code no longer works. Tell us on WhatsApp and we will extend it.'),$('#back').href,t('Kembali','Back'));load(d)},
+ ()=>gate(t('Database Nawala belum terhubung','The Nawala database is out of reach'),t('Periksa sambungan, lalu muat ulang halaman ini.','Check the connection, then reload this page.'),location.href,t('Muat ulang','Reload')))}
+if(!WHO)gate(AS==='tim'?t('Masuk dulu ke konsol tim','Log in to the team console first'):t('Masuk dulu ke ruang pasangan','Open your room first'),AS==='tim'?t('Denah dibuka dari pesanan di konsol tim.','The plan opens from an order in the team console.'):t('Denah dibuka dari ruang kalian, menu Tamu.','The plan opens from your room, under Guests.'),AS==='tim'?'../tim/':'../ruang/',t('Buka','Open'));
+else if(AS==='tim'&&!SLUG)gate(t('Pesanan tidak ditemukan','Order not found'),t('Buka denah dari pesanan di konsol tim.','Open the plan from an order in the team console.'),'../tim/#undangan',t('Kembali','Back'));
+else reload();
+renderPalette();
+new ResizeObserver(()=>{if(view==='edit')fit()}).observe(canvas);
+}
+</script>
+</body>
+</html>

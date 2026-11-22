@@ -398,7 +398,7 @@
   function liveLink(name) { var o = ORD(); return DB.site + o.slug + (name ? '?to=' + encodeURIComponent(name) : ''); }
   function order() {
     var o = ORD();
-    $('#rail-ord').hidden = !o; $('#rail-guests').hidden = !o;
+    $('#rail-ord').hidden = !o; $('#rail-guests').hidden = !o; $('#rail-seat').hidden = !o;
     if (!o) { $('#ord-form').innerHTML = '<div class="empty"><b>' + t('Belum ada pesanan.', 'No order yet.') + '</b>' + t('Halaman ini terbuka setelah kalian memesan lewat tim Nawala.', 'This page opens once you have ordered through the Nawala team.') + '</div>'; $('#ord-tools').hidden = true; return; }
     $('#ord-tools').hidden = false;
     var st = { isi: t('Silakan isi. Semua tersimpan otomatis.', 'Fill it in. Everything saves as you type.'),
@@ -449,7 +449,7 @@
       : t('Tautan sudah bisa disalin, tetapi baru terbuka setelah undangan tayang.', 'Links can be copied now, but they open only once the invitation is live.')) + ' ' + list.length + ' ' + t('tamu', list.length === 1 ? 'guest' : 'guests') + '.';
     $('#g-list').innerHTML = list.length ? list.map(function (g, i) {
       var a = g.answer && ans[g.answer];
-      return '<div class="row"><div class="row__t"><b>' + esc(g.name) + '</b><span>' + (g.phone ? esc(g.phone.replace(/^62/, '0')) + ', ' : '') + (g.sent_at ? t('sudah dikirim', 'sent') : t('belum dikirim', 'not sent yet')) + (a ? '' : ', ' + t('belum menjawab', 'no answer yet')) + '</span></div>' +
+      return '<div class="row"><div class="row__t"><b>' + esc(g.name) + '</b><span>' + (g.party || 1) + ' ' + t('orang', 'people') + (g.grp ? ', ' + esc(g.grp) : '') + ', ' + (g.phone ? esc(g.phone.replace(/^62/, '0')) + ', ' : '') + (g.sent_at ? t('sudah dikirim', 'sent') : t('belum dikirim', 'not sent yet')) + (a ? '' : ', ' + t('belum menjawab', 'no answer yet')) + '</span></div>' +
         (a ? '<span class="pill pill--' + a[1] + '">' + a[0] + '</span>' : '') +
         '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" data-sent="' + i + '" href="' + esc((g.phone ? 'https://wa.me/' + g.phone.replace(/^0/, '62') : 'https://wa.me/') + '?text=' + encodeURIComponent(message(g))) + '">WhatsApp</a>' +
         '<button type="button" class="round" style="width:44px;height:44px" data-glink="' + i + '" aria-label="' + t('Salin tautan', 'Copy the link') + '">' + K.ic('copy') + '</button>' +
@@ -457,7 +457,7 @@
     }).join('') : '<div class="empty"><b>' + t('Daftar masih kosong.', 'The list is empty.') + '</b>' + t('Tempel nama tamu di kotak, satu nama per baris.', 'Paste guest names in the box, one per line.') + '</div>';
   }
   function saveGuests(list, done) {
-    DB.rpc('room_guests_save', { p_code: room.code, p_guests: list.map(function (g) { return { name: g.name, phone: g.phone || '', sent: !!g.sent_at }; }) }).then(function (ok) {
+    DB.rpc('room_guests_save', { p_code: room.code, p_guests: list.map(function (g) { return { name: g.name, phone: g.phone || '', sent: !!g.sent_at, party: g.party || 1, grp: g.grp || '' }; }) }).then(function (ok) {
       if (!ok) throw new Error('no');
       return DB.rpc('room_open', { p_code: room.code }).then(function (r) { if (r && r.order) { room.order.guests = r.order.guests; } guests(); if (done) done(); });
     }).catch(function () { K.toast(t('Daftar tamu belum tersimpan. Coba lagi.', 'The guest list was not saved. Try again.')); });
@@ -469,8 +469,14 @@
     if (!lines.length) return K.toast(t('Tulis minimal satu nama.', 'Write at least one name.'));
     var list = (o.guests || []).slice();
     lines.forEach(function (l) {
-      var m = l.match(/^(.*?)[,;\t]\s*([+0-9][0-9 .\-]{7,})$/), name = (m ? m[1] : l).trim().slice(0, 80), phone = m ? m[2].replace(/\D/g, '').replace(/^0/, '62') : '';
-      if (name && !list.some(function (g) { return g.name.toLowerCase() === name.toLowerCase(); })) list.push({ name: name, phone: phone });
+      /* name, then in any order after commas: a WhatsApp number, the number of people (1 to 20), a group */
+      var parts = l.split(/[,;\t]/).map(function (x) { return x.trim(); }), name = parts.shift().slice(0, 80), phone = '', party = 1, grp = '';
+      parts.forEach(function (x) {
+        if (/^[+0-9][0-9 .\-]{7,}$/.test(x)) phone = x.replace(/\D/g, '').replace(/^0/, '62');
+        else if (/^\d{1,2}$/.test(x)) party = Math.max(1, Math.min(20, +x));
+        else if (x) grp = x.slice(0, 40);
+      });
+      if (name && !list.some(function (g) { return g.name.toLowerCase() === name.toLowerCase(); })) list.push({ name: name, phone: phone, party: party, grp: grp });
     });
     saveGuests(list, function () { $('#g-paste').value = ''; K.toast(t('Daftar tamu tersimpan.', 'Guest list saved.')); });
   });
