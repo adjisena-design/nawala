@@ -1,0 +1,94 @@
+/* Theme kit: Seribu Lentera (A Thousand Lanterns).
+   Paper sky lanterns rise over an imagined Nusantara palace at night (no single region, owner's choice). Journey: down.
+   The opening is the lantern sky above the clouds; every change of scene sinks the camera one level lower through the lanterns:
+   the palace from above (cover), the pendopo, the turquoise pool with its fountain, the lakeside garden terrace.
+   The writing sits on pages of deep teal paper with a gold line border (border-image), the couple stand in a gold arch.
+   The lanterns are cut-outs moved in code (.lamps in index.html): transform and opacity only, eight on a phone, fourteen wider,
+   standing still under reduced motion.
+   No film and no music of its own (owner, 22 Nov 2026): the opening picture zooms at the tap and Nawala's instrumental plays.
+   Front layers are the lower part of each picture with a soft fade at the top, moving exactly with the picture.
+   Pictures: Higgsfield, 22 Nov 2026 (job numbers in CLAUDE.md). */
+
+:root{
+  --ink:#10292B; --deep:#06181A; --main:#0E3B3D; --soft:#C9A45A;
+  --paper:#F7EED8; --mist:#E9E1CC; --light:#F2C46B;
+  --gate-ink:#FBF3E0;
+  --gate-shade:linear-gradient(180deg,rgba(4,20,24,.55) 0,rgba(4,20,24,.12) 26%,rgba(4,20,24,0) 42%,rgba(4,20,24,0) 60%,rgba(4,20,24,.85) 100%);
+  --bar-rgb:11,42,44; --backdrop:url("../assets/img/plate-seribu-lentera-kolam.webp"); --backdrop-veil:rgba(4,20,24,.6);
+  --accent:#D8436B; --accent-soft:#F4A6C0; --accent-wash:#FBDCE6;
+  --plate-gate:url("../assets/img/plate-seribu-lentera-gate.webp");
+  --nw-flap:url("../assets/img/nw-flap.webp");
+}
+
+[data-scene="sky"]{--plate:url("../assets/img/plate-seribu-lentera-istana.webp");--fg:url("../assets/img/fg-seribu-lentera-istana.webp");--tone:#1C3B4A;
+  --shade:rgba(4,20,24,.16);
+  --veil:#0B2A36;--rim:#FFE2A8;--g1:rgba(255,190,100,.7);--g2:rgba(90,170,180,.32)}
+[data-scene="treetops"]{--plate:url("../assets/img/plate-seribu-lentera-pendopo.webp");--fg:url("../assets/img/fg-seribu-lentera-pendopo.webp");--tone:#2A2620;
+  --shade:linear-gradient(180deg,rgba(6,18,20,.22) 0,rgba(6,18,20,.42) 45%,rgba(6,18,20,.38));
+  --veil:#1A1A16;--rim:#FFDCA0;--g1:rgba(245,175,85,.8);--g2:rgba(120,90,50,.38)}
+[data-scene="branches"]{--plate:url("../assets/img/plate-seribu-lentera-kolam.webp");--fg:url("../assets/img/fg-seribu-lentera-kolam.webp");--tone:#123A40;
+  --shade:rgba(4,20,24,.24);
+  --veil:#08262C;--rim:#BFF2EC;--g1:rgba(80,200,200,.6);--g2:rgba(255,190,100,.35)}
+[data-scene="boulder"]{--plate:url("../assets/img/plate-seribu-lentera-taman.webp");--fg:url("../assets/img/fg-seribu-lentera-taman.webp");--tone:#14303C;
+  --shade:rgba(4,20,24,.2);
+  --veil:#0A2430;--rim:#FFE6B4;--g1:rgba(255,200,120,.75);--g2:rgba(150,200,220,.35)}
+
+.world{--fg-line:.79}
+.front{transform-origin:50% 62%;transform:scale(var(--cam,1))}
+
+/* the join between two levels is always warm lantern light */
+.seam[data-scene]{--veil:#3A2A12;--g1:rgba(255,196,110,.7);--g2:rgba(255,170,80,.3)}
+
+/* night everywhere: no doves, no butterflies; the fireflies stay by the pool */
+.critters .k-dove,.critters .k-bfly{display:none}
+.k-fly{left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 10px 3px rgba(246,196,69,.55);opacity:0;animation:k-glow var(--t,5s) ease-in-out var(--d,0s) infinite}
+@keyframes k-glow{0%,100%{opacity:0;transform:translate3d(0,0,0)}40%{opacity:.95}70%{opacity:.5;transform:translate3d(14px,-26px,0)}}
+
+/* ---------- The lanterns ----------
+   Each rises the full height of the stage from below its place to above it, drifting sideways and swaying on its string of air.
+   Small ones are far away: slower and fainter. They fade in and out at the ends, so none appears or vanishes with a cut. */
+.js .worlds{z-index:1} /* the lanterns stay behind the pages */
+.lamps{display:block;position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none}
+.lamps i{position:absolute;left:var(--x);top:var(--y);width:calc(40px * var(--s,1));aspect-ratio:110/154;opacity:calc(.5 + var(--s,1) * .42);
+  animation:k-rise var(--t,36s) linear var(--d,0s) infinite;will-change:transform,opacity}
+.lamps i::before{content:"";position:absolute;inset:0;background:url("../assets/img/fx-lanterns.webp") calc(var(--n,0) * 100% / 3) 0/400% 100% no-repeat;
+  transform-origin:50% 0;animation:k-sway calc(var(--t,36s) / 6) ease-in-out var(--d,0s) infinite alternate}
+@keyframes k-rise{
+  0%{transform:translate3d(0,var(--sh,100vh),0);opacity:0}
+  8%{opacity:calc(.5 + var(--s,1) * .42)}
+  88%{opacity:calc(.5 + var(--s,1) * .42)}
+  100%{transform:translate3d(var(--dx,0px),calc(var(--sh,100vh) * -1),0);opacity:0}}
+@keyframes k-sway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+/* fewer on small phones */
+@media (max-width:599px){.lamps i:nth-child(n+9){display:none}}
+@media (prefers-reduced-motion:reduce){.lamps i,.lamps i::before{animation:none}}
+
+/* gallery frames: Nawala as bride and groom, set into this world's own scenery; the large one is an arch */
+.is-near .shot[data-plate="sky"]{background-image:url("../assets/img/plate-seribu-lentera-istana.webp");background-position:50% 45%}
+.is-near .shot[data-plate="arch"]{background-image:url("../assets/img/plate-seribu-lentera-gate.webp");background-position:50% 30%}
+.is-near .shot[data-plate="treetops"]{background-image:url("../assets/img/plate-seribu-lentera-pendopo.webp");background-position:50% 50%}
+.is-near .shot[data-plate="branches"]{background-image:url("../assets/img/plate-seribu-lentera-kolam.webp");background-position:50% 60%}
+.is-near .shot[data-plate="boulder"]{background-image:url("../assets/img/plate-seribu-lentera-taman.webp");background-position:50% 55%}
+.is-near .shot[data-plate="hill"]{background-image:url("../assets/img/plate-seribu-lentera-taman.webp");background-position:50% 100%;background-size:210%}
+.gallery__big{border-radius:999px 999px 14px 14px;box-shadow:0 0 0 2px #D9B56A,0 0 0 6px rgba(14,59,61,.9),0 0 0 7px rgba(217,181,106,.7)}
+.thumbs .shot{border-radius:60px 60px 10px 10px}
+
+/* the couple stand in a gold arch */
+.person{position:relative}
+.person::before{content:"";position:absolute;left:50%;top:0;width:min(62%,250px);height:clamp(150px,34vh,300px);transform:translateX(-50%);
+  border-radius:999px 999px 0 0;border:2px solid #D9B56A;border-bottom:0;
+  background:radial-gradient(120% 80% at 50% 30%,rgba(255,206,130,.32),rgba(14,59,61,.55) 70%);
+  box-shadow:inset 0 0 0 5px rgba(14,59,61,.6),inset 0 0 0 6px rgba(217,181,106,.55)}
+.person > img{z-index:1}
+
+/* ---------- The panel is a page of deep teal paper with a gold line border ---------- */
+.js .step .pane{border-radius:0;border-style:solid;border-color:transparent;box-shadow:none;background:none;border-width:50px 50px;
+  border-image:url("../assets/img/panel-seribu-lentera-kertas.webp") 170 172 fill / 50px 50px stretch;
+  padding:.9rem .7rem calc(1rem + var(--sink,0px));color:#F7EED8;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.js .step .pane::before{display:none}
+.js .step .pane h2,.js .step .pane h3{color:#F2D08A}
+.js .step .pane .pane__seal{color:#F4A6C0}
+.js .step .pane a:not([class]){color:#F2D08A}
+/* choices on teal paper: unchosen ones are outlined in gold, the chosen one is ivory */
+.js .step .pane .chips span{background:rgba(247,238,216,.08);color:#F7EED8;box-shadow:inset 0 0 0 1.5px rgba(242,208,138,.6);text-shadow:none}
+.js .step .pane .chips input:checked + span{background:#F7EED8;color:#0E3B3D;box-shadow:none}

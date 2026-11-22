@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://nawalainvite.com/assets/img/og.jpg">
 <link rel="icon" href="../assets/img/icon-64.png">
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/fraunces.woff2" crossorigin>
-<link rel="stylesheet" href="skeleton.css?v=20261121o">
+<link rel="stylesheet" href="skeleton.css?v=20261122a">
 <script src="couple-laras-bima.js"></script>
 <script src="live.js"></script>
 <script>
@@ -44,6 +44,11 @@
     'kapal-bulan': { open: 'drift', close: 'float', name: ['Kapal Bulan', 'Moon Boat'], gate: '../assets/img/plate-kapal-bulan-gate.webp', bar: '#0C1128',
       film: { src: '../assets/video/kapal-bulan-opening.mp4', rate: 1.1 }, music: '../assets/audio/kapal-bulan.mp3', journey: 'diagonal',
       tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'light' } },
+    /* no film and no music of its own (owner, 22 Nov 2026): the lantern sky zooms at the tap and Nawala's instrumental plays.
+       journey: down, the camera sinks through the lanterns into the palace */
+    'seribu-lentera': { open: 'veil', close: 'float', name: ['Seribu Lentera', 'A Thousand Lanterns'], gate: '../assets/img/plate-seribu-lentera-gate.webp', bar: '#0B2A2C',
+      journey: 'down',
+      tones: { sky: 'dark', treetops: 'dark', branches: 'dark', boulder: 'dark' } },
     'kyoto': { open: 'drop', close: 'spin', name: ['Kyoto', 'Kyoto'], gate: '../assets/img/plate-kyoto-gate.webp', bar: '#121A12',
       /* film: from the garden gate up into the sky view (job c0fcd8b1) */
       film: { src: '../assets/video/kyoto-opening.mp4', rate: 1.2 }, music: '../assets/audio/kyoto.mp3', journey: 'drop',
@@ -141,6 +146,23 @@
         <i class="k-bfly" style="--x:76%;--y:88%;--n:6;--t:16s;--d:-2s;--s:.7"></i>
         <i class="k-bfly" style="--x:30%;--y:50%;--n:3;--t:20s;--d:-11s;--s:.75"></i>
       </div>
+    </div>
+    <!-- lanterns drawn over the scenery; only a kit that shows .lamps uses them (Seribu Lentera) -->
+    <div class="lamps">
+      <i style="--x:45%;--y:27%;--s:0.85;--t:33.3s;--d:-2.4s;--dx:4px;--n:0"></i>
+      <i style="--x:16%;--y:54%;--s:1;--t:27.3s;--d:-13.9s;--dx:-28px;--n:1"></i>
+      <i style="--x:15%;--y:63%;--s:0.85;--t:29.8s;--d:-2.7s;--dx:-3px;--n:2"></i>
+      <i style="--x:11%;--y:80%;--s:0.45;--t:41.5s;--d:-26.2s;--dx:7px;--n:3"></i>
+      <i style="--x:11%;--y:81%;--s:1;--t:29.4s;--d:-28.7s;--dx:-28px;--n:0"></i>
+      <i style="--x:75%;--y:25%;--s:0.7;--t:34.3s;--d:-18.5s;--dx:6px;--n:1"></i>
+      <i style="--x:43%;--y:79%;--s:1.2;--t:24.9s;--d:-14.5s;--dx:10px;--n:2"></i>
+      <i style="--x:28%;--y:55%;--s:0.45;--t:39.1s;--d:-2.5s;--dx:-27px;--n:3"></i>
+      <i style="--x:83%;--y:34%;--s:0.85;--t:33.5s;--d:-14.3s;--dx:-10px;--n:0"></i>
+      <i style="--x:63%;--y:82%;--s:0.85;--t:31.6s;--d:-7.9s;--dx:-19px;--n:1"></i>
+      <i style="--x:35%;--y:18%;--s:1;--t:28.8s;--d:-14.3s;--dx:-9px;--n:2"></i>
+      <i style="--x:61%;--y:44%;--s:1;--t:32.9s;--d:-3.9s;--dx:-4px;--n:3"></i>
+      <i style="--x:25%;--y:51%;--s:0.55;--t:39.8s;--d:-16.8s;--dx:12px;--n:0"></i>
+      <i style="--x:13%;--y:79%;--s:1;--t:31.7s;--d:-25.9s;--dx:-9px;--n:1"></i>
     </div>
   </div>
 
@@ -414,6 +436,7 @@
       <button type="button" data-v="istana-awan">Istana Awan</button>
       <button type="button" data-v="teater-tua">Teater Tua</button>
       <button type="button" data-v="kapal-bulan">Kapal Bulan</button>
+      <button type="button" data-v="seribu-lentera">Seribu Lentera</button>
       <button type="button" data-v="kyoto">Kyoto</button>
     </div>
   </div>
@@ -436,7 +459,7 @@
 
 <script src="../assets/js/origin.js?v=2"></script>
 <script src="../assets/js/db.js"></script>
-<script src="invite.js"></script>
+<script src="invite.js?v=20261122a"></script>
 <!-- opened from the home page's theme list: save or pass with a sideways swipe, then the next theme (jelajah.js) -->
 <script>if (/[?&]jelajah=/.test(location.search)) document.write('<script src="../assets/js/simpan.js"><\/script><script src="jelajah.js?v=20261121n"><\/script>');</script>
 </body>

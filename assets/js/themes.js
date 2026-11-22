@@ -130,7 +130,7 @@ window.NAWALA = (function () {
     ['Taman Kaca', 'Glass Garden', 'Rumah kaca penuh anggrek saat fajar.', 'A glasshouse full of orchids at dawn.'],
     ['Perpustakaan Emas', 'Golden Library', 'Perpustakaan keemasan; bukunya terbuka dan bercahaya saat tamu tiba.', 'A golden library; its book opens and glows as your guest arrives.'],
     ['Kapal Bulan', 'Moon Boat', 'Perahu kecil di lautan bintang menuju bulan sabit.', 'A small boat on a sea of stars, heading for the crescent moon.'],
-    ['Seribu Lentera', 'A Thousand Lanterns', 'Lorong seribu lentera; gerbangnya terbuka di ujung.', 'A corridor of a thousand lanterns; the gate opens at its end.'],
+    ['Seribu Lentera', 'A Thousand Lanterns', 'Lentera kertas naik di atas istana Nusantara; halaman kertas toska bergaris emas.', 'Paper lanterns rise over a Nusantara palace; deep teal pages lined with gold.'],
     ['Bawah Laut', 'Under the Sea', 'Paviliun karang dan mutiara di dasar laut yang jernih.', 'A pavilion of coral and pearl on a clear sea floor.'],
     ['Teater Tua', 'Old Opera House', 'Gedung opera tua; tirainya terbuka saat tamu mendekat.', 'An old opera house; the curtain parts as your guest approaches.'],
     ['Keraton Malam', 'Palace by Lamplight', 'Pelataran keraton yang diterangi ratusan pelita.', 'A palace courtyard lit by hundreds of oil lamps.'],

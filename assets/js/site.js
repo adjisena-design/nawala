@@ -42,7 +42,7 @@
      for the couple's photos. Premium: an immersive world: opening film, glass panels standing in the scenery, one swipe
      one step. Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   /* Premium worlds that already have a working sample invitation (undangan/?tema=<slug>). Add a slug when its kit is built. */
-  var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto ';
+  var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto seribu-lentera ';
   var TIERS = {
     dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai untuk foto kalian. 12 foto dan 72 lukisan dengan bunga di sudut kartu; semuanya sudah bisa dibuka.', 'The familiar scroll invitation: one picture, cards that read easily, and frames for your photos. 12 photographs and 72 paintings with flowers on the card corners; every one can be opened.'],
     premium: ['Premium', 'Premium', 'Dunia yang bisa dimasuki: film pembuka, panel kaca di tengah pemandangan, satu geser satu langkah. Tema Umum Nawala, Pendopo Jawa, Akad Putih, dan Kyoto sudah bisa dibuka; dunia lainnya kami kerjakan satu per satu.', 'A world to walk into: an opening film, glass panels standing in the scenery, one swipe one step. The General Nawala theme, Pendopo Jawa, Akad Putih and Kyoto can be opened now; the other worlds are being built one by one.'],
@@ -141,7 +141,7 @@
     ['Taman Kaca', 'Glass Garden', 'Rumah kaca penuh anggrek saat fajar.', 'A glasshouse full of orchids at dawn.'],
     ['Perpustakaan Emas', 'Golden Library', 'Perpustakaan keemasan; bukunya terbuka dan bercahaya saat tamu tiba.', 'A golden library; its book opens and glows as your guest arrives.'],
     ['Kapal Bulan', 'Moon Boat', 'Perahu kecil di lautan bintang menuju bulan sabit.', 'A small boat on a sea of stars, heading for the crescent moon.'],
-    ['Seribu Lentera', 'A Thousand Lanterns', 'Lorong seribu lentera; gerbangnya terbuka di ujung.', 'A corridor of a thousand lanterns; the gate opens at its end.'],
+    ['Seribu Lentera', 'A Thousand Lanterns', 'Lentera kertas naik di atas istana Nusantara; halaman kertas toska bergaris emas.', 'Paper lanterns rise over a Nusantara palace; deep teal pages lined with gold.'],
     ['Bawah Laut', 'Under the Sea', 'Paviliun karang dan mutiara di dasar laut yang jernih.', 'A pavilion of coral and pearl on a clear sea floor.'],
     ['Teater Tua', 'Old Opera House', 'Gedung opera tua; tirainya terbuka saat tamu mendekat.', 'An old opera house; the curtain parts as your guest approaches.'],
     ['Keraton Malam', 'Palace by Lamplight', 'Pelataran keraton yang diterangi ratusan pelita.', 'A palace courtyard lit by hundreds of oil lamps.'],

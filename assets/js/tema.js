@@ -18,7 +18,7 @@
   var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var WA = '6281379211628';
   /* Premium and Exclusive worlds with a working sample, until the database answers with its kit column (as in site.js) */
-  var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto ';
+  var BUILT = ' pendopo-jawa akad-putih istana-awan teater-tua kapal-bulan kyoto seribu-lentera ';
   var PREFIX = { dasar: 'D', premium: 'P', eksklusif: 'E' };
   var FAMTAG = { alam: 'alam', royal: 'kerajaan', religi: 'religi', nusa: 'nusantara', dunia: 'mancanegara', era: 'lintasmasa', elemen: 'elemen',
     bunga: 'bunga', tempat: 'indonesia', budaya: 'budaya', waktu: 'musim' };

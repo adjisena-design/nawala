@@ -525,7 +525,7 @@
   /* put a step on screen at once (start, level change, resize) */
   /* ----- Journeys: a kit may move from scene to scene in its own direction instead of the light sweep.
      Both scenes are on screen while they move; #seam covers the join. Only transform and opacity change. ----- */
-  var JTIME = { up: 1350, side: 1250, diagonal: 1500, hop: 900, drop: 1870 };
+  var JTIME = { up: 1350, down: 1450, side: 1250, diagonal: 1500, hop: 900, drop: 1870 };
   var JOURNEY = JTIME[KIT.journey] ? KIT.journey : '', JT = JTIME[JOURNEY] || 0, seam = $('#seam');
   if (JOURNEY) { stage.setAttribute('data-journey', JOURNEY); stage.style.setProperty('--jt', JT + 'ms'); }
   function travel(a, b, next) {

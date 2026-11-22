@@ -429,6 +429,16 @@ dialog::backdrop{background:rgba(8,18,12,.8)}
 [data-journey="up"] .seam__fit i::before{content:"";position:absolute;left:-10%;right:-10%;height:76%;top:calc(50% + var(--dir,1) * 50% - 38%);
   background:linear-gradient(180deg,transparent 0,var(--g2) 16%,var(--g1) 30%,var(--veil) 43%,var(--veil) 57%,var(--g1) 70%,var(--g2) 84%,transparent 100%)}
 
+/* down: sinking. The new scene rises from below, the old one leaves above; the same band of light rides on the join. */
+[data-journey="down"] .j-out{animation-name:j-down-out}
+[data-journey="down"] .j-in,[data-journey="down"] .seam.is-run .seam__fit i{animation-name:j-down-in}
+@keyframes j-down-out{to{transform:translate3d(0,calc(var(--dir,1) * -100%),0) scale(var(--cam,1))}}
+@keyframes j-down-in{from{transform:translate3d(0,calc(var(--dir,1) * 100%),0) scale(var(--cam,1))}}
+[data-journey="down"] .seam__fit i::before{content:"";position:absolute;left:-10%;right:-10%;height:76%;top:calc(50% - var(--dir,1) * 50% - 38%);
+  background:linear-gradient(180deg,transparent 0,var(--g2) 16%,var(--g1) 30%,var(--veil) 43%,var(--veil) 57%,var(--g1) 70%,var(--g2) 84%,transparent 100%)}
+/* lanterns over the scenery: hidden unless a kit shows them */
+.lamps{display:none}
+
 /* side: an old film reel. Scenes pass sideways as frames; the dark frame line rides on the join and the perforations run along the edges. */
 [data-journey="side"] .j-out{animation-name:j-side-out}
 [data-journey="side"] .j-in,[data-journey="side"] .seam.is-run .seam__fit i{animation-name:j-side-in}
