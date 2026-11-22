@@ -254,7 +254,8 @@ main{overflow-x:clip}
 .hero__lead{margin-top:1.1rem;font-size:1.0625rem;line-height:1.55;color:rgba(12,29,19,.86);max-width:30rem}
 .hero__title,.hero__lead{position:relative;z-index:3}
 .hero .hero__actions{position:absolute;z-index:3;left:1.25rem;right:1.25rem;bottom:calc(84px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:.75rem}
-.hero__next{position:absolute;z-index:3;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));width:48px;height:48px;margin-left:-24px;display:grid;place-items:center;border-radius:50%;color:var(--forest);background:rgba(251,246,234,.55);box-shadow:inset 0 0 0 1.5px rgba(22,48,31,.4);animation:nudge 2.6s ease-in-out infinite}
+/* the cue sits clear above the band of light that rests on the seam, solid so it reads on clouds or peaks */
+.hero__next{position:absolute;z-index:3;left:50%;bottom:calc(16vh + env(safe-area-inset-bottom));width:52px;height:52px;margin-left:-26px;display:grid;place-items:center;border-radius:50%;color:var(--forest-deep);background:rgba(251,246,234,.94);box-shadow:inset 0 0 0 1.5px rgba(22,48,31,.28),0 10px 26px -10px rgba(12,29,19,.45);animation:nudge 2.6s ease-in-out infinite}
 .hero__next svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
@@ -266,11 +267,12 @@ main{overflow-x:clip}
 
 @media (min-width:900px){
   .hero .plate img{object-position:50% 50%}
-  .hero__mist{background:linear-gradient(90deg,rgba(251,246,234,.92) 0%,rgba(251,246,234,.78) 30%,rgba(251,246,234,.5) 50%,rgba(251,246,234,.14) 64%,rgba(251,246,234,0) 74%)}
+  .hero__mist{background:linear-gradient(90deg,rgba(251,246,234,.94) 0%,rgba(251,246,234,.88) 34%,rgba(251,246,234,.66) 46%,rgba(251,246,234,.26) 60%,rgba(251,246,234,0) 72%)}
   .hero__copy::before{content:"";position:absolute;z-index:2;inset:-14% -14% -22% -10%;pointer-events:none;background:radial-gradient(closest-side,rgba(251,246,234,.82),rgba(251,246,234,.6) 58%,rgba(251,246,234,0))}
-  .hero__copy{position:absolute;left:calc(var(--rail) + 3vw);top:calc(50% + 24px);transform:translateY(-50%);padding:0;max-width:min(48rem,47vw)}
+  /* the words sit higher and narrower than before, so the lead ends left of the far peak (owner, 22 Nov 2026) */
+  .hero__copy{position:absolute;left:calc(var(--rail) + 3vw);top:calc(44% + 24px);transform:translateY(-50%);padding:0;max-width:min(48rem,47vw)}
   .hero__title{font-size:clamp(3.75rem,min(7.8vw,15svh),9rem);line-height:1.02;letter-spacing:-.026em}
-  .hero__lead{font-size:clamp(1.25rem,1.55vw,1.625rem);line-height:1.5;margin-top:1.4rem;max-width:36rem}
+  .hero__lead{font-size:clamp(1.25rem,1.55vw,1.625rem);line-height:1.5;margin-top:1.4rem;max-width:min(30rem,31vw)}
   .hero .hero__actions{position:static;margin-top:2rem}
   .flock{top:16%}.flock--b{top:30%}
   .dove{width:calc(70px * var(--s,1))}
@@ -1053,7 +1055,7 @@ main{overflow-x:clip}
 .fore img{display:block;width:100%;height:auto}
 /* the near doves fly behind the words and, on phones, below them: nothing bright crosses in front of text */
 .flock--near{top:48%;z-index:2;width:420px;height:260px;animation-duration:30s;animation-delay:-9s}
-.fore--arch{left:-12vw;bottom:-2px;width:124vw;z-index:1;transform:translate3d(0,calc(var(--p,0) * -3vh),0);will-change:transform}
+.fore--arch{left:-12vw;bottom:-7vh;width:124vw;z-index:1;transform:translate3d(0,calc(var(--p,0) * -3vh),0);will-change:transform}
 .fore--arch img{transform-origin:50% 100%}
 .fore--arch,.fore--meadow,.svc-fore img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%)}
 .fore--meadow{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}

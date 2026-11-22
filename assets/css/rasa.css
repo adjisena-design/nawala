@@ -2,6 +2,8 @@
 .rasa-sheen{position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none;opacity:0;overflow:hidden;transition:opacity .45s;
   background:radial-gradient(420px circle at var(--rasa-mx,50%) var(--rasa-my,50%),rgba(255,255,255,.3),rgba(255,255,255,.08) 38%,transparent 62%);mix-blend-mode:soft-light}
 .is-rasa > .rasa-sheen{opacity:1}
+/* the services items have no box of their own, so the light would show as a pale rectangle on the forest: they tilt, without light */
+.svc > .rasa-sheen{display:none}
 .btn > .rasa-sheen{background:radial-gradient(110px circle at var(--rasa-mx,50%) var(--rasa-my,50%),rgba(255,255,255,.6),transparent 70%);mix-blend-mode:overlay}
 /* depth for the tilt */
 .about__says,.services__list,.services__phone,.tiers,.contact__inner,.dm--letters,.dm--steps,.hero__actions,.ga__from,.ga__album{perspective:1100px}

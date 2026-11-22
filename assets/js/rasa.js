@@ -47,17 +47,20 @@
     }
     if (live.length) raf = requestAnimationFrame(tick);
   }
+  /* a services item that is not the one on screen stays still: no peeking at the next card (owner, 22 Nov 2026) */
+  function asleep(el) { return el.classList.contains('svc') && !el.classList.contains('is-on') && innerWidth >= 900; }
   function kick() { if (!raf) raf = requestAnimationFrame(tick); }
   function enter(el) { if (cur === el) return; if (cur) leave(cur); cur = el; st(el); el.classList.add('is-rasa'); kick(); }
   function leave(el) { var o = el._rasa; if (o) { o.ta = 0; o.tyy = 0; o.ts = 1; } el.classList.remove('is-rasa'); if (cur === el) cur = null; kick(); }
   d.addEventListener('pointerover', function (e) {
     if (!fine.matches || e.pointerType !== 'mouse') return;
     var el = e.target.closest && e.target.closest(SEL);
+    if (el && asleep(el)) el = null;
     if (el) enter(el); else if (cur) leave(cur);
   });
   d.addEventListener('pointermove', function (e) { if (cur && e.pointerType === 'mouse') { px = e.clientX; py = e.clientY; kick(); } }, { passive: true });
   d.addEventListener('pointerout', function (e) { if (cur && !(e.relatedTarget && cur.contains(e.relatedTarget))) leave(cur); });
-  addEventListener('scroll', function () { if (cur) kick(); }, { passive: true });
+  addEventListener('scroll', function () { if (cur) { if (asleep(cur)) leave(cur); else kick(); } }, { passive: true });
 
   /* Phones (data-rasa="hp"): they rest leaned and turned (CSS transform) and follow the pointer anywhere in their
      section, not only under it; on touch screens they follow the device's own tilt where the browser gives it
