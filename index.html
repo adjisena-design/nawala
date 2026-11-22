@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261122t">
+<link rel="stylesheet" href="assets/css/site.css?v=20261122i">
 <link rel="stylesheet" href="assets/css/kit.css?v=20261121o">
 </head>
 <body>
@@ -154,20 +154,12 @@ d.classList.add('js');})();
       <div class="say" data-step="0">
         <h2 data-en="Every guest receives a letter of their own.">Setiap tamu menerima suratnya sendiri.</h2>
         <p data-en="Not one link dropped into a group chat. Nawala arrives with the guest's name on the envelope, so it gets opened, not scrolled past.">Bukan satu tautan yang dilempar ke grup chat. Nawala datang dengan nama tamu di amplopnya, sehingga dibuka, bukan dilewati.</p>
-        <div class="dm dm--chat" aria-hidden="true">
-          <div class="dm__msg"><i class="dm__env"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z"/></svg></i><div><b data-en="To Dinda">Kepada Dinda</b><span>nawalainvite.com/laras-bima?to=Dinda</span></div></div>
-          <div class="dm__msg"><i class="dm__env"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z"/></svg></i><div><b data-en="To Mr Hendra">Kepada Pak Hendra</b><span>nawalainvite.com/laras-bima?to=Pak+Hendra</span></div></div>
-          <div class="dm__msg"><i class="dm__env"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z"/></svg></i><div><b data-en="To the Santoso family">Kepada Keluarga Santoso</b><span>nawalainvite.com/laras-bima?to=Keluarga+Santoso</span></div></div>
-        </div>
+        <div class="dm dm--letters" aria-hidden="true"><div class="lt" style="--d:0s"><img src="assets/img/nw-back.webp" width="720" height="395" alt="" loading="lazy"><span class="lt__label"><span data-en="To">Kepada Yth.</span><b data-en="Dinda">Dinda</b></span></div><div class="lt" style="--d:0.35s"><img src="assets/img/nw-back.webp" width="720" height="395" alt="" loading="lazy"><span class="lt__label"><span data-en="To">Kepada Yth.</span><b data-en="Mr Hendra">Pak Hendra</b></span></div><div class="lt" style="--d:0.7s"><img src="assets/img/nw-back.webp" width="720" height="395" alt="" loading="lazy"><span class="lt__label"><span data-en="To">Kepada Yth.</span><b class="is-long" data-en="The Santoso family">Keluarga Santoso</b></span></div></div>
       </div>
       <div class="say" data-step="1">
         <h2 data-en="It opens like a gift, not like a brochure.">Dibuka seperti hadiah, bukan seperti brosur.</h2>
         <p data-en="The envelope opens and your guest steps into the world you chose: a forest, a palace, a shore, or a place made only for you.">Amplop terbuka, lalu tamu melangkah masuk ke dunia yang kalian pilih: hutan, istana, pantai, atau tempat yang dibuat hanya untuk kalian.</p>
-        <div class="dm dm--gift" aria-hidden="true">
-          <div class="dm__world"></div>
-          <div class="dm__card"><b>Laras &amp; Bima</b><span data-en="Saturday, 12 June 2027">Sabtu, 12 Juni 2027</span></div>
-          <div class="dm__envelope"><i class="dm__flap"></i><span data-en="To">Kepada</span><b>Dinda</b><i class="dm__seal"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 20.500c-5-3.600-8-6.500-8-10a4.300 4.300 0 0 1 8-2.300 4.300 4.300 0 0 1 8 2.300c0 3.500-3 6.400-8 10z"/></svg><i class="tap"></i></i></div>
-        </div>
+        <div class="dm dm--film" aria-hidden="true"><div class="dm__phone"><video id="open-film" muted playsinline loop preload="none" poster="assets/img/beranda-buka.webp" data-src="assets/video/beranda-buka.mp4"></video></div></div>
       </div>
       <div class="say" data-step="2">
         <h2 data-en="You choose. We do the work.">Kalian memilih. Kami yang mengerjakan.</h2>
@@ -305,13 +297,11 @@ d.classList.add('js');})();
       </li>
       <li class="svc" data-svc="6" data-tab="4">
         <div class="svc__screen scr scr--photo">
-          <div class="scr__top"><b data-en="Guest gallery">Galeri tamu</b><span>Laras &amp; Bima</span></div>
-          <div class="shots"><i></i><i></i><i></i><i></i><i></i><i></i><u class="shots__new"></u></div>
-          <b class="cnt"><span data-en="24 photos from guests">24 foto dari tamu</span><span data-en="25 photos from guests">25 foto dari tamu</span></b>
-          <em class="scr__btn scr__btn--add" data-en="Add a photo">Tambah foto<i class="tap"></i></em>
+          <div class="scr__top"><b data-en="Album from guests">Album dari tamu</b><span>Laras &amp; Bima</span></div>
+          <div class="ga"><div class="ga__from"><div class="ga__ph" style="--i:0"><i class="ga__shot" style="background-image:url(assets/img/tamu-lorong.webp?v=2)"></i><span>Dinda</span></div><div class="ga__ph" style="--i:1"><i class="ga__shot" style="background-image:url(assets/img/tamu-kue.webp?v=2)"></i><span>Rani</span></div><div class="ga__ph" style="--i:2"><i class="ga__shot" style="background-image:url(assets/img/tamu-cincin.webp?v=2)"></i><span>Pak Hendra</span></div></div><div class="ga__album"><i class="ga__t ga__t--new" style="--i:0"><u class="ga__fly" style="background-image:url(assets/img/tamu-lorong.webp?v=2)"></u></i><i class="ga__t ga__t--new" style="--i:1"><u class="ga__fly" style="background-image:url(assets/img/tamu-kue.webp?v=2)"></u></i><i class="ga__t ga__t--new" style="--i:2"><u class="ga__fly" style="background-image:url(assets/img/tamu-cincin.webp?v=2)"></u></i><i class="ga__t" style="background-image:url(assets/img/tamu-lengkung.webp?v=2)"></i><i class="ga__t" style="background-image:url(assets/img/tamu-pelaminan.webp?v=2)"></i><i class="ga__t" style="background-image:url(assets/img/tamu-meja.webp?v=2)"></i></div></div><b class="ga__cnt"><span data-en="Album: 24 photos">Album: 24 foto</span><span data-en="Album: 25 photos">Album: 25 foto</span><span data-en="Album: 26 photos">Album: 26 foto</span><span data-en="Album: 27 photos">Album: 27 foto</span></b>
         </div>
-        <h3 data-en="Photos from guests">Foto dari tamu</h3>
-        <p data-en="Guests add their own photos and videos to one shared gallery during the event.">Tamu menambahkan foto dan video mereka ke satu galeri bersama selama acara.</p>
+        <h3 data-en="One album from every guest">Satu album dari semua tamu</h3>
+        <p data-en="Guests take photos on their own phones, and every photo lands in one album that is yours. No more asking everyone to send them one by one.">Tamu memotret dengan ponsel masing-masing, dan fotonya langsung masuk ke satu album milik kalian. Tidak perlu lagi meminta kiriman satu per satu.</p>
       </li>
     </ul>
   </div>
@@ -543,6 +533,7 @@ d.classList.add('js');})();
 <script src="assets/js/origin.js?v=2"></script>
 <script src="assets/js/db.js?v=20261121n" defer></script>
 <script src="assets/js/simpan.js?v=20261121n" defer></script>
+<script src="assets/js/peraga.js?v=1" defer></script>
 <script src="assets/js/site.js?v=20261122h" defer></script>
 </body>
 </html>

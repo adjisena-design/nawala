@@ -1,13 +1,7 @@
-/* Preview of the owner's points 2, 3 and 4 (22 Nov 2026). Loaded only by undangan/pratinjau.html. */
+/* The arch's real opening film and the guests' album (owner, approved 22 Nov 2026). */
 (function () {
   'use strict';
   var d = document;
-  /* the page has <base href="../">, so in-page links would leave for the live home page: keep them here */
-  d.addEventListener('click', function (e) {
-    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
-    var el = d.getElementById(a.getAttribute('href').slice(1)); if (!el) return;
-    e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
   function ready(fn) { if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', fn); else fn(); }
   ready(function () {
     var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
