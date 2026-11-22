@@ -8,6 +8,7 @@ Home page for Nawala, a digital wedding invitation business in Indonesia. Static
   - One agreed exception: the desktop menu morph (top bar into left rail) moves `clip-path` on two small glass shapes. It only exists at 900px and wider. Phones do the same job with opacity and scale.
 - No emojis anywhere. No real or generated human faces: Nawala (the winged letter) stands in for the couple.
 - Site copy is Indonesian first with an English toggle. Every visible string carries `data-en`; the script swaps it. Strings built in `site.js` go through `t(id, en)`.
+- Text must stay readable over its picture (owner, 22 Nov 2026). Never put text in front of a high-visibility object (a mountain, a bright cloud bank, a creature) without checking it on screen at 1440x900, a laptop width and 390x844: move the object, move the text, or add a fade behind the text. Creatures fly behind or away from text, never across it.
 - Nothing thin and nothing tiny: body text 17px or larger, touch targets 44px or larger.
 - Do not invent evidence. There are no customers, testimonials or prices yet. The 50 theme covers, the 72 painted Dasar themes and 20 sample films are real. Working sample invitations exist for eight Premium worlds (General Nawala theme, Pendopo Jawa, Akad Putih, Kyoto, Istana Awan, Teater Tua, Kapal Bulan, Seribu Lentera; the last four moved from Eksklusif on 22 Nov 2026) and all 84 Dasar themes (12 photographic, 72 painted); the other 25 Premium and all 6 Eksklusif covers still have no invitation behind them, and the page says so. No theme is marked as owned until a couple has really bought it. The log-in box checks codes against the database; if the check cannot be reached it says so and offers WhatsApp.
 - Higgsfield credits: for the painted Dasar themes (owner, 21 Nov 2026, 13:55) the floor was 250 remaining; before that it was 350, earlier 500. Ask before going lower. Balance after the 72 painted themes: 264.4. For Seribu Lentera (22 Nov 2026) the owner allowed 12 credits, pictures and art only (balance before: 215.68, after about 203.7).
@@ -23,7 +24,7 @@ Sky, arch, trees, deep forest, flower hill. Each section sits on scenery; text s
 
 | Altitude | Section | Scenery | Creatures (all drawn from cut-outs, moved with transforms) |
 | --- | --- | --- | --- |
-| 1 | `.hero` | open sky above the clouds, sun rays | two flocks of white doves, a small plane with a contrail, an ivory blimp |
+| 1 | `.hero` | open sky above the clouds, sun rays | two flocks of white doves, a small plane high up and fast with its contrail, an ivory blimp lower and slower, drifting nose first right to left |
 | 2 | `.about` | moss arch | three doves |
 | 3 | `.services` | treetops, warm golden green | two doves |
 | 4 | `.themes` | mossy branches, dim + the river of covers | three butterflies, and the branch Nawala bumps into |
@@ -277,3 +278,8 @@ Owner: "make it beautiful, like our grand theme ... available from the landing p
 
 ## Hero without buttons (owner, 22 Nov 2026, 22:18)
 The hero has no buttons any more ("Mulai undangan kalian", "Lihat tema" and "Coba demo denah" are gone; their `.hero__actions` rules stay unused in `site.css`). The owner's two ways on from the hero: scroll down through the whole descent, or go straight to what they need with the top bar, which becomes the side rail on scroll. Do not add buttons back to the hero.
+
+## Hero sky, 22 Nov 2026, 22:40 (owner: lead text hard to read over the mountain; plane and blimp unrealistic)
+- The desktop mist (`.hero__mist`) now reaches further right and an ivory halo (`.hero__copy::before`) sits behind the headline and lead.
+- The plane flies high (13% desktop) and small, crossing in 70 s with its contrail; the blimp hangs lower (23%), larger, drifts right to left the way its nose points in 380 s and bobs a little.
+- The two near doves (`.flock--near`) fly at 48% and behind the text (z 2), so nothing bright crosses the words on phones.

@@ -232,19 +232,22 @@ main{overflow-x:clip}
   animation:rays 9s ease-in-out infinite alternate}
 @keyframes rays{from{opacity:.35}to{opacity:.8}}
 .hero__mist{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,246,234,.9) 0%,rgba(251,246,234,.78) 32%,rgba(251,246,234,.4) 46%,rgba(251,246,234,0) 58%)}
-/* doves in flocks, one small plane far off, one slow blimp */
+/* doves in flocks; one small plane high and far off, fast, with its contrail; one blimp lower and nearer,
+   drifting slowly the way its nose points (right to left) and bobbing a little (owner, 22 Nov 2026) */
 .flock{position:absolute;left:0;top:47%;width:300px;height:150px;pointer-events:none;animation:cross 58s linear infinite;animation-delay:-14s;will-change:transform}
 .flock--b{top:57%;animation-duration:84s;animation-delay:-46s}
 .dove{position:absolute;left:var(--x);top:var(--y);width:calc(58px * var(--s,1));aspect-ratio:160/150;overflow:hidden}
 .dove b{position:absolute;left:0;top:0;width:400%;height:100%;background:url("../img/fx-doves.webp") 0 0/100% 100% no-repeat;animation:wing .44s steps(4) infinite;animation-delay:var(--d,0s)}
 @keyframes wing{to{transform:translate3d(-100%,0,0)}}
 @keyframes cross{from{transform:translate3d(-40vw,0,0)}to{transform:translate3d(120vw,-5vh,0)}}
-.plane{position:absolute;left:0;top:49%;width:56px;pointer-events:none;animation:far 130s linear infinite;animation-delay:-52s;will-change:transform}
+.plane{position:absolute;left:0;top:38%;width:44px;pointer-events:none;animation:far 70s linear infinite;animation-delay:-28s;will-change:transform}
 .plane img,.blimp img{width:100%;height:auto}
 .plane i{position:absolute;right:88%;top:56%;width:34vw;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));transform:rotate(-7deg);transform-origin:100% 50%}
-.blimp{position:absolute;left:0;top:52%;width:84px;pointer-events:none;animation:drift 240s linear infinite;animation-delay:-96s;will-change:transform}
+.blimp{position:absolute;left:0;top:46%;width:96px;pointer-events:none;animation:drift 380s linear infinite;animation-delay:-150s;will-change:transform}
+.blimp img{animation:bob 7s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translate3d(0,-3px,0) rotate(-.6deg)}to{transform:translate3d(0,4px,0) rotate(.6deg)}}
 @keyframes far{from{transform:translate3d(-30vw,5vh,0)}to{transform:translate3d(125vw,-3vh,0)}}
-@keyframes drift{from{transform:translate3d(-30vw,0,0)}to{transform:translate3d(120vw,-3vh,0)}}
+@keyframes drift{from{transform:translate3d(120vw,-2vh,0)}to{transform:translate3d(-30vw,1vh,0)}}
 
 .hero__copy{position:static;padding:calc(84px + env(safe-area-inset-top)) 1.25rem 0;max-width:34rem}
 .hero__title{font-size:clamp(3rem,13vw,4.75rem);line-height:1.02;color:var(--forest-deep)}
@@ -263,15 +266,16 @@ main{overflow-x:clip}
 
 @media (min-width:900px){
   .hero .plate img{object-position:50% 50%}
-  .hero__mist{background:linear-gradient(90deg,rgba(251,246,234,.9) 0%,rgba(251,246,234,.7) 30%,rgba(251,246,234,.2) 52%,rgba(251,246,234,0) 64%)}
+  .hero__mist{background:linear-gradient(90deg,rgba(251,246,234,.92) 0%,rgba(251,246,234,.78) 30%,rgba(251,246,234,.5) 50%,rgba(251,246,234,.14) 64%,rgba(251,246,234,0) 74%)}
+  .hero__copy::before{content:"";position:absolute;z-index:2;inset:-14% -14% -22% -10%;pointer-events:none;background:radial-gradient(closest-side,rgba(251,246,234,.82),rgba(251,246,234,.6) 58%,rgba(251,246,234,0))}
   .hero__copy{position:absolute;left:calc(var(--rail) + 3vw);top:calc(50% + 24px);transform:translateY(-50%);padding:0;max-width:min(48rem,47vw)}
   .hero__title{font-size:clamp(3.75rem,min(7.8vw,15svh),9rem);line-height:1.02;letter-spacing:-.026em}
   .hero__lead{font-size:clamp(1.25rem,1.55vw,1.625rem);line-height:1.5;margin-top:1.4rem;max-width:36rem}
   .hero .hero__actions{position:static;margin-top:2rem}
   .flock{top:16%}.flock--b{top:30%}
   .dove{width:calc(70px * var(--s,1))}
-  .plane{top:14%;width:96px}
-  .blimp{top:19%;width:150px}
+  .plane{top:13%;width:70px}
+  .blimp{top:23%;width:140px}
 }
 
 /* ---------- 2. About: the arch ---------- */
@@ -1047,7 +1051,8 @@ main{overflow-x:clip}
    the scenery's own cut-outs, softer than the plates on purpose: near the camera, out of focus. */
 .fore{position:absolute;z-index:4;pointer-events:none}
 .fore img{display:block;width:100%;height:auto}
-.flock--near{top:12%;z-index:4;width:420px;height:260px;animation-duration:30s;animation-delay:-9s}
+/* the near doves fly behind the words and, on phones, below them: nothing bright crosses in front of text */
+.flock--near{top:48%;z-index:2;width:420px;height:260px;animation-duration:30s;animation-delay:-9s}
 .fore--arch{left:-12vw;bottom:-2px;width:124vw;z-index:1;transform:translate3d(0,calc(var(--p,0) * -3vh),0);will-change:transform}
 .fore--arch img{transform-origin:50% 100%}
 .fore--arch,.fore--meadow,.svc-fore img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 78%,transparent 100%)}
