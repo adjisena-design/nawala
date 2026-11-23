@@ -6050,7 +6050,7 @@ function mount({ stage, svg, read }, value) {
 export { amplop };
 
 /* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "keranjang" (pass D, 23 Nov 2026).
-   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
+   Source: assets/js/garis-src/keranjang.js, built on the package's own kernel and checked with its look.mjs. */
 TABLE.keranjang = [10, 22, 34];
 var keranjang = (() => {
 
@@ -6194,19 +6194,13 @@ function mount({ stage, svg, read }, value) {
 
 
   return function keranjang(el, options) {
-    return create({
-      id: "keranjang",
-      label: 'A basket holding an album, an envelope and a phone: the one nearest the pointer rises out and takes the bright edge.',
-      rest: "rest",
-      engine: mount,
-      tour: [[140, 150], [205, 165], [262, 190], null]
-    }, el, options);
+    return create({ id: "keranjang", label: 'A basket holding an album, an envelope and a phone: the one nearest the pointer rises out and takes the bright edge.', rest: "rest", engine: mount, tour: [[140, 150], [205, 165], [262, 190], null] }, el, options);
   };
 })();
 export { keranjang };
 
 /* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "denah" (pass D, 23 Nov 2026).
-   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
+   Source: assets/js/garis-src/denah.js, built on the package's own kernel and checked with its look.mjs. */
 TABLE.denah = [8, 15, 22];
 var denah = (() => {
 
@@ -6312,74 +6306,87 @@ function mount({ stage, svg, read }, value) {
 
 
   return function denah(el, options) {
-    return create({
-      id: "denah",
-      label: 'A reception floor: stage, aisle and six round tables. The table nearest the pointer rises and its chairs light.',
-      rest: "rest",
-      engine: mount,
-      tour: [[150, 150], [245, 185], [205, 235], null]
-    }, el, options);
+    return create({ id: "denah", label: 'A reception floor: stage, aisle and six round tables. The table nearest the pointer rises and its chairs light.', rest: "rest", engine: mount, tour: [[150, 150], [245, 185], [205, 235], null] }, el, options);
   };
 })();
 export { denah };
 
 /* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "album" (pass D, 23 Nov 2026).
-   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
-TABLE.album = [16, 30, 46];
+   Source: assets/js/garis-src/album.js, built on the package's own kernel and checked with its look.mjs. */
+TABLE.album = [8, 18, 30];
 var album = (() => {
 
 
 const W = 132, D = 88, GUT = 5, CZ = 3, PZ = 5.5, REST = 0.62, N = 4;
-// pockets: two on each page, one behind the other
+const PH = { x0: -44, x1: -24, y0: 66, y1: 70, h: 42 };   // the guest's phone
+const SHOTS = ["tamu-pelaminan", "tamu-kue", "tamu-lengkung", "tamu-meja"];
 const POCKETS = [];
 for (let page = 0; page < 2; page++) for (let k = 0; k < 2; k++) {
   const x0 = page === 0 ? 9 : W / 2 + GUT / 2 + 6, x1 = page === 0 ? W / 2 - GUT / 2 - 6 : W - 9;
   POCKETS.push([x0, k === 0 ? 8 : 47, x1, k === 0 ? 41 : 80]);
 }
-// the order they land in: far to near, so a landed print is never painted over a falling one behind it
+// the order they land in: far to near, so a landed print is never painted over one still in flight behind it
 const ORDER = POCKETS.map((_, i) => i).sort((a, b) => POCKETS[a][0] + POCKETS[a][1] - POCKETS[b][0] - POCKETS[b][1]);
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  let drop = value;
+  let arc = value;
 
-  const C = Cam(45, 0.5, 1.72);
-  fit(C, [[0, 0, 0], [W, D, 0], [W, 0, 0], [0, D, 0], [8, 8, PZ + 56], [W - 8, 8, PZ + 56], [W - 8, 80, PZ + 56]], 200, 172);
+  const C = Cam(45, 0.5, 1.5);
+  fit(C, [[PH.x0, 0, 0], [W, D, 0], [W, 0, 0], [PH.x0, D, 0], [PH.x0, PH.y0, PH.h + 4], [40, 30, PZ + 60], [W - 8, 8, PZ + 30]], 200, 176);
   const P = proj(C), front = facing(C);
 
   const g = mk("g", {}, svg);
-  // the cover, then the two pages lying on it with the gutter between them
   const [cr, ci] = rings(0, 0, W, D, 7, 1.6);
   reflect(svg, g, P, front, cr, 0, 12);
   put(solid(g), prism(P, front, cr, ci, 0, CZ));
   [[3, W / 2 - GUT / 2], [W / 2 + GUT / 2, W - 3]].forEach(([a, b]) => { const [r, i] = rings(a, 3, b, D - 3, 4, 1.2); put(solid(g), prism(P, front, r, i, CZ, PZ)); });
-  // the spine's stitching, down the gutter
   mk("path", { d: [14, 30, 46, 62, 78].map((y) => seg(P(W / 2, y - 4, CZ), P(W / 2, y + 4, CZ))).join(""), class: "nf lo" }, g);
-  // the pockets, drawn on the pages
   mk("path", { d: POCKETS.map(([x0, y0, x1, y1]) => poly(ringAt(P, rrect(x0, y0, x1, y1, 2, 3), PZ))).join(""), class: "nf lo" }, g);
 
-  // the prints, in landing order: each a thin plate with a picture's border inside
-  const prints = ORDER.map((p) => {
-    const [x0, y0, x1, y1] = POCKETS[p], grp = mk("g", {}, g);
-    return { plate: mk("path", { class: "sil" }, grp), pic: mk("path", { class: "nf lo" }, grp), ring: rrect(x0 + 1.2, y0 + 1.2, x1 - 1.2, y1 - 1.2, 1.6, 3), in: rrect(x0 + 4.5, y0 + 4.5, x1 - 4.5, y1 - 8, 1, 3), drawn: NaN };
+  // the prints, in landing order. Each is a plate, its photograph laid on it, and the plate's edge again on top
+  const sx = (PH.x0 + PH.x1) / 2, sy = (PH.y0 + PH.y1) / 2, sz = PH.h + 6;
+  const prints = ORDER.map((p, k) => {
+    const [x0, y0, x1, y1] = POCKETS[p], w = x1 - x0 - 2.4, h = y1 - y0 - 2.4, grp = mk("g", {}, g);
+    const plate = mk("path", {}, grp);
+    const img = mk("image", { href: "assets/img/" + SHOTS[k] + ".webp", width: w - 5, height: h - 5, preserveAspectRatio: "xMidYMid slice" }, grp);
+    const edge = mk("path", { class: "nf sil" }, grp);
+    return { plate, img, edge, w, h, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, ring: rrect(-w / 2, -h / 2, w / 2, h / 2, 1.6, 3), drawn: NaN };
   });
+
+  // the guest's phone, nearest the viewer, painted last
+  const pg = mk("g", {}, g), body = solid(pg);
+  const [pr, pi] = rings(PH.x0, PH.y0, PH.x1, PH.y1, 2.4, 0.9);
+  put(body, prism(P, front, pr, pi, 0, PH.h));
+  mk("path", { d: poly(rrect(PH.x0 + 2.2, 3, PH.x1 - 2.2, PH.h - 3, 1.5, 4).map((q) => P(q.u, PH.y1, q.v))), class: "nf lo" }, pg);
+  mk("path", { d: poly(rrect(sx - 3.2, PH.h - 7.2, sx + 3.2, PH.h - 5.4, 0.9, 4).map((q) => P(q.u, PH.y1, q.v))), class: "nf" }, pg);
 
   const o = spring(REST);
   let lit = -2, said = "";
   function draw(t) {
     const at = t * N;
-    prints.forEach((pr, k) => {
-      // print k falls while the scrub passes from k to k + 1; before that it hangs, higher the later its turn
-      const f = clamp(at - k, 0, 1), ease = f * f * (3 - 2 * f);
-      const z = PZ + 0.6 + (1 - ease) * (drop + (k - Math.min(at, k)) * 4);
-      if (Math.abs(z - pr.drawn) < 0.01) return;
-      pr.drawn = z;
-      pr.plate.setAttribute("d", poly(ringAt(P, pr.ring, z)));
-      pr.pic.setAttribute("d", poly(ringAt(P, pr.in, z)));
+    prints.forEach((pr2, k) => {
+      // print k flies while the scrub passes from k to k + 1; before its turn it waits inside the phone, unseen
+      const f = clamp(at - k, 0, 1), e = f * f * (3 - 2 * f);
+      if (Math.abs(e - pr2.drawn) < 0.0008) return;
+      pr2.drawn = e;
+      const show = f > 0.02;
+      [pr2.plate, pr2.img, pr2.edge].forEach((el) => { if (show) el.removeAttribute("display"); else el.setAttribute("display", "none"); });
+      if (!show) return;
+      const cx = sx + (pr2.cx - sx) * e, cy = sy + (pr2.cy - sy) * e;
+      const z = sz + (PZ + 0.7 - sz) * e + Math.sin(Math.PI * e) * arc, s = 0.35 + 0.65 * e;
+      const pts = pr2.ring.map((q) => P(cx + q.u * s, cy + q.v * s, z));
+      const d = poly(pts);
+      pr2.plate.setAttribute("d", d); pr2.edge.setAttribute("d", d);
+      // the photograph: an affine map of its rectangle onto the print's own plane
+      const iw = (pr2.w - 5) * s, ih = (pr2.h - 5) * s;
+      const A = P(cx - iw / 2, cy - ih / 2, z), B = P(cx + iw / 2, cy - ih / 2, z), Cc = P(cx - iw / 2, cy + ih / 2, z);
+      const m = [(B[0] - A[0]) / (pr2.w - 5), (B[1] - A[1]) / (pr2.w - 5), (Cc[0] - A[0]) / (pr2.h - 5), (Cc[1] - A[1]) / (pr2.h - 5), A[0], A[1]];
+      pr2.img.setAttribute("transform", "matrix(" + m.map((n) => n.toFixed(3)).join(" ") + ")");
     });
-    // the bright edge rides on the print that is falling; once all are in, on the last one landed
+    // the bright edge rides on the print in flight; once all are in, on the last one landed
     const now = clamp(Math.floor(at), 0, N - 1);
-    if (now !== lit) { lit = now; prints.forEach((pr, k) => pr.plate.classList.toggle("hi", k === now)); }
+    if (now !== lit) { lit = now; prints.forEach((pr2, k) => pr2.edge.classList.toggle("hi", k === now)); }
   }
   function say(t, on) {
     const s = on ? "foto " + String(clamp(Math.round(t * N), 0, N)).padStart(2, "0") : "rest";
@@ -6388,31 +6395,255 @@ function mount({ stage, svg, read }, value) {
   draw(REST); say(REST, false);
 
   let over = false;
-  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(o.t, over); return m; });
-  bag.add(B.unregister);
+  const B2 = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(o.t, over); return m; });
+  bag.add(B2.unregister);
 
   // the pointer's x across the stage is the scrub: nothing drawn is tested, so nothing can flicker
   bag.add(pointer(stage, {
-    move: ([x]) => { over = true; o.t = clamp((x - 96) / 208, 0, 1); B.wake(); },
-    leave: () => { over = false; o.t = REST; B.wake(); },
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B2.wake(); },
+    leave: () => { over = false; o.t = REST; B2.wake(); },
   }));
   bag.add(() => svg.replaceChildren());
 
   return {
-    set: (v) => { drop = clamp(v, 6, 60); prints.forEach((pr) => { pr.drawn = NaN; }); draw(o.x); },
+    set: (v) => { arc = clamp(v, 4, 40); prints.forEach((pr2) => { pr2.drawn = NaN; }); draw(o.x); },
     destroy: bag.dispose,
   };
 }
 
 
   return function album(el, options) {
-    return create({
-      id: "album",
-      label: 'An open album and four prints from the guests: moving across lets them drop into their pockets one by one.',
-      rest: "rest",
-      engine: mount,
-      tour: [[110, 160], [200, 150], [300, 170], null]
-    }, el, options);
+    return create({ id: "album", label: "A guest's phone beside the couple's album: moving across sends four photos over, one by one, into their pockets.", rest: "rest", engine: mount, tour: [[96, 190], [170, 150], [250, 160], [312, 170], null] }, el, options);
   };
 })();
 export { album };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "hari" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/hari.js, built on the package's own kernel and checked with its look.mjs. */
+TABLE.hari = [4, 12, 22];
+var hari = (() => {
+
+
+const N = 6, R = 10.5, TZ = 5, REST = 0.3;
+const STOPS = [[8, 30], [34, 6], [60, 32], [86, 8], [112, 34], [138, 10]];
+const at = (ring, cx, cy) => ring.map((q) => ({ u: q.u + cx, v: q.v + cy, nu: q.nu, nv: q.nv }));
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let hop = value;
+
+  const C = Cam(45, 0.5, 1.72);
+  fit(C, [[-6, -8, 0], [152, 48, 0], [152, -8, 0], [-6, 48, 0], [8, 30, 60], [138, 10, 60]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(-8, -10, 154, 50, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+  // the way from stop to stop, drawn on the floor
+  mk("path", { d: STOPS.slice(1).map((s, i) => seg(P(STOPS[i][0], STOPS[i][1], 0), P(s[0], s[1], 0))).join(""), class: "nf dash" }, g);
+
+  const order = STOPS.map((_, i) => i).sort((a, b) => STOPS[a][0] + STOPS[a][1] - STOPS[b][0] - STOPS[b][1]);
+  const peds = [];
+  order.forEach((i) => {
+    const [cx, cy] = STOPS[i], grp = mk("g", {}, g), body = solid(grp), dots = [];
+    for (let k = 0; k <= i; k++) dots.push(flatDot(grp, C, 1.5, "dot off"));
+    peds[i] = { cx, cy, body, dots, ring: at(circ(R, 26), cx, cy), inner: at(circ(R - 1.5, 26), cx, cy), drawn: NaN };
+  });
+  // the letter: a small envelope standing in the air, a wing behind each top corner
+  const lg = mk("g", {}, g), wings = mk("path", { class: "sil" }, lg), env = solid(lg), vee = mk("path", { class: "nf lo" }, lg), seal = mk("path", { class: "nf hi" }, lg);
+
+  function drawPed(p, i, z) {
+    if (Math.abs(z - p.drawn) < 0.01) return;
+    p.drawn = z;
+    put(p.body, prism(P, front, p.ring, p.inner, 0, TZ + z));
+    p.dots.forEach((el, k) => { const a = (k / (i + 1)) * Math.PI * 2 - Math.PI / 2, r = i ? 4.4 : 0; place(el, P(p.cx + Math.cos(a) * r, p.cy + Math.sin(a) * r, TZ + z)); });
+  }
+  const o = spring(REST);
+  let lit = -2, drawn = NaN;
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    const s = t * (N - 1), i0 = clamp(Math.floor(s), 0, N - 2), f = clamp(s - i0, 0, 1), e = f * f * (3 - 2 * f);
+    const cx = STOPS[i0][0] + (STOPS[i0 + 1][0] - STOPS[i0][0]) * e, cy = STOPS[i0][1] + (STOPS[i0 + 1][1] - STOPS[i0][1]) * e;
+    const now = clamp(Math.round(s), 0, N - 1);
+    peds.forEach((p, i) => drawPed(p, i, i === now ? 4 * (1 - Math.min(1, Math.abs(s - i) * 2)) : 0));
+    const z0 = TZ + 6 + Math.sin(Math.PI * e) * hop, w = 13, h = 17, y1 = cy + 1.2, y0 = cy - 1.2;
+    const [er, ei] = rings(cx - w, y0, cx + w, y1, 1, 0.5);
+    put(env, prism(P, front, er, ei, z0, z0 + h));
+    const top = z0 + h;
+    vee.setAttribute("d", seg(P(cx - w + 1, y1, top - 1), P(cx, y1, top - 8)) + seg(P(cx + w - 1, y1, top - 1), P(cx, y1, top - 8)));
+    const ring = []; for (let k = 0; k < 12; k++) { const a = (k / 12) * Math.PI * 2; ring.push(P(cx + Math.cos(a) * 2.2, y1, top - 8.6 + Math.sin(a) * 2.2)); }
+    seal.setAttribute("d", poly(ring));
+    const wing = (sg, x) => poly(fillet([[x + sg * 3, top - 6], [x - sg * 3, top - 1], [x - sg * 11, top + 7], [x - sg * 12, top + 2], [x - sg * 7, top - 5]], [1, 1.6, 2, 2, 2.4]).map(([u, v]) => P(u, y0, v)));
+    wings.setAttribute("d", wing(1, cx - w) + wing(-1, cx + w));
+    if (now !== lit) {
+      lit = now;
+      peds.forEach((p, i) => { p.body.sil.classList.toggle("hi", i === now); p.dots.forEach((el) => el.setAttribute("class", i === now ? "dot" : i < now ? "dot m" : "dot off")); });
+      // one highlight: the stop the letter is at; the seal gives its bright up to it
+      seal.classList.remove("hi");
+    }
+  }
+  let over = false, said = "";
+  function say() { const s = over ? "langkah " + (clamp(Math.round(o.t * (N - 1)), 0, N - 1) + 1) : "rest"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 80) / 240, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { hop = clamp(v, 0, 30); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function hari(el, options) {
+    return create({ id: "hari", label: 'One winged letter and six stops of the day: moving across carries it from stop to stop, and each lights as it lands.', rest: "rest", engine: mount, tour: [[90, 190], [170, 160], [250, 170], [318, 160], null] }, el, options);
+  };
+})();
+export { hari };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "pintu" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/pintu.js, built on the package's own kernel and checked with its look.mjs. */
+TABLE.pintu = [4, 8, 14];
+var pintu = (() => {
+
+
+const L = 150, GX = 104, REST = 0.3;
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let carry = value;
+
+  const C = Cam(45, 0.5, 1.95);
+  fit(C, [[0, -24, -3], [L, 24, -3], [L, -24, 0], [0, 24, 0], [GX, -22, 60], [GX, 22, 60], [10, 4, 52]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(0, -24, L, 24, 10, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+  // the carpet to the door
+  mk("path", { d: seg(P(6, -8, 0), P(L - 6, -8, 0)) + seg(P(6, 8, 0), P(L - 6, 8, 0)), class: "nf lo" }, g);
+  const post = (y) => { const s = solid(g); const [r, i] = rings(GX - 3.5, y - 3.5, GX + 3.5, y + 3.5, 2, 0.8); put(s, prism(P, front, r, i, 0, 50)); return s; };
+  post(-19);
+  // the phone, between the far post and the near one
+  const pg = mk("g", {}, g), body = solid(pg), scr = mk("path", { class: "nf lo" }, pg), code = [];
+  for (let k = 0; k < 9; k++) code.push(mk("circle", { r: 1.35, class: "dot off" }, pg));
+  post(19);
+  const beam = solid(g);
+  { const [r, i] = rings(GX - 5, -24, GX + 5, 24, 3, 1); put(beam, prism(P, front, r, i, 50, 58)); }
+  // the reader's eye, under the beam's near end
+  const eye = mk("path", { d: poly(rrect(-4, 51.5, 4, 54.5, 1.4, 4).map((q) => P(GX + 5, q.u, q.v))), class: "nf lo" }, g);
+
+  const o = spring(REST);
+  let drawn = NaN, state = "";
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    const x = 14 + t * (L - 34), z0 = carry, w = 9, h = 32;
+    const [r, i] = rings(x - w, 1.4, x + w, 4.8, 2, 0.7);
+    put(body, prism(P, front, r, i, z0, z0 + h));
+    scr.setAttribute("d", poly(rrect(x - w + 1.8, z0 + 2.4, x + w - 1.8, z0 + h - 2.4, 1.2, 4).map((q) => P(q.u, 4.8, q.v))));
+    code.forEach((el, k) => place(el, P(x + ((k % 3) - 1) * 4.2, 4.8, z0 + h / 2 + (1 - Math.floor(k / 3)) * 4.2 + 2)));
+    const s = t > 0.62 ? "in" : "way";
+    if (s !== state) {
+      state = s;
+      beam.sil.classList.toggle("hi", s === "in"); eye.classList.toggle("lo", s !== "in");
+      // on the way the heart of the code is the one bright mark; at the gate it gives the bright to the beam
+      code.forEach((el, k) => el.setAttribute("class", s === "in" ? "dot m" : k === 4 ? "dot" : (k * 7) % 3 ? "dot m" : "dot off"));
+    }
+  }
+  let over = false, said = "";
+  function say() { const s = !over ? "rest" : o.t > 0.62 ? "tercatat" : "memindai"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { carry = clamp(v, 2, 16); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function pintu(el, options) {
+    return create({ id: "pintu", label: "A guest's phone and the door's gate: moving across brings the code to the reader, and the beam lights as it is read.", rest: "rest", engine: mount, tour: [[110, 170], [200, 190], [300, 200], null] }, el, options);
+  };
+})();
+export { pintu };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "susun" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/susun.js, built on the package's own kernel and checked with its look.mjs. */
+TABLE.susun = [16, 30, 44];
+var susun = (() => {
+
+
+const S = 112, R = 12, CH = 17, TZ = 4, REST = 0.3;
+const SET = [[32, 30], [82, 34]], NEW = [56, 80], SLIP = [-22, 58];
+const at = (ring, cx, cy) => ring.map((q) => ({ u: q.u + cx, v: q.v + cy, nu: q.nu, nv: q.nv }));
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let high = value;
+
+  const C = Cam(45, 0.5, 1.72);
+  fit(C, [[-34, 0, -3], [S, S, -3], [S, 0, 0], [-34, S, 0], [56, 80, 58], [32, 30, 10]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(0, 0, S, S, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+  // drafting lines on the floor
+  mk("path", { d: [28, 56, 84].map((v) => seg(P(v, 6, 0), P(v, S - 6, 0)) + seg(P(6, v, 0), P(S - 6, v, 0))).join(""), class: "nf lo" }, g);
+  const chairsOf = (grp, cx, cy) => { const out = []; for (let k = 0; k < 8; k++) { const a = (k / 8) * Math.PI * 2 + Math.PI / 8, el = flatDot(grp, C, 2, "dot off"); place(el, P(cx + Math.cos(a) * CH, cy + Math.sin(a) * CH, 0)); out.push(el); } return out; };
+  SET.forEach(([cx, cy]) => { const grp = mk("g", {}, g); chairsOf(grp, cx, cy); put(solid(grp), prism(P, front, at(circ(R, 26), cx, cy), at(circ(R - 1.6, 26), cx, cy), 0, TZ)); });
+  // where the new table will stand, marked on the floor
+  mk("path", { d: at(circ(R, 26), NEW[0], NEW[1]).map((q, i) => (i ? "L" : "M") + P(q.u, q.v, 0).map((n) => n.toFixed(1)).join(" ")).join("") + "Z", class: "nf dash" }, g);
+  const ng = mk("g", {}, g), chairs = chairsOf(ng, NEW[0], NEW[1]), table = solid(ng);
+  // the slip of guests still to seat, beside the floor
+  const sg = mk("g", {}, g);
+  { const [r, i] = rings(SLIP[0] - 9, SLIP[1] - 26, SLIP[0] + 9, SLIP[1] + 26, 4, 1); put(solid(sg), prism(P, front, r, i, 0, 2.5)); }
+  [-16, 0].forEach((dy) => place(flatDot(sg, C, 2.3, "dot m"), P(SLIP[0], SLIP[1] + dy, 2.5)));
+  const guest = flatDot(g, C, 2.5, "dot m");
+  const seat = [NEW[0] + Math.cos(Math.PI * 9 / 8) * CH, NEW[1] + Math.sin(Math.PI * 9 / 8) * CH];
+
+  const o = spring(REST);
+  let drawn = NaN, phase = "";
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    const a = clamp(t / 0.55, 0, 1), ea = a * a * (3 - 2 * a), z = (1 - ea) * high;
+    put(table, prism(P, front, at(circ(R, 26), NEW[0], NEW[1]), at(circ(R - 1.6, 26), NEW[0], NEW[1]), z, z + TZ));
+    const b = clamp((t - 0.6) / 0.4, 0, 1), eb = b * b * (3 - 2 * b);
+    place(guest, P(SLIP[0] + (seat[0] - SLIP[0]) * eb, SLIP[1] + 16 + (seat[1] - SLIP[1] - 16) * eb, 2.5 * (1 - eb) + Math.sin(Math.PI * eb) * 16));
+    const ph = t < 0.58 ? "meja" : "tamu";
+    if (ph !== phase) {
+      phase = ph;
+      table.sil.classList.toggle("hi", ph === "meja");
+      guest.setAttribute("class", ph === "tamu" ? "dot" : "dot m");
+      chairs.forEach((el) => el.setAttribute("class", ph === "tamu" ? "dot m" : "dot off"));
+    }
+  }
+  let over = false, said = "";
+  function say() { const s = !over ? "rest" : o.t < 0.58 ? "meja 3" : "dinda"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { high = clamp(v, 6, 50); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function susun(el, options) {
+    return create({ id: "susun", label: "The couple's planner: moving across sets a third table down on the floor, then seats a guest from the waiting slip.", rest: "rest", engine: mount, tour: [[110, 180], [210, 170], [300, 180], null] }, el, options);
+  };
+})();
+export { susun };

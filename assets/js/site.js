@@ -462,11 +462,12 @@
     if (!travel) return;
     nwBase = D ? 300 : 190;
     var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
-    var ph = D ? $('.services__phone').getBoundingClientRect() : null;
+    /* desktop: Nawala keeps to the gap between the items' text and their figures */
+    var phEl = D ? $('.svc:not(.svc--lead) .svc__fig') : null, ph = phEl ? phEl.getBoundingClientRect() : { left: vw * .6 };
     /* phones and tablets (audit V2): a smaller letter that stands on the box's top edge inside the clear strip the layout keeps above the box */
     var perchS = D ? .5 : .5, perchY = bT - nwBase * .26 * perchS + (D ? 20 : -4);
     /* phones (audit V2): Nawala keeps to the row of the menu button, above where a card comes to rest */
-    var side = D ? ph.left - 84 : vw - 52, sideS = D ? .5 : .36;
+    var side = D ? ph.left - 40 : vw - 52, sideS = D ? .42 : .36;
     var cx = D ? .4 : .5;
     var pan = $('#themes-panel'), panR = pan ? pan.getBoundingClientRect().right : 0;
     var bn = $('#branch').getBoundingClientRect(), tipX = bn.left + bn.width * .1, tipY = bn.top + window.scrollY + bn.height * .3;
@@ -688,66 +689,18 @@
     setTimeout(function () { nearJobs.forEach(function (j) { j[1](); }); }, 0);
   }
 
-  /* ---------- Services: the phone stays, the screen changes ---------- */
+  /* ---------- Services: each item has its own big figure (pass D); this only marks the item on screen ---------- */
   (function () {
-    var phone = $('#phone-screen'), items = $$('.svc');
-    if (!phone || !items.length) return;
-    var screens = items.map(function (li) { return $('.svc__screen', li); });
-    var qr = $('.qr'), frame = $('#phone'), tabs = $$('#phone-tabs i');
-    if (qr) qr.innerHTML = fakeQr();
-    function plans() {
-      var p = $('.seat__plan--p'), l = $('.seat__plan--l');
-      if (p) p.innerHTML = floorPlan(false);
-      if (l) l.innerHTML = floorPlan(true);
-    }
-    plans(); afterLang.push(plans);
-    var current = 0;
-    /* Seven screens: the day in one link (the lead), then the opening, guestbook, floor plan, the couple's seating planner, souvenir, gallery.
-       The tab bar belongs to the five wedding pages, so it hides on the first two. A screen plays its little
-       hands-on loop (.play) only while it is the one in the desktop phone, or while its card is on a phone screen. */
-    function setActive(i) {
-      current = i;
-      items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); });
-      screens.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
-      replay(i);
-      /* the tab bar belongs to the guest's pages (data-tab); the lead, the opening and the couple's planner hide it */
-      var tab = items[i].getAttribute('data-tab');
-      tabs.forEach(function (el, k) { el.classList.toggle('is-on', String(k) === tab); });
-      if (frame) frame.classList.toggle('is-cover', i <= 1 || tab === null);
-    }
-    /* a screen's loop always starts from its beginning when it arrives: the class comes off, one frame passes,
-       and it goes back on (owner, 22 Nov 2026: the day's light sometimes started at the third icon or already full) */
-    function replay(i) {
-      if (!desktop.matches || calm) return;
-      screens.forEach(function (s) { s.classList.remove('play'); });
-      void phone.offsetWidth;
-      requestAnimationFrame(function () { if (current === i) screens[i].classList.add('play'); });
-    }
-    var svcSec = $('.services');
-    if (svcSec && 'IntersectionObserver' in window) new IntersectionObserver(function (en) { if (en[0].isIntersecting) replay(current); }, { threshold: .35 }).observe(svcSec);
-    function place() {
-      screens.forEach(function (s, i) {
-        s.classList.remove('play');
-        if (desktop.matches) phone.appendChild(s);
-        else if (items[i].classList.contains('svc--lead')) items[i].appendChild(s);
-        else items[i].insertBefore(s, items[i].firstChild);
-      });
-      setActive(current);
-    }
-    place();
-    if (desktop.addEventListener) desktop.addEventListener('change', function () { place(); replan(); });
+    var items = $$('.svc');
+    if (!items.length) return;
+    function setActive(i) { items.forEach(function (li, k) { li.classList.toggle('is-on', k === i); }); }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) { if (en.isIntersecting && desktop.matches) setActive(items.indexOf(en.target)); });
       }, { rootMargin: '-48% 0px -48% 0px' });
       items.forEach(function (li) { io.observe(li); });
-      if (!calm) {
-        var seen = new IntersectionObserver(function (entries) {
-          entries.forEach(function (en) { if (!desktop.matches) screens[items.indexOf(en.target)].classList.toggle('play', en.isIntersecting); });
-        }, { threshold: .45 });
-        items.forEach(function (li) { seen.observe(li); });
-      }
     }
+    if (desktop.addEventListener) desktop.addEventListener('change', function () { replan(); });
   })();
 
   /* A sample reception room: stage with the couple, parents' tables, the aisle, ten round tables of eight,
