@@ -357,7 +357,7 @@
       (live ? '<a class="link" target="_blank" rel="noopener" href="https://' + esc(addr(o)) + '">' + esc(addr(o)) + '</a>' : '<span class="muted">' + esc(addr(o)) + ' ' + t('(belum tayang)', '(not live yet)') + '</span>');
     var miss = B.missing(B.norm(o.draft)), r = B.route(o.theme, themeRows());
     var dasar = B.route(o.theme, themeRows()).route === 'dasar' && o.theme;
-    var designBits = '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + seatLink(o) + '">' + t('Denah & kursi', 'Floor plan & seats') + '</a>' + (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
+    var designBits = '<button type="button" class="btn btn--line btn--sm" data-pm="' + esc(o.slug) + '">' + t('Persiapan', 'Plan') + '</button><a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + seatLink(o) + '">' + t('Denah & kursi', 'Floor plan & seats') + '</a>' + (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
       (designWaiting(o) ? '<p class="small" style="width:100%"><span class="pill pill--pink">' + t('Desain baru menunggu persetujuan', 'New design waiting for approval') + '</span> ' +
         t('Periksa di Pratinjau, lalu terbitkan untuk menyetujuinya.', 'Check it in Preview, then publish to approve it.') + '</p>' : '');
     if (!sup()) {
@@ -832,6 +832,17 @@
     document.title = t('Nawala, konsol tim', 'Nawala, team console');
   }
   K.onLang(all);
+  /* ---------- Persiapan: every wedding's plan (assets/js/persiapan.js) ---------- */
+  var PM = window.NAWALA_PM;
+  PM.mount({ root: $('#pm-root'), as: 'tim', who: function () { return token; },
+    onDenied: function () { refresh().catch(function () {}); } });
+  K.onShow.persiapan = function () { PM.show(); };
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pm]'); if (!b) return;
+    e.preventDefault(); PM.open(b.getAttribute('data-pm'));
+    if (location.hash !== '#persiapan') location.hash = 'persiapan';
+  });
+
   K.start();
   if (stored()) enter(stored(), false); else $('#gate-token').focus();
 })();

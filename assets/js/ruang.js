@@ -358,7 +358,7 @@
   function forget() { try { sessionStorage.removeItem(STORE); localStorage.removeItem(STORE); } catch (e) {} }
   function note(pair) { gateNote = pair || null; var m = $('#gate-msg'); m.hidden = !pair; m.textContent = pair ? t(pair[0], pair[1]) : ''; }
   function lock(pair) {
-    room = null; dirty = false; clearTimeout(saveTimer); forget();
+    room = null; dirty = false; clearTimeout(saveTimer); forget(); window.NAWALA_PM.reset();
     $$('dialog[open]').forEach(closePop);
     document.body.classList.add('is-locked');
     $('#gate-code').value = ''; note(pair);
@@ -398,7 +398,7 @@
   function liveLink(name) { var o = ORD(); return DB.site + o.slug + (name ? '?to=' + encodeURIComponent(name) : ''); }
   function order() {
     var o = ORD();
-    $('#rail-ord').hidden = !o; $('#rail-guests').hidden = !o; $('#rail-seat').hidden = !o;
+    $('#rail-ord').hidden = !o; $('#rail-guests').hidden = !o; $('#rail-seat').hidden = !o; $('#rail-pm').hidden = !o;
     if (!o) { $('#ord-form').innerHTML = '<div class="empty"><b>' + t('Belum ada pesanan.', 'No order yet.') + '</b>' + t('Halaman ini terbuka setelah kalian memesan lewat tim Nawala.', 'This page opens once you have ordered through the Nawala team.') + '</div>'; $('#ord-tools').hidden = true; return; }
     $('#ord-tools').hidden = false;
     var st = { isi: t('Silakan isi. Semua tersimpan otomatis.', 'Fill it in. Everything saves as you type.'),
@@ -499,6 +499,10 @@
     document.title = t('Nawala, ruang pasangan', 'Nawala, the couple\'s room');
   }
   /* a view is drawn again each time it is opened, so it never shows what was true a few taps ago */
+  /* ---------- Persiapan: our wedding's plan with the team (assets/js/persiapan.js) ---------- */
+  window.NAWALA_PM.mount({ root: $('#pm-root'), as: 'pasangan', who: function () { return room && room.code; },
+    onBadge: function (n) { var b = $('#badge-pm'); b.hidden = !n; b.textContent = n || ''; } });
+  K.onShow.persiapan = function () { if (ORD()) window.NAWALA_PM.show(); };
   K.onShow.beranda = home; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule; K.onShow.tamu = guests;
   K.onLang(all);
   K.start();

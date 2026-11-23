@@ -8,6 +8,7 @@
 <title>Nawala, konsol tim</title>
 <link rel="icon" href="../assets/img/icon-64.png">
 <link rel="stylesheet" href="../assets/css/console.css?v=20261121o">
+<link rel="stylesheet" href="../assets/css/persiapan.css?v=20261123a">
 <link rel="stylesheet" href="../assets/css/kit.css?v=20261121o">
 </head>
 <body class="k k--tim is-locked">
@@ -58,6 +59,7 @@
   <a href="#ringkasan" data-ic="home"><span data-en="Overview">Ringkasan</span></a>
   <a href="#permintaan" data-ic="inbox"><span data-en="Requests">Permintaan</span><i id="badge-new" hidden></i></a>
   <a href="#undangan" data-ic="letter"><span data-en="Orders">Pesanan</span></a>
+  <a href="#persiapan" data-ic="tasks"><span data-en="Plans">Persiapan</span><i id="badge-pm" hidden></i></a>
   <a href="#tema" data-ic="themes"><span data-en="Themes">Tema</span></a>
   <a href="#kode" data-ic="key" data-need="super"><span data-en="Codes">Kode</span></a>
   <a href="#aktivitas" data-ic="pulse" data-need="super"><span data-en="Activity">Aktivitas</span></a>
@@ -220,6 +222,9 @@
   </div>
 </dialog>
 
+  <!-- Persiapan: every wedding's plan (assets/js/persiapan.js draws it; supabase/migrations/20261123_persiapan.sql) -->
+  <section class="view" data-view="persiapan"><div id="pm-root"></div></section>
+
   <p class="k__sample g"><span id="foot-who"></span> <button type="button" class="link" id="reload" data-en="Reload the data">Muat ulang data</button> <button type="button" class="link" id="logout" data-en="Log out">Keluar</button></p>
 </main>
 
@@ -227,8 +232,9 @@
 <script src="../assets/js/origin.js?v=2"></script>
 <script src="../assets/js/db.js"></script>
 <script src="../assets/js/themes.js?v=20261122a"></script>
-<script src="../assets/js/console.js?v=20261122s"></script>
+<script src="../assets/js/console.js?v=20261123a"></script>
 <script src="../assets/js/builder.js?v=20261122a"></script>
-<script src="../assets/js/tim.js?v=20261122s"></script>
+<script src="../assets/js/persiapan.js?v=20261123a"></script>
+<script src="../assets/js/tim.js?v=20261123a"></script>
 </body>
 </html>

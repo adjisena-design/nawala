@@ -8,6 +8,7 @@
 <title>Nawala, ruang pasangan</title>
 <link rel="icon" href="../assets/img/icon-64.png">
 <link rel="stylesheet" href="../assets/css/console.css?v=20261121o">
+<link rel="stylesheet" href="../assets/css/persiapan.css?v=20261123a">
 <link rel="stylesheet" href="../assets/css/kit.css?v=20261121o">
 </head>
 <body class="k k--ruang is-locked">
@@ -59,6 +60,7 @@
   <a href="#pilihan" data-ic="heart"><span data-en="Saved">Pilihan</span><i id="badge-saved" hidden></i></a>
   <a href="#jadwal" data-ic="calendar"><span data-en="Call">Jadwal</span></a>
   <a href="#undangan" data-ic="letter" id="rail-ord" hidden><span data-en="Invitation">Undangan</span></a>
+  <a href="#persiapan" data-ic="tasks" id="rail-pm" hidden><span data-en="Plan">Persiapan</span><i id="badge-pm" hidden></i></a>
   <a href="#tamu" data-ic="inbox" id="rail-guests" hidden><span data-en="Guests">Tamu</span></a>
   <a href="../undangan/denah.html?as=ruang" data-ic="seat" id="rail-seat" hidden><span data-en="Floor plan">Denah &amp; Kursi</span></a>
 </nav>
@@ -201,6 +203,9 @@
     </div>
   </section>
 
+  <!-- Persiapan: our wedding's plan with the Nawala team (assets/js/persiapan.js) -->
+  <section class="view" data-view="persiapan"><div id="pm-root"></div></section>
+
   <p class="k__sample g"><span data-en="Your saved themes, your choice and your call time are kept with Nawala, so the team sees them too.">Tema tersimpan, pilihan, dan jadwal panggilan kalian disimpan di Nawala, jadi tim kami ikut melihatnya.</span> <button type="button" class="link" id="logout" data-en="Leave the room">Keluar dari ruang</button></p>
 </main>
 
@@ -242,8 +247,9 @@
 <script src="../assets/js/origin.js?v=2"></script>
 <script src="../assets/js/db.js"></script>
 <script src="../assets/js/themes.js?v=20261122a"></script>
-<script src="../assets/js/console.js?v=20261122s"></script>
+<script src="../assets/js/console.js?v=20261123a"></script>
 <script src="../assets/js/builder.js?v=20261122a"></script>
-<script src="../assets/js/ruang.js?v=20261122s"></script>
+<script src="../assets/js/persiapan.js?v=20261123a"></script>
+<script src="../assets/js/ruang.js?v=20261123a"></script>
 </body>
 </html>
