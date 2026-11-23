@@ -561,7 +561,7 @@
     rLastT = -1;
   }
   /* the phone's status bar takes the colour of the section under it, so the top of the screen is seamless */
-  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#F2F1E9', about: '#F1F1EE', services: '#14261A', themes: '#121A10', contact: '#F3F0EA' };
+  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', contact: '#F7F3F1' };
   function barTone(name) { if (barMeta && BAR[name] && barMeta.content !== BAR[name]) barMeta.content = BAR[name]; }
   var running = false;
   function frame(now) {

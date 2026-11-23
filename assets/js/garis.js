@@ -26,7 +26,7 @@ function mount(el) {
   const name = el.getAttribute('data-garis'), fn = H[name] || (window.NAWALA_GARIS || {})[name];
   if (!fn) return;
   const l = LABEL[name], dark = !el.closest('[data-garis-light]');
-  const f = fn(el, { theme: dark ? 'dark' : 'light', intensity: Number(el.getAttribute('data-intensity') || .5), label: l ? l[en() ? 1 : 0] : undefined });
+  const f = fn(el, { theme: 'light', intensity: Number(el.getAttribute('data-intensity') || .5), label: l ? l[en() ? 1 : 0] : undefined });
   figs.set(el, f);
 }
 const els = [...document.querySelectorAll('.garis[data-garis]')];
