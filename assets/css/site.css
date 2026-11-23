@@ -1457,3 +1457,11 @@ main{overflow-x:clip}
 .ask .garis.garis--plug{width:138px;right:.2rem;top:.1rem}
 .foot .garis.garis--phone{width:170px}
 @media (max-width:699px){.ask .garis.garis--plug{width:104px;right:.1rem;top:-.3rem}}
+/* tablets in portrait: the stage on top at full card width, the words under it */
+@media (min-width:700px) and (max-width:899px){
+  .svc,.svc.svc--lead{grid-template-columns:minmax(0,1fr);grid-template-rows:none;max-width:38rem;margin-inline:auto}
+  .svc > *,.svc > h3,.svc > h2,.svc > p,.svc > .svc__link{grid-column:1;grid-row:auto}
+  .svc > .svc__fig{grid-column:1;grid-row:auto;order:-1;margin-bottom:.8rem}
+  .svc.svc--lead > .svc__fig{order:5;margin-top:1rem}
+  .svc .svc__fig .garis--panggung,.svc.svc--lead .svc__fig .garis--panggung{width:min(100%,calc(40svh * 1.25))}
+}
