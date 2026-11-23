@@ -1431,7 +1431,7 @@ main{overflow-x:clip}
 }
 /* the drawing fills about a third of its own frame, so it is shown larger inside the stage (the stage clips nothing: the frame's margins are empty) */
 .svc__fig{overflow:hidden}
-.svc .svc__fig .garis--panggung svg{scale:1.32;transform-origin:50% 52%}
+.svc .svc__fig .garis--panggung{scale:1.32;transform-origin:50% 52%}
 @media (max-width:699px) and (max-height:660px){.svc .svc__fig .garis--panggung{width:min(100%,calc(21svh * 1.25))}}
 
 /* Pass D, larger (owner, 23 Nov 2026, 13:33): the figures are the thing to play with, so they take about half the
@@ -1530,3 +1530,12 @@ dialog.pop--demo:focus,dialog.pop--demo:focus-visible{outline:none}
 /* the light band: its swells wobble only while it stands up; phones draw two swells and no arcs */
 [data-scroll]:not(.is-rise) > .sweep i,[data-scroll]:not(.is-rise) > .sweep s,[data-scroll]:not(.is-rise) > .sweep b{animation-play-state:paused}
 @media (max-width:899px){.sweep i:nth-child(3),.sweep s:nth-child(7),.sweep b{display:none}.sweep{transition-duration:1.2s}}
+
+/* 23 Nov 2026, 14:47 (owner): the drawing is enlarged on its own box, not on the inner svg, so the figure's pointer
+   (measured from the box) lands where the cursor is. The lead's hint line has its own row (it overlapped the words). */
+@media (min-width:900px){
+  .svc{grid-template-rows:1fr auto auto auto auto 1fr}
+  .svc > .svc__hint{grid-row:4}
+  .svc > .svc__link{grid-row:5}
+  .svc > .svc__fig{grid-row:1 / 7}
+}
