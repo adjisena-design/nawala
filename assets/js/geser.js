@@ -4,7 +4,8 @@
    with a flick going one card further; trackpad and wheel: the first movement of a gesture picks the axis; arrows,
    the counter and the arrow keys. It settles on a card after every move. Nothing glides under reduced motion.
    Second pass (owner, 23 Nov 2026, 17:46: the dots could not tell the third card from the fourth, and the cards were
-   dull): a spacer at the end lets every card reach the left edge, so "2 / 5" always means the second card; the cards
+   dull): a counter instead of dots; the row ends with the last card at the right edge (owner, 18:36: no empty room
+   after it), so the counter shows the last card's number there; the cards
    lean with the speed of a swipe or a wheel turn (transform on the card, so Rasa's hover tilt still adds on top). */
 (function () {
   'use strict';
@@ -15,13 +16,6 @@
     var dots = g.querySelector('.geser__dots'), cnt = g.querySelector('.geser__count'), prev = g.querySelector('[data-dir="-1"]'), next = g.querySelector('[data-dir="1"]');
     if (dots) cards.forEach(function () { dots.appendChild(document.createElement('i')); });
     if (cnt) cnt.querySelector('span').textContent = String(cards.length);
-    /* the spacer: room after the last card so it too can stand at the left edge */
-    var spacer = document.createElement('i'); spacer.className = 'geser__end'; spacer.setAttribute('aria-hidden', 'true'); track.appendChild(spacer);
-    function room() {
-      spacer.style.flexBasis = '0px';
-      var last = cards[cards.length - 1], need = (last.offsetLeft - cards[0].offsetLeft) - max();
-      spacer.style.flexBasis = Math.max(0, need) + 'px';
-    }
     function lefts() { var o = cards[0].offsetLeft; return cards.map(function (c) { return c.offsetLeft - o; }); }
     function max() { return Math.max(0, track.scrollWidth - track.clientWidth); }
     function idx() {
@@ -40,7 +34,7 @@
     function paint() {
       var x = track.scrollLeft, m = max(), L = lefts(), i = 0;
       L.forEach(function (l, k) { if (l <= x + 4) i = k; });
-      if (x >= m - 2 && countTail(L) > 0) i = cards.length - 1;
+      if (x >= m - 2) i = cards.length - 1;
       if (dots && i !== painted) Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('is-on', k === i); });
       if (cnt && i !== painted) cnt.querySelector('b').textContent = String(i + 1);
       if (i !== painted) cards.forEach(function (c, k) { c.classList.toggle('is-cur', k === i); });
@@ -65,7 +59,7 @@
       if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); });
       if (!reduce && !leanRaf) { leanRaf = requestAnimationFrame(leanTick); }
     }, { passive: true });
-    window.addEventListener('resize', function () { room(); paint(); });
+    window.addEventListener('resize', paint);
     if (prev) prev.addEventListener('click', function () { step(-1); });
     if (next) next.addEventListener('click', function () { step(1); });
     function step(d) {
@@ -136,7 +130,7 @@
       clearTimeout(snap); snap = setTimeout(function () { snap = 0; settle(wDir); }, 180);
     }, { passive: false });
 
-    room(); paint();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { room(); paint(); });
+    paint();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
   });
 })();
