@@ -236,7 +236,7 @@
         });
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ['beranda', 'tentang', 'layanan', 'tema', 'kontak'].forEach(function (id) { var s = doc.getElementById(id); if (s) navIO.observe(s); });
+    ['beranda', 'layanan', 'tema', 'paket', 'faq', 'kontak'].forEach(function (id) { var s = doc.getElementById(id); if (s) navIO.observe(s); });
   }
 
   /* ---------- Menu morph: top bar on the hero, rail on the left after it ----------
@@ -449,10 +449,10 @@
      at its own pace. A fast flick never makes it faster; it only changes where it is heading.
      A point is either on the screen (x, y in pixels) or pinned to the page (dy: a document y), so a
      letter sitting on a box moves with that box while the page scrolls, as anything on the page does. */
-  var nw = $('#nw'), ask = $('#ask'), services = $('.services'), themes = $('.themes'), contact = $('.contact'), pair = $('#pair');
+  var nw = $('#nw'), ask = $('#ask'), services = $('.services'), themes = $('.themes'), valley = $('.lembah'), contact = $('.contact'), pair = $('#pair');
   var nwBase = 190, poseNow = 'fly', poseHold = '', mx = 0, my = 0, pairTop = 0, pairSpan = 1;
   var travel = !calm && !!nw;
-  var SECS = [['hero', $('.hero')], ['about', about], ['services', services], ['themes', themes], ['contact', contact]];
+  var SECS = [['hero', $('.hero')], ['about', about], ['services', services], ['themes', themes], ['valley', valley], ['contact', contact]];
   var R = {}, secNow = '', routine = null, rStart = 0, rLastT = -1, fromS = null, flyFrom = 0, flyDur = 0, cur = null;
   function docTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
   function plan() {
@@ -503,6 +503,13 @@
         { t: 5.1, x: D ? vw - 92 : .8 * vw, y: D ? .26 * vh : 50, s: D ? .54 : .38, r: 720, pose: 'fly' },
         { t: 8.6, x: D ? Math.min(vw - 110, tipX + vw * .2) : .74 * vw, y: D ? .13 * vh : 44, s: D ? .56 : .38, r: 726, pose: 'tilt' },
         { t: 10.6 } ] },
+      /* the valley (platform, packages, questions, journal): long reading, so Nawala keeps to the right edge on desktop
+         and to the menu button's row on phones, small, never over the text */
+      valley: { loop: true, k: [
+        { t: 0, x: D ? vw - 70 : vw - 52, y: D ? .2 * vh : 42, s: D ? .42 : .34, r: -5, pose: 'fly' },
+        { t: 3.4, x: D ? vw - 78 : vw - 56, y: D ? .36 * vh : 46, s: D ? .42 : .34, r: 4, pose: 'fly', cue: 'flip' },
+        { t: 6.8, x: D ? vw - 66 : vw - 50, y: D ? .5 * vh : 40, s: D ? .4 : .34, r: 0, pose: 'fly' },
+        { t: 10.2 } ] },
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
         { t: 3.2, x: br.right - (D ? 96 : 58), dy: perchY + (D ? 6 : 2), s: perchS * (D ? 1.15 : 1.05), r: 0, pose: 'rest' } ] }
@@ -570,7 +577,7 @@
     rLastT = -1;
   }
   /* the phone's status bar takes the colour of the section under it, so the top of the screen is seamless */
-  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', contact: '#F7F3F1' };
+  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', valley: '#FAF8F6', contact: '#F7F3F1' };
   function barTone(name) { if (barMeta && BAR[name] && barMeta.content !== BAR[name]) barMeta.content = BAR[name]; }
   var running = false;
   function frame(now) {
