@@ -1,5 +1,6 @@
 /* Nawala's buttons: two kinds, everywhere (owner, 21 Nov 2026).
-   1. The one main action of a screen or sheet: an ivory pill with a slowly turning neon edge (.btn--glow).
+   1. The one main action of a screen or sheet: a white pill with a slowly turning rainbow edge and a soft light around it (.btn--glow);
+      never a pink fill (owner, 23 Nov 2026, 16:51).
       At most one per screen or sheet.
    2. Everything else: the material of the home page's menu bar. Dark green glass with ivory writing (.btn--glass);
       on dark pages and inside dark glass the same glass is ivory-tinted instead, so it still shows.
@@ -26,9 +27,9 @@
 
 /* 1. the main action */
 .btn--glow,.btn--main{color:#3A3035;border:2px solid transparent;
-  background:linear-gradient(#FBDCE6,#F9C9D9) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box;
-  box-shadow:0 10px 30px -12px rgba(216,67,107,.55);animation:kit-spin 5s linear infinite}
-.btn--glow:hover,.btn--main:hover{box-shadow:0 0 28px 2px rgba(244,166,192,.55),0 12px 34px -12px rgba(216,67,107,.7);transform:translateY(-2px)}
+  background:linear-gradient(#FFFFFF,#FFFDFB) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box;
+  box-shadow:0 0 16px rgba(244,166,192,.5),0 0 34px rgba(246,196,69,.2),0 10px 26px -14px rgba(160,70,105,.45);animation:kit-spin 5s linear infinite}
+.btn--glow:hover,.btn--main:hover{box-shadow:0 0 22px 2px rgba(244,166,192,.62),0 0 44px rgba(246,196,69,.3),0 14px 30px -14px rgba(160,70,105,.5);transform:translateY(-2px)}
 @keyframes kit-spin{to{--a:360deg}}
 
 /* 2. everything else: menu-bar glass */

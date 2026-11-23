@@ -251,11 +251,13 @@
     var right = window.innerWidth - 30;
     for (var i = flips.length - 1; i >= 0; i--) {
       var f = flips[i], r = f.el.getBoundingClientRect(), label = $('span', f.el);
-      var w = 48 + (label ? label.offsetWidth + 2 : 0);
+      /* each item is one pill in the bar: icon, label and 16px of room after it (owner, 23 Nov 2026: more air) */
+      var w = 48 + (label ? label.offsetWidth + 16 : 0);
       var isLang = f.el.hasAttribute('data-lang');
       var x = right - w;
-      right = x - (isLang ? (f.el.getAttribute('data-lang') === 'id' ? 22 : 6) : (f.el.classList.contains('nav__login') ? 18 : 8));
+      right = x - (isLang ? (f.el.getAttribute('data-lang') === 'id' ? 26 : 6) : (f.el.classList.contains('nav__login') ? 22 : 10));
       f.dx = x - r.left; f.dy = (isLang ? 28 : 24) - r.top; f.bx = x; f.w = w;
+      f.el.style.setProperty('--pw', w);
     }
   }
   /* The morph no longer follows the finger. Scrolling past a small threshold decides bar or rail
@@ -360,7 +362,8 @@
   var nw = $('#nw'), ask = $('#ask'), services = $('.services'), themes = $('.themes'), valley = $('.lembah'), contact = $('.contact'), pair = $('#pair');
   var nwBase = 190, poseNow = 'fly', poseHold = '', mx = 0, my = 0, pairTop = 0, pairSpan = 1;
   var travel = !calm && !!nw;
-  var SECS = [['hero', $('.hero')], ['about', about], ['services', services], ['themes', themes], ['valley', valley], ['contact', contact]];
+  var udara = $('#udara'), beda = $('#beda');
+  var SECS = [['hero', $('.hero')], ['about', about], ['services', services], ['themes', themes], ['valley', valley], ['air', udara], ['valley', beda], ['contact', contact]];
   var R = {}, secNow = '', routine = null, rStart = 0, rLastT = -1, fromS = null, flyFrom = 0, flyDur = 0, cur = null;
   function docTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
   function plan() {
@@ -423,6 +426,20 @@
         { t: 3.4, x: D ? vw - 78 : vw - 56, y: D ? .36 * vh : 46, s: D ? .42 : .34, r: 4, pose: 'fly', cue: 'flip' },
         { t: 6.8, x: D ? vw - 66 : vw - 50, y: D ? .5 * vh : 40, s: D ? .4 : .34, r: 0, pose: 'fly' },
         { t: 10.2 } ] },
+      /* the open stretch between the platform and the comparison: Nawala crosses the clear band between the line
+         (high) and the numbers (low), pinned to the page, turning once on the way */
+      air: (function () {
+        var u = udara ? udara.getBoundingClientRect() : { top: 0, height: vh }, uy = u.top + window.scrollY + u.height * .52;
+        /* the clear band: halfway between the end of the line and the top of the numbers */
+        var ln = udara && $('.lb-udara__line', udara), nm = udara && $('.lb-nums', udara);
+        if (ln && nm) uy = (ln.getBoundingClientRect().bottom + nm.getBoundingClientRect().top) / 2 + window.scrollY + (D ? 0 : 8);
+        return { loop: true, k: [
+          { t: 0, x: vw * (D ? .3 : .18), dy: uy, s: D ? .95 : .6, r: -6, pose: 'fly' },
+          { t: 3.6, x: vw * (D ? .62 : .62), dy: uy - (D ? 40 : 24), s: D ? 1 : .64, r: 3, pose: 'fly', cue: 'flip' },
+          { t: 6.4, x: vw * (D ? .82 : .84), dy: uy + 10, s: D ? .92 : .58, r: 6, pose: 'tilt' },
+          { t: 9.6, x: vw * (D ? .5 : .5), dy: uy + (D ? 30 : 18), s: D ? .9 : .6, r: -4, pose: 'fly' },
+          { t: 12.8 } ] };
+      })(),
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
         { t: 3.2, x: br.right - (D ? 96 : 58), dy: perchY + (D ? 6 : 2), s: perchS * (D ? 1.15 : 1.05), r: 0, pose: 'rest' } ] }
@@ -490,7 +507,7 @@
     rLastT = -1;
   }
   /* the phone's status bar takes the colour of the section under it, so the top of the screen is seamless */
-  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', valley: '#FAF8F6', contact: '#F7F3F1' };
+  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', valley: '#FAF8F6', air: '#FAF8F6', contact: '#F7F3F1' };
   function barTone(name) { if (barMeta && BAR[name] && barMeta.content !== BAR[name]) barMeta.content = BAR[name]; }
   var running = false;
   function frame(now) {

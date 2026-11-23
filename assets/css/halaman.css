@@ -290,3 +290,12 @@ p,li{text-wrap:pretty}
 @keyframes bar{from{transform:scaleX(.1)}to{transform:scaleX(1)}}
 .siaran__to{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem}
 .siaran__to span{padding:.2rem .75rem;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line);font-weight:650;font-size:.9375rem}
+/* the top bar's items, the same as the home page's menu (owner, 23 Nov 2026): hover lifts and tints, a press pushes
+   in, the chosen one is white with the rainbow edge and a soft light, never a pink fill */
+.top__links > a,.drop > summary,.lang button{transition:translate .28s cubic-bezier(.3,1.35,.5,1),scale .2s,background-color .25s,box-shadow .3s}
+.top__links > a:hover,.drop > summary:hover,.lang button:hover{translate:0 -2px;background:rgba(251,220,230,.7);box-shadow:0 10px 18px -12px rgba(160,70,105,.55)}
+.top__links > a:active,.drop > summary:active,.lang button:active{translate:0 1px;scale:.96;box-shadow:inset 0 2px 5px rgba(120,50,80,.25)}
+.top__links > a.is-here,.lang button[aria-pressed="true"]{border:1.5px solid transparent;background:linear-gradient(#fff,#fff) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box;
+  box-shadow:0 0 14px rgba(244,166,192,.55),0 0 26px rgba(246,196,69,.22);animation:kit-spin 6s linear infinite}
+.lang button{background:transparent}
+@media (prefers-reduced-motion:reduce){.top__links > a.is-here,.lang button[aria-pressed="true"]{animation:none}}

@@ -1,0 +1,40 @@
+/* Tanya: the question box's tools (search pill, chips, count, empty state, copy link), on the home page and faq/.
+   After the Jabar Open FAQ, in Nawala's white and pink. The soft open and close is in assets/js/tanya.js. */
+.tanya__tools{display:grid;gap:12px;margin-bottom:1.1rem}
+.tanya__tools.is-sticky{position:sticky;top:84px;z-index:10;padding:12px;margin:-12px -12px 1.1rem;border-radius:24px;background:rgba(255,255,255,.94);
+  box-shadow:0 14px 30px -24px rgba(120,60,85,.5)}
+@media (min-width:900px){.tanya__tools.is-sticky{background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}}
+.tanya__search{position:relative;display:block}
+.tanya__search svg{position:absolute;left:17px;top:50%;width:20px;height:20px;margin-top:-10px;fill:none;stroke:rgba(58,48,53,.6);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.tanya__search input{width:100%;min-height:52px;padding:12px 52px 12px 48px;border:1.5px solid rgba(216,67,107,.2);border-radius:999px;background:#fff;
+  font:inherit;font-size:1.0625rem;color:#3A3035;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s,box-shadow .2s}
+.tanya__search input::placeholder{color:rgba(58,48,53,.55)}
+.tanya__search input::-webkit-search-cancel-button{display:none}
+.tanya__search input:focus{border-color:#F4A6C0;box-shadow:0 0 0 4px rgba(244,166,192,.25),0 0 18px rgba(246,196,69,.18)}
+.tanya__clear{position:absolute;right:6px;top:50%;width:40px;height:40px;margin-top:-20px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(251,220,230,.6);cursor:pointer}
+.tanya__clear svg{position:static;margin:0;width:16px;height:16px;stroke:#3A3035}
+.tanya__chips{display:flex;flex-wrap:wrap;gap:8px}
+.tanya__chip{min-height:44px;padding:0 16px;border:1.5px solid rgba(216,67,107,.16);border-radius:999px;background:#fff;color:#3A3035;font:inherit;font-weight:650;font-size:.9375rem;cursor:pointer;
+  transition:translate .25s cubic-bezier(.3,1.35,.5,1),background-color .2s,box-shadow .25s,border-color .2s}
+.tanya__chip:hover{translate:0 -2px;background:#FDEFF4}
+.tanya__chip:active{translate:0 1px}
+.tanya__chip[aria-pressed="true"]{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box;
+  box-shadow:0 0 14px rgba(244,166,192,.5),0 0 26px rgba(246,196,69,.2);animation:kit-spin 6s linear infinite}
+.tanya__count{margin:0;font-size:.9375rem;font-weight:650;color:rgba(58,48,53,.7)}
+.tanya__count:empty{display:none}
+.tanya__none{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;margin-top:.6rem;padding:1rem 1.1rem;border-radius:18px;background:rgba(251,220,230,.45)}
+.tanya__none[hidden]{display:none}
+.tanya__link{margin-top:.5rem}
+.tanya__copy{min-height:40px;padding:0;border:0;background:none;color:rgba(58,48,53,.7);font:inherit;font-size:.9375rem;font-weight:650;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.tanya__copy:hover,.tanya__copy.is-done{color:#D8436B}
+.tanya__copy.is-done{text-decoration:none}
+/* a question opened from a link glows once */
+details.is-flash{box-shadow:0 0 0 2px rgba(244,166,192,.9),0 0 24px rgba(246,196,69,.35) !important;transition:box-shadow .6s}
+/* the plus turns into a cross as it opens, and back while it closes */
+.qa summary::after,.lb-qa summary::after{transition:transform .38s cubic-bezier(.2,.8,.2,1),background-color .25s}
+.qa details.is-closing summary::after,.lb-qa details.is-closing summary::after{transform:none}
+.qa summary:hover::after,.lb-qa summary:hover::after{background-color:#F9C9D9}
+.qa details,.lb-qa details{will-change:auto}
+details[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.tanya__chip{transition:none}.tanya__chip[aria-pressed="true"]{animation:none}}
+.tanya__clear[hidden]{display:none}

@@ -9,11 +9,13 @@
 
   $$('[data-en]').forEach(function (el) { el.setAttribute('data-id', el.textContent); });
   $$('[data-en-label]').forEach(function (el) { el.setAttribute('data-id-label', el.getAttribute('aria-label') || ''); });
+  $$('[data-en-placeholder]').forEach(function (el) { el.setAttribute('data-id-placeholder', el.placeholder); });
   $$('[data-en-title]').forEach(function (el) { el.setAttribute('data-id-title', el.getAttribute('title') || ''); });
   function apply() {
     root.lang = lang;
     $$('[data-en]').forEach(function (el) { var v = el.getAttribute('data-' + lang); if (v != null && el.textContent !== v) el.textContent = v; });
     $$('[data-en-label]').forEach(function (el) { el.setAttribute('aria-label', el.getAttribute(lang === 'en' ? 'data-en-label' : 'data-id-label')); });
+    $$('[data-en-placeholder]').forEach(function (el) { el.placeholder = el.getAttribute(lang === 'en' ? 'data-en-placeholder' : 'data-id-placeholder'); });
     $$('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
     $$('[data-wa]').forEach(function (a) {
       a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(a.getAttribute(lang === 'en' ? 'data-wa-en' : 'data-wa'));

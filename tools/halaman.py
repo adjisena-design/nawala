@@ -12,7 +12,7 @@ no all-caps labels, no middle-dot taglines, no arrows inside buttons.
 import html, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = '20261123k1'   # bump when halaman.css / halaman.js change
+V = '20261123n2'   # bump when halaman.css / halaman.js change
 
 def esc(s): return html.escape(s, quote=True)
 def T(p, tag='span', cls='', attrs=''):
@@ -129,7 +129,8 @@ def head(B, title, desc, title_en, garis=False, noindex=False):
 try{{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}}catch(e){{}}d.classList.add('js');}})();
 </script>
 <link rel="stylesheet" href="{B}assets/css/halaman.css?v={V}">
-<link rel="stylesheet" href="{B}assets/css/kit.css?v=20261123c2">
+<link rel="stylesheet" href="{B}assets/css/kit.css?v=20261123n1">
+<link rel="stylesheet" href="{B}assets/css/tanya.css?v=1">
 {g}</head>
 <body>
 <a class="skip" href="#isi" data-en="Skip to content">Langsung ke isi</a>
@@ -192,7 +193,7 @@ def footer(B):
 
 def scripts(B, garis=False):
     g = f'<script type="module" src="{B}assets/js/garis.js?v=6"></script>\n' if garis else ''
-    return f'<script src="{B}assets/js/halaman.js?v={V}" defer></script>\n{g}</body>\n</html>\n'
+    return f'<script src="{B}assets/js/tanya.js?v=1" defer></script>\n<script src="{B}assets/js/halaman.js?v={V}" defer></script>\n{g}</body>\n</html>\n'
 
 def crumb(B, items):
     out = [f'<a href="{B}" data-en="Home">Beranda</a>']
@@ -233,11 +234,15 @@ def incl(items):
 def day(items):
     return '<ol class="day">' + ''.join(f'<li data-rise>{T(t, "time")}{T(h, "h3")}{T(p, "p")}</li>' for t, h, p in items) + '</ol>'
 
-def qa(items):
+def qa(items, keys=None, pop=()):
+    """the questions as <details>; with keys each gets an id (t-<key>, so a link can open it), its category and,
+    for the home page's first view, a popular flag"""
     out = []
-    for q, a in items:
+    for n, (q, a) in enumerate(items):
         paras = a if isinstance(a, list) else [a]
-        out.append(f'<details>{T(q, "summary")}<div>{"".join(T(p, "p") for p in paras)}</div></details>')
+        k = keys[n] if keys else None
+        attrs = f' id="t-{k}" data-cat="{CAT_OF.get(k, "")}"' + (' data-pop' if k in pop else '') if k else ''
+        out.append(f'<details{attrs}>{T(q, "summary")}<div class="qa__a">{"".join(T(p, "p") for p in paras)}</div></details>')
     return '<div class="qa">' + ''.join(out) + '</div>'
 
 def stage(fig, note=None):
@@ -337,7 +342,22 @@ Q = {
    (f'Saat ini {N["tema"]} tema dalam empat tingkat: {N["dasar"]} Dasar, {N["premium"]} Premium, {N["eksklusif"]} Eksklusif, ditambah Kustom yang dibuat khusus. {N["contoh"]} di antaranya sudah punya undangan contoh yang bisa dibuka.',
     f'Right now there are {N["tema"]} themes in four tiers: {N["dasar"]} Basic, {N["premium"]} Premium, {N["eksklusif"]} Exclusive, plus Custom, made just for you. {N["contoh"]} of them already have a sample invitation you can open.')),
 }
-def qs(*keys): return qa([Q[k] for k in keys])
+def qs(*keys, pop=()): return qa([Q[k] for k in keys], keys, pop)
+
+def tanya_tools(sticky=False):
+    """search pill, category chips and a live count, after the Jabar Open FAQ (assets/js/tanya.js does the work)"""
+    chips = ''.join(f'<button type="button" class="tanya__chip" data-cat="{k}" data-en="{esc(t[1])}">{esc(t[0])}</button>' for k, t, _ in FAQ_GROUPS)
+    return (f'<div class="tanya__tools{" is-sticky" if sticky else ""}">'
+            '<label class="tanya__search"><span class="sr" data-en="Search questions">Cari pertanyaan</span>'
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>'
+            '<input type="search" autocomplete="off" placeholder="Ketik kata kunci, mis. QRIS, revisi, kru" data-en-placeholder="Type a keyword, e.g. QRIS, revision, crew">'
+            '<button type="button" class="tanya__clear" hidden aria-label="Hapus pencarian" data-en-label="Clear search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg></button></label>'
+            f'<div class="tanya__chips" role="group" aria-label="Kategori" data-en-label="Categories"><button type="button" class="tanya__chip" data-cat="*" data-en="All">Semua</button>{chips}</div>'
+            '<p class="tanya__count" aria-live="polite"></p></div>')
+
+def tanya_none():
+    return ('<p class="tanya__none" hidden><span data-en="No question matches. Try another word, or ask us on WhatsApp.">Tidak ada pertanyaan yang cocok. Coba kata lain, atau tanyakan langsung lewat WhatsApp.</span> '
+            + wa_btn(('Tanya lewat WhatsApp', 'Ask on WhatsApp'), ('Halo Nawala, saya punya pertanyaan.', 'Hello Nawala, I have a question.'), 'btn btn--glass btn--sm') + '</p>')
 
 # ---------- product pages ----------
 def page_product(slug):
@@ -700,18 +720,14 @@ FAQ_GROUPS = [
  ('persiapan', ('Persiapan pernikahan', 'Wedding planning'), ['pm', 'pmtambah', 'pmlihat', 'pmlama']),
  ('data', ('Data dan privasi', 'Data and privacy'), ['data']),
 ]
+CAT_OF = {k: g for g, _, keys in FAQ_GROUPS for k in keys}
+
 def page_faq():
     B = '../'
     out = head(B, 'Pertanyaan umum, Nawala', 'Jawaban atas pertanyaan tentang undangan digital, buku tamu, live streaming, persiapan pernikahan, pembayaran, dan data di Nawala.', 'Questions, Nawala')
     out += topbar(B, 'faq') + '<main id="isi">\n'
-    nav = ''.join(f'<a href="#{k}" data-en="{esc(t[1])}">{esc(t[0])}</a>' for k, t, _ in FAQ_GROUPS)
-    out += f'''<section class="head"><div class="wrap">{crumb(B, [(None, ('Pertanyaan umum', 'Questions'))])}
-  <h1 data-en="Questions, answered.">Pertanyaan, terjawab.</h1>
-  {T(('Belum menemukan jawabannya? Tanyakan lewat WhatsApp; kami siap 24 jam setiap hari.', 'Cannot find your answer? Ask us on WhatsApp; we are there around the clock, every day.'), 'p', 'head__lead')}
-  <div class="head__acts">{wa_btn(('Tanya lewat WhatsApp', 'Ask on WhatsApp'), ('Halo Nawala, saya punya pertanyaan.', 'Hello Nawala, I have a question.'))}</div></div></section>
-'''
-    groups = ''.join(f'<div class="qa__group" id="{k}">{T(t, "h2")}{qs(*keys)}</div>' for k, t, keys in FAQ_GROUPS)
-    out += S(f'<nav class="qa-nav" aria-label="Kategori" data-en-label="Categories">{nav}</nav>{groups}')
+    groups = ''.join(f'<div class="qa__group" id="{k}" data-group="{k}">{T(t, "h2")}{qs(*keys)}</div>' for k, t, keys in FAQ_GROUPS)
+    out += S(f'<div class="tanya" data-tanya="page">{tanya_tools(True)}{groups}{tanya_none()}</div>')
     out += ajak(B, ('Siap memulai?', 'Ready to begin?'), ('Ceritakan tanggal dan rencana kalian. Kami membalas lewat WhatsApp.', 'Tell us your date and plans. We reply on WhatsApp.'))
     out += '</main>\n' + footer(B) + scripts(B)
     return out
@@ -798,6 +814,17 @@ def page_article(a):
     return out
 
 # ---------- the home page's generated blocks ----------
+def geser(head, cards, label, cls=''):
+    """a row of big cards that scrolls sideways (assets/js/geser.js): heading on the left, arrows on the right,
+    the row bleeding to the screen's edge, dots under it. Axis locked: a gesture that starts sideways moves only the cards."""
+    arrows = ('<div class="geser__nav"><button type="button" class="geser__btn" data-dir="-1" aria-label="Sebelumnya" data-en-label="Previous">'
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>'
+              '<button type="button" class="geser__btn" data-dir="1" aria-label="Berikutnya" data-en-label="Next">'
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>')
+    return (f'<div class="geser {cls}" data-geser><div class="geser__head">{head}{arrows}</div>'
+            f'<div class="geser__track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="{esc(label[0])}" data-en-label="{esc(label[1])}">{cards}</div>'
+            '<div class="geser__dots" aria-hidden="true"></div></div>')
+
 def home_blocks():
     """Blocks for index.html. Class names are prefixed lb- (styled in site.css, "Lembah") so they never meet the home page's own .card, .day or .phone."""
     B = ''
@@ -811,7 +838,7 @@ def home_blocks():
     }
     for s, ic, n, d in PRODUCTS:
         ul = '<ul>' + ''.join(T(b, 'li') for b in bullets[s]) + '</ul>'
-        cards += (f'<article class="lb-prod">{icon(ic, "lb-ic")}{T(n, "h3")}{T(d, "p")}{ul}'
+        cards += (f'<article class="lb-prod geser__card">{icon(ic, "lb-ic")}{T(n, "h3")}{T(d, "p")}{ul}'
                   f'<a class="btn btn--glass" href="layanan/{s}/" data-en="Read more">Pelajari selengkapnya</a></article>')
     figs = [('tema', f'{N["tema"]}', ('tema dalam empat tingkat', 'themes in four tiers'), ('ratusan', 'hundreds')),
             ('contoh', f'{N["contoh"]}', ('undangan contoh siap dibuka', 'sample invitations to open'), ('puluhan', 'dozens')),
@@ -822,12 +849,18 @@ def home_blocks():
         val = n if (MODE == 'pasti' or not kira) else kira[0]
         val_en = n if (MODE == 'pasti' or not kira) else kira[1]
         nums += f'<div class="lb-num"><b data-en="{val_en}">{val}</b>{T(label)}</div>'
-    blocks['platform'] = f'''
-      <div class="lb-head">{T(('Satu platform untuk seluruh pernikahan.', 'One platform for the whole wedding.'), 'h2')}
-        {T(('Undangan hanyalah awalnya. Pesan satu layanan atau semuanya sekaligus, dengan satu pendamping dari tim Nawala dari undangan pertama sampai tamu terakhir pulang.', 'The invitation is only the beginning. Book one service or all of them at once, with one companion from the Nawala team from the first invitation to the last guest going home.'), 'p')}</div>
-      <div class="lb-prods">{cards}</div>
+    blocks['platform'] = geser(
+        '<div class="lb-head">' + T(('Satu platform untuk seluruh pernikahan.', 'One platform for the whole wedding.'), 'h2')
+        + T(('Undangan hanyalah awalnya. Pesan satu layanan atau semuanya sekaligus, dengan satu pendamping dari tim Nawala dari undangan pertama sampai tamu terakhir pulang.', 'The invitation is only the beginning. Book one service or all of them at once, with one companion from the Nawala team from the first invitation to the last guest going home.'), 'p') + '</div>',
+        cards, ('Empat layanan Nawala', 'The four Nawala services'))
+    blocks['udara'] = f'''
+      <p class="lb-udara__line" data-en="Four services, one letter, one person who knows your wedding from the start.">Empat layanan, satu surat, satu orang yang mengenal pernikahan kalian sejak awal.</p>
       <div class="lb-nums">{nums}</div>
-      <div class="lb-cmp">{T(('Apa bedanya dengan undangan digital lain?', 'How is this different from other digital invitations?'), 'h3')}{compare_table('lb-tbl')}{T(COMPARE_NOTE, 'p', 'lb-small')}</div>
+    '''
+    blocks['cmp'] = f'''
+      <div class="lb-head">{T(('Apa bedanya dengan undangan digital lain?', 'How is this different from other digital invitations?'), 'h2')}
+        {T(('Delapan hal yang kalian dapatkan di Nawala, dibandingkan dengan yang biasa ditemui di layanan undangan digital.', 'Eight things you get at Nawala, next to what digital invitation services usually offer.'), 'p')}</div>
+      {compare_table('lb-tbl')}{T(COMPARE_NOTE, 'p', 'lb-small')}
     '''
     pk = [
       ('surat', ('Undangan digital', 'Digital invitation'), ('Dasar, Premium, Eksklusif, atau Kustom', 'Basic, Premium, Exclusive or Custom'),
@@ -847,20 +880,21 @@ def home_blocks():
     for ic, n, sub, items, msg, hi in pk:
         ul = '<ul>' + ''.join(T(b, 'li') for b in items) + '</ul>'
         btn = wa_btn(('Tanya harga', 'Ask the price'), msg, 'btn btn--glow' if hi else 'btn btn--glass')
-        cards += f'<article class="lb-pack{" is-hi" if hi else ""}">{icon(ic, "lb-ic")}{T(n, "h3")}{T(sub, "p", "lb-sub")}{ul}{btn}</article>'
-    blocks['paket'] = f'''
-      <div class="lb-head">{T(('Pilih paket kalian.', 'Choose your package.'), 'h2')}
-        {T(('Harga mengikuti tingkat tema, layanan, jumlah tamu, dan kota acara. Tanyakan lewat WhatsApp; kami balas dengan rincian lengkap untuk pernikahan kalian.', 'Prices follow the theme tier, the services, the number of guests and the city. Ask on WhatsApp and we reply with a full breakdown for your wedding.'), 'p')}</div>
-      <div class="lb-packs">{cards}</div>
-      <div class="lb-terms">
+        cards += f'<article class="lb-pack geser__card{" is-hi" if hi else ""}">{icon(ic, "lb-ic")}{T(n, "h3")}{T(sub, "p", "lb-sub")}{ul}{btn}</article>'
+    blocks['paket'] = geser(
+        '<div class="lb-head">' + T(('Pilih paket kalian.', 'Choose your package.'), 'h2')
+        + T(('Harga mengikuti tingkat tema, layanan, jumlah tamu, dan kota acara. Tanyakan lewat WhatsApp; kami balas dengan rincian lengkap untuk pernikahan kalian.', 'Prices follow the theme tier, the services, the number of guests and the city. Ask on WhatsApp and we reply with a full breakdown for your wedding.'), 'p') + '</div>',
+        cards, ('Paket Nawala', 'Nawala packages')) + '''
+      <div class="wrap"><div class="lb-terms">
         <p><b data-en="Every package:">Setiap paket:</b> <span data-en="a dedicated companion, 24-hour customer service on WhatsApp, and unlimited revisions.">pendamping khusus, layanan pelanggan 24 jam lewat WhatsApp, dan revisi tanpa batas.</span></p>
         <p><b data-en="Payment:">Pembayaran:</b> <span data-en="in full before the event, by bank transfer. QRIS is coming soon.">dilunasi sebelum hari acara, lewat transfer bank. QRIS segera tersedia.</span></p>
         <p><b data-en="Planning:">Persiapan:</b> <span data-en="the invitation work is in every booking; full wedding planning is an add-on.">pengerjaan undangan termasuk di setiap pesanan; perencanaan pernikahan penuh adalah layanan tambahan.</span> <a href="layanan/persiapan/" data-en="About Persiapan">Tentang Persiapan</a></p>
-      </div>
+      </div></div>
     '''
+    allk = [k for _, _, ks in FAQ_GROUPS for k in ks]
     blocks['faq'] = f'''
       <div class="lb-head">{T(('Pertanyaan yang sering ditanyakan.', 'Frequently asked questions.'), 'h2')}</div>
-      {qs('pesan', 'bayar', 'kapan', 'revisi', 'kirim', 'aplikasi', 'siapa', 'tema').replace('class="qa"', 'class="lb-qa"')}
+      <div class="tanya" data-tanya="home">{tanya_tools()}{qs(*allk, pop=('pesan', 'bayar', 'kapan', 'revisi', 'kirim', 'aplikasi', 'siapa', 'tema')).replace('class="qa"', 'class="lb-qa"')}{tanya_none()}</div>
       <p class="lb-more"><a class="btn btn--glass" href="faq/" data-en="See every question">Lihat semua pertanyaan</a></p>
     '''
     posts = ''.join(f'<a class="lb-post" href="kabar/{a["slug"]}/">{T(a["kind"], "span", "k")}{T(a["title"], "h3")}{T(a["lead"], "p")}</a>' for a in ARTICLES[:3])

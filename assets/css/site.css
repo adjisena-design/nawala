@@ -1658,3 +1658,97 @@ html[data-sec="valley"]{background:#FAF8F6}
   .lb-tbl td:nth-child(3)::before{content:"Umumnya: ";color:rgba(58,48,53,.6)}
   html[lang="en"] .lb-tbl td:nth-child(3)::before{content:"Typically: "}
 }
+
+/* ================= Menu pills (owner, 23 Nov 2026, 16:49) =================
+   The bar was clunky: big icon tiles, thin spacing, an underline on hover. Now every item is one pill with a small
+   icon: hover lifts it and tints it blush, a press pushes it in. The chosen item (current section, chosen language)
+   is a white pill set apart only by the turning rainbow edge and a soft light around it, never a pink fill
+   (owner, 16:51). The same in the rail. Only transform, opacity and colours change. */
+.nav__list a{position:relative}
+.nav__list a,.nav__login,.nav__lang button{isolation:isolate}
+@media (max-width:899px){.nav__login,.nav__lang button{position:relative}}
+.nav__list svg,.nav__login svg{padding:14px;background:none !important;transition:color .3s}
+.nav__login svg{background:none}
+.nav [data-flip]::before{content:"";position:absolute;z-index:-1;left:2px;top:4px;bottom:4px;width:calc(100% - 4px);border-radius:14px;background:transparent;
+  transition:background-color .25s,box-shadow .3s}
+.nav__lang button::before{left:0;top:0;bottom:0;width:100%}
+.nav__lang button{background:transparent}
+.nav__list a,.nav__login,.nav__lang button{transition:translate .28s var(--spring),scale .2s var(--ease)}
+.nav__list a:hover,.nav__login:hover,.nav__lang button:hover{translate:0 -2px}
+.nav__list a:hover::before,.nav__login:hover::before,.nav__lang button:hover::before{background:rgba(251,220,230,.7);box-shadow:0 10px 18px -12px rgba(160,70,105,.55)}
+.nav__list a:active,.nav__login:active,.nav__lang button:active{translate:0 1px;scale:.96}
+.nav__list a:active::before,.nav__login:active::before,.nav__lang button:active::before{background:rgba(244,166,192,.4);box-shadow:inset 0 2px 5px rgba(120,50,80,.25)}
+/* the chosen one: white, rainbow edge, soft light */
+.nav__list a.is-here::before,.nav__lang button[aria-pressed="true"]::before{background:linear-gradient(#fff,#fff) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box;border:1.5px solid transparent;
+  box-shadow:0 0 14px rgba(244,166,192,.55),0 0 26px rgba(246,196,69,.22);animation:kit-spin 6s linear infinite}
+.nav__list a.is-here svg,.nav__lang button[aria-pressed="true"]{color:var(--ink)}
+.nav__lang button[aria-pressed="true"]{background:transparent}
+.nav__list a.is-here:hover::before,.nav__lang button[aria-pressed="true"]:hover::before{background:linear-gradient(#FFF5F8,#FFF5F8) padding-box,conic-gradient(from var(--a),var(--rainbow)) border-box}
+@media (min-width:900px){
+  /* in the bar the pill wraps icon and label; in the rail it is the icon's square */
+  .nav.is-top [data-flip]::before{width:calc(var(--pw,48) * 1px - 4px)}
+  .nav.is-top [data-flip] span{padding-left:0}
+  .nav.is-top a:hover span,.nav.is-top .nav__login:hover span{text-decoration:none}
+  .nav.is-top .nav__lang button::before{left:0;top:0;bottom:0;width:100%}
+  .nav.is-rail [data-flip]:not(.nav__lang button)::before{width:44px}
+}
+@media (max-width:899px){
+  .nav [data-flip]::before{left:0;top:2px;bottom:2px;width:100%}
+  .nav__list a,.nav__login{padding-right:12px}
+}
+@media (prefers-reduced-motion:reduce){.nav__list a.is-here::before,.nav__lang button[aria-pressed="true"]::before{animation:none}}
+
+/* ================= The valley, second pass (owner, 23 Nov 2026, 16:49) =================
+   The platform and the packages were thin columns with writing far below: now each is a heading row across the
+   page and a row of big cards that runs to the screen's edge and moves sideways (assets/js/geser.js, axis locked).
+   Between the platform and the comparison: an open stretch of scenery with one line, the real numbers and
+   Nawala flying through. The comparison is its own block. The highlighted package glows; nothing is filled pink. */
+.lembah__in{display:grid;gap:3.2rem;padding:0}
+.lb-platform,.lb-paket{padding:0}
+.geser__head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem 2rem;padding-inline:1.25rem;margin-bottom:1.2rem}
+.geser__head .lb-head{margin:0;max-width:44rem;padding:1.2rem 1.3rem 1.3rem;border-radius:26px;background:rgba(255,255,255,.86);box-shadow:0 20px 50px -36px rgba(120,60,85,.4)}
+.geser__nav{display:flex;gap:.6rem}
+.geser__btn{display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:50%;background:#fff;color:#3A3035;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(216,67,107,.14),0 12px 24px -16px rgba(120,60,85,.5);transition:translate .25s var(--spring),background-color .2s,opacity .2s}
+.geser__btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.geser__btn:hover{translate:0 -2px;background:#FDEFF4}
+.geser__btn:active{translate:0 1px}
+.geser__btn:disabled{opacity:.35;cursor:default;translate:none}
+.geser.is-static .geser__nav,.geser.is-static .geser__dots{visibility:hidden}
+.geser__track{display:flex;gap:1rem;overflow-x:hidden;overflow-y:visible;touch-action:pan-y pinch-zoom;padding:14px 1.25rem 34px;
+  scroll-padding-inline:1.25rem;cursor:grab;-webkit-user-select:none;user-select:none;outline-offset:-3px}
+.geser.is-drag .geser__track{cursor:grabbing}
+.geser__track::after{content:"";flex:0 0 1px}
+.geser__card{flex:0 0 min(84vw,26rem);min-height:100%}
+.geser__card a,.geser__card button{-webkit-user-drag:none}
+.lb-prods,.lb-packs{display:contents}
+.lb-prod.geser__card,.lb-pack.geser__card{padding:1.6rem 1.5rem 1.6rem;border-radius:28px;gap:.7rem}
+.lb-prod.geser__card h3,.lb-pack.geser__card h3{font-size:clamp(1.6rem,2.4vw,2rem)}
+.lb-pack.is-hi{box-shadow:0 0 0 1.5px rgba(255,255,255,.9),0 0 22px rgba(244,166,192,.55),0 0 46px rgba(246,196,69,.25),0 24px 50px -30px rgba(160,70,105,.45)}
+.geser__dots{display:flex;justify-content:center;gap:8px;margin-top:-14px}
+.geser__dots i{width:9px;height:9px;border-radius:50%;background:rgba(58,48,53,.22);cursor:pointer;transition:background-color .25s,transform .3s var(--spring)}
+.geser__dots i.is-on{background:#D8436B;transform:scale(1.25)}
+@media (min-width:700px){.geser__card{flex-basis:min(44vw,26rem)}}
+@media (min-width:900px){
+  .geser__head{padding-left:calc(var(--rail) + 3vw);padding-right:4vw}
+  .geser__track{padding-left:calc(var(--rail) + 3vw);padding-right:4vw;scroll-padding-left:calc(var(--rail) + 3vw);gap:1.4rem}
+  .geser__card{flex-basis:clamp(320px,34vw,470px)}
+  .lembah__in{gap:4.2rem}
+  .lembah__in{padding-right:0}
+}
+/* the open stretch: no box, one line high up, the numbers low, Nawala in the clear band between them */
+.lb-udara{position:relative;min-height:92svh;display:grid;align-content:space-between;padding:10svh 1.25rem 8svh;text-align:center}
+.lb-udara__line{max-width:30ch;margin:0 auto;font:var(--display-weight) clamp(1.9rem,5.4vw,3.4rem)/1.12 var(--display);letter-spacing:var(--display-track);color:var(--ink);text-wrap:balance;
+  text-shadow:0 0 30px rgba(255,255,255,.9),0 0 12px rgba(255,255,255,.9)}
+.lb-udara .lb-nums{max-width:62rem;margin:0 auto;width:100%}
+.lb-udara .lb-num{background:rgba(255,255,255,.8)}
+@media (min-width:900px){.lb-udara{padding-left:calc(var(--rail) + 3vw);padding-right:4vw}}
+.lb-cmp{margin:0}
+.lb-cmp > .lb-head h2{font-size:clamp(2rem,5.6vw,3rem)}
+@media (prefers-reduced-motion:reduce){.geser__btn,.geser__dots i{transition:none}}
+/* in the valley Nawala flies behind the cards and writing (owner's rule: creatures pass behind text, never across it);
+   in the open stretch ("air") it is in front again, in the clear band */
+.lembah{z-index:auto}
+.lembah__in{position:relative;z-index:6}
+html[data-sec="valley"] .nw{z-index:3}
+@media (max-width:699px){.lb-udara{min-height:108svh;padding-top:8svh}}
