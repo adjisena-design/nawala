@@ -6048,3 +6048,371 @@ function mount({ stage, svg, read }, value) {
   };
 })();
 export { amplop };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "keranjang" (pass D, 23 Nov 2026).
+   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
+TABLE.keranjang = [10, 22, 34];
+var keranjang = (() => {
+
+
+const X0 = -8, X1 = 112, Y0 = -13, Y1 = 15, WH = 17, WR = 9, WT = 2.4, FLOOR = 3;
+// each item: its name, footprint x0..x1 and y0..y1, height, corner radius, and its rest height above the floor
+const ITEMS = [
+  { name: "album", x0: 2, x1: 34, y0: -11, y1: -2, h: 42, r: 2.2, rest: 2 },
+  { name: "amplop", x0: 39, x1: 79, y0: 0, y1: 3.4, h: 28, r: 1.4, rest: 7 },
+  { name: "ponsel", x0: 84, x1: 104, y0: -3, y1: 0.8, h: 47, r: 2.6, rest: 0 },
+];
+const SINK = -2.5;
+
+const LR = (pts) => (pts[0][0] <= pts[pts.length - 1][0] ? pts : pts.slice().reverse());
+
+/** The basket, which never moves: `far` is painted before the items, `near` after them. */
+function basket(P, front, outer, inner) {
+  const far = [
+    [poly(hull(ringAt(P, outer, 0).concat(ringAt(P, outer, WH)))), "sil"],
+    [poly(ringAt(P, inner, WH)), "nf"],
+    [open(ringAt(P, run(inner, (q) => !front(q)), FLOOR)), "nf lo"],
+  ];
+  const iF = LR(ringAt(P, run(inner, front), WH)), oT = LR(ringAt(P, run(outer, front), WH)), oB = LR(ringAt(P, run(outer, front), 0));
+  const band = (z) => open(LR(ringAt(P, run(outer, front), z)));
+  const near = [
+    [poly([...iF, oT[oT.length - 1], ...oB.slice().reverse(), oT[0]]), "fo"],
+    [open(oT), "nf lo"],
+    [open(iF), "nf"],
+    [open([oT[0], ...oB, oT[oT.length - 1]]), "nf sil"],
+    // the weave: two bands round the wall
+    [band(5.5), "nf lo"],
+    [band(11), "nf lo"],
+  ];
+  return { far, near };
+}
+
+/** An outline on an item's front face (the plane y = y1), from a ring in face coordinates. */
+const onFace = (P, y, ring, dz) => ring.map((q) => P(q.u, y, q.v + dz));
+
+/** What makes each item itself, drawn on its front face at height z0. */
+function marks(P, it, z0) {
+  const y = it.y1, cx = (it.x0 + it.x1) / 2, top = z0 + it.h;
+  if (it.name === "album") {
+    return {
+      lo: seg(P(it.x0 + 5.5, y, z0 + 2), P(it.x0 + 5.5, y, top - 2)) + poly(onFace(P, y, rrect(it.x0 + 11, 14, it.x1 - 5, 32, 1.6, 4), z0)),
+      mark: poly(onFace(P, y, rrect(it.x0 + 14, 18, it.x1 - 8, 28, 1, 3), z0)),
+    };
+  }
+  if (it.name === "amplop") {
+    const tip = [cx, top - 14], ring = [];
+    for (let k = 0; k < 16; k++) { const a = (k / 16) * Math.PI * 2; ring.push({ u: tip[0] + Math.cos(a) * 3.4, v: tip[1] - 1 + Math.sin(a) * 3.4 }); }
+    return {
+      lo: seg(P(it.x0 + 1.6, y, top - 1.6), P(tip[0], y, tip[1])) + seg(P(it.x1 - 1.6, y, top - 1.6), P(tip[0], y, tip[1])),
+      mark: poly(onFace(P, y, ring, 0)),
+    };
+  }
+  return {
+    lo: poly(onFace(P, y, rrect(it.x0 + 2.2, 3, it.x1 - 2.2, it.h - 3, 1.6, 4), z0)),
+    mark: poly(onFace(P, y, rrect(cx - 3.4, it.h - 7.4, cx + 3.4, it.h - 5.4, 1, 4), z0)),
+  };
+}
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let lift = value;
+
+  const C = Cam(45, 0.5, 2.1);
+  fit(C, [[X0, Y0, 0], [X1, Y1, 0], [X1, Y0, 0], [X0, Y1, 0], [2, -11, FLOOR + 42 + 34], [104, -3, FLOOR + 47 + 34]], 200, 164);
+  const P = proj(C), front = facing(C);
+  const outer = rrect(X0, Y0, X1, Y1, WR, 6), inner = rrect(X0 + WT, Y0 + WT, X1 - WT, Y1 - WT, WR - WT, 6);
+  const paths = basket(P, front, outer, inner);
+
+  const g = mk("g", {}, svg);
+  reflect(svg, g, P, front, outer, 0, 14);
+  for (const [d, cls] of paths.far) mk("path", { d, class: cls }, g);
+
+  const items = ITEMS.map((it, i) => {
+    const grp = mk("g", {}, g), body = solid(grp);
+    // the envelope is Nawala's letter: a wing behind each top corner, painted before the body so the body covers their roots
+    const wings = it.name === "amplop" ? mk("path", { class: "sil" }, grp) : null;
+    if (wings) grp.insertBefore(wings, body.g);
+    const lo = mk("path", { class: "nf lo" }, grp), mark = mk("path", { class: "nf" }, grp);
+    const [ring, inner2] = rings(it.x0, it.y0, it.x1, it.y1, it.r, 0.9);
+    return { it, body, lo, mark, wings, ring, inner: inner2, z: tween(it.rest), drawn: NaN, i };
+  });
+  for (const [d, cls] of paths.near) mk("path", { d, class: cls }, g);
+
+  function draw(o, z) {
+    if (Math.abs(z - o.drawn) < 0.01) return;
+    o.drawn = z;
+    const z0 = FLOOR + z;
+    put(o.body, prism(P, front, o.ring, o.inner, z0, z0 + o.it.h));
+    const m = marks(P, o.it, z0);
+    o.lo.setAttribute("d", m.lo); o.mark.setAttribute("d", m.mark);
+    if (o.wings) {
+      const { x0, x1, y0, h } = o.it, t = z0 + h;
+      const wing = (s, x) => poly(fillet([[x + s * 5, t - 9], [x - s * 4, t - 2], [x - s * 15, t + 9], [x - s * 17, t + 2], [x - s * 10, t - 8]], [1, 2, 2.4, 2.4, 3]).map(([u, v]) => P(u, y0, v)));
+      o.wings.setAttribute("d", wing(1, x0) + wing(-1, x1));
+    }
+  }
+
+  const B = register(stage, (_dt, now) => {
+    let moving = false;
+    items.forEach((o) => { draw(o, tval(o.z, now)); if (!tdone(o.z, now)) moving = true; });
+    return moving;
+  });
+  bag.add(B.unregister);
+
+  // hit test: the item whose REST centre is nearest the pointer on screen, inside the basket's reach
+  const centres = items.map((o) => P((o.it.x0 + o.it.x1) / 2, o.it.y1, FLOOR + o.it.rest + o.it.h * 0.55));
+  function hit([x, y]) {
+    let best = -1, bd = 46;
+    centres.forEach((c, i) => { const d = Math.hypot(x - c[0], (y - c[1]) * 0.55); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+
+  let act = -2;
+  function setActive(a) {
+    if (a === act) return;
+    const now = performance.now(), from = a >= 0 ? a : Math.max(act, 0);
+    act = a;
+    items.forEach((o, i) => {
+      tset(o.z, a < 0 ? o.it.rest : i === a ? o.it.rest + lift : o.it.rest + SINK, now, Math.abs(i - from) * 55);
+      o.body.sil.classList.toggle("hi", i === a);
+      // at rest the envelope's seal is the one bright mark; it gives the bright up to whatever is chosen
+      o.mark.classList.toggle("hi", a < 0 && o.it.name === "amplop");
+    });
+    read.textContent = a < 0 ? "rest" : ITEMS[a].name;
+    B.wake();
+  }
+  setActive(-1);
+
+  bag.add(pointer(stage, { move: (p) => setActive(hit(p)), leave: () => setActive(-1) }));
+  bag.add(() => svg.replaceChildren());
+
+  return {
+    set: (v) => { lift = clamp(v, 0, 40); if (act >= 0) { const a = act; act = -2; setActive(a); } },
+    destroy: bag.dispose,
+  };
+}
+
+
+  return function keranjang(el, options) {
+    return create({
+      id: "keranjang",
+      label: 'A basket holding an album, an envelope and a phone: the one nearest the pointer rises out and takes the bright edge.',
+      rest: "rest",
+      engine: mount,
+      tour: [[140, 150], [205, 165], [262, 190], null]
+    }, el, options);
+  };
+})();
+export { keranjang };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "denah" (pass D, 23 Nov 2026).
+   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
+TABLE.denah = [8, 15, 22];
+var denah = (() => {
+
+
+const W = 124, L = 156, R = 11.5, CH = 16.5, TZ = 4;
+const TABLES = [[30, 54], [94, 54], [30, 92], [94, 92], [30, 130], [94, 130]];
+const SEAT = [3, 6];   // at rest: table 4, the chair facing the aisle
+
+/** A ring moved to stand at (cx, cy). */
+const at = (ring, cx, cy) => ring.map((q) => ({ u: q.u + cx, v: q.v + cy, nu: q.nu, nv: q.nv }));
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let lift = value;
+
+  const C = Cam(45, 0.5, 1.5);
+  fit(C, [[0, 0, -4], [W, L, -4], [W, 0, 0], [0, L, 0], [36, 4, 30], [88, 4, 30], [94, 130, TZ + 24], [30, 54, TZ + 24]], 200, 170);
+  const P = proj(C), front = facing(C);
+
+  const g = mk("g", {}, svg);
+  // the floor: one low plate
+  const [fr, fi] = rings(0, 0, W, L, 12, 2);
+  reflect(svg, g, P, front, fr, -4, 12);
+  put(solid(g), prism(P, front, fr, fi, -4, 0));
+  // the aisle, from the door to the stage
+  mk("path", { d: seg(P(56, 30, 0), P(56, L - 6, 0)) + seg(P(68, 30, 0), P(68, L - 6, 0)), class: "nf lo" }, g);
+  // the stage and its backdrop at the far end
+  const [br, bi] = rings(40, 5, 84, 9, 2, 0.8);
+  put(solid(g), prism(P, front, br, bi, 0, 30));
+  const [sr, si] = rings(34, 8, 90, 26, 4, 1.4);
+  put(solid(g), prism(P, front, sr, si, 0, 6));
+  // the couple's two seats on the stage
+  [[55, 17], [69, 17]].forEach(([x, y]) => place(flatDot(g, C, 2.4, "dot m"), P(x, y, 6)));
+  // the door: two posts at the near end
+  [[50, L - 3], [74, L - 3]].forEach(([x, y]) => { const [r, i] = rings(x - 2.5, y - 2.5, x + 2.5, y + 2.5, 2, 0.7); put(solid(g), prism(P, front, r, i, 0, 9)); });
+
+  // tables, far to near
+  const order = TABLES.map((_, i) => i).sort((a, b) => TABLES[a][0] + TABLES[a][1] - TABLES[b][0] - TABLES[b][1]);
+  const tables = [];
+  order.forEach((i) => {
+    const [cx, cy] = TABLES[i], grp = mk("g", {}, g);
+    const chairs = [];
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2 + Math.PI / 8;
+      const el = flatDot(grp, C, 2.1, "dot off");
+      place(el, P(cx + Math.cos(a) * CH, cy + Math.sin(a) * CH, 0));
+      chairs.push(el);
+    }
+    const body = solid(grp);
+    tables[i] = { cx, cy, body, chairs, ring: at(circ(R, 28), cx, cy), inner: at(circ(R - 1.6, 28), cx, cy), z: tween(0), drawn: NaN };
+  });
+
+  function draw(t, z) {
+    if (Math.abs(z - t.drawn) < 0.01) return;
+    t.drawn = z;
+    put(t.body, prism(P, front, t.ring, t.inner, z, z + TZ));
+    // the chairs draw back from a rising table, as when its guests stand
+    const out = CH + z * 0.42;
+    t.chairs.forEach((el, k) => { const a = (k / 8) * Math.PI * 2 + Math.PI / 8; place(el, P(t.cx + Math.cos(a) * out, t.cy + Math.sin(a) * out, 0)); });
+  }
+
+  const B = register(stage, (_dt, now) => {
+    let moving = false;
+    tables.forEach((t) => { draw(t, tval(t.z, now)); if (!tdone(t.z, now)) moving = true; });
+    return moving;
+  });
+  bag.add(B.unregister);
+
+  // hit test on the floor, which never moves: the table whose centre is nearest, within reach
+  function hit([sx, sy]) {
+    const [x, y] = unproj(C, sx, sy, 0);
+    let best = -1, bd = 24;
+    TABLES.forEach(([cx, cy], i) => { const d = Math.hypot(x - cx, y - cy); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+
+  let act = -2;
+  function setActive(a) {
+    if (a === act) return;
+    const now = performance.now(), from = a >= 0 ? a : Math.max(act, 0);
+    act = a;
+    tables.forEach((t, i) => {
+      const far = Math.hypot(t.cx - TABLES[from][0], t.cy - TABLES[from][1]) / 38;
+      // the answer falls off with distance: the chosen table rises fully, its neighbours a little, the rest barely
+      const fall = a < 0 ? 0 : i === a ? 1 : far < 1.1 ? 0.32 : 0.1;
+      tset(t.z, lift * fall, now, far * 50);
+      t.body.sil.classList.toggle("hi", i === a);
+      t.chairs.forEach((el, k) => { el.setAttribute("class", i === a ? "dot" : a < 0 && i === SEAT[0] && k === SEAT[1] ? "dot" : "dot off"); });
+    });
+    read.textContent = a < 0 ? "rest" : "meja " + (a + 1);
+    B.wake();
+  }
+  setActive(-1);
+
+  bag.add(pointer(stage, { move: (p) => setActive(hit(p)), leave: () => setActive(-1) }));
+  bag.add(() => svg.replaceChildren());
+
+  return {
+    set: (v) => { lift = clamp(v, 0, 26); if (act >= 0) { const a = act; act = -2; setActive(a); } },
+    destroy: bag.dispose,
+  };
+}
+
+
+  return function denah(el, options) {
+    return create({
+      id: "denah",
+      label: 'A reception floor: stage, aisle and six round tables. The table nearest the pointer rises and its chairs light.',
+      rest: "rest",
+      engine: mount,
+      tour: [[150, 150], [245, 185], [205, 235], null]
+    }, el, options);
+  };
+})();
+export { denah };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "album" (pass D, 23 Nov 2026).
+   Built on the package's own kernel with its hairline-create workflow; checked with look.mjs. */
+TABLE.album = [16, 30, 46];
+var album = (() => {
+
+
+const W = 132, D = 88, GUT = 5, CZ = 3, PZ = 5.5, REST = 0.62, N = 4;
+// pockets: two on each page, one behind the other
+const POCKETS = [];
+for (let page = 0; page < 2; page++) for (let k = 0; k < 2; k++) {
+  const x0 = page === 0 ? 9 : W / 2 + GUT / 2 + 6, x1 = page === 0 ? W / 2 - GUT / 2 - 6 : W - 9;
+  POCKETS.push([x0, k === 0 ? 8 : 47, x1, k === 0 ? 41 : 80]);
+}
+// the order they land in: far to near, so a landed print is never painted over a falling one behind it
+const ORDER = POCKETS.map((_, i) => i).sort((a, b) => POCKETS[a][0] + POCKETS[a][1] - POCKETS[b][0] - POCKETS[b][1]);
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let drop = value;
+
+  const C = Cam(45, 0.5, 1.72);
+  fit(C, [[0, 0, 0], [W, D, 0], [W, 0, 0], [0, D, 0], [8, 8, PZ + 56], [W - 8, 8, PZ + 56], [W - 8, 80, PZ + 56]], 200, 172);
+  const P = proj(C), front = facing(C);
+
+  const g = mk("g", {}, svg);
+  // the cover, then the two pages lying on it with the gutter between them
+  const [cr, ci] = rings(0, 0, W, D, 7, 1.6);
+  reflect(svg, g, P, front, cr, 0, 12);
+  put(solid(g), prism(P, front, cr, ci, 0, CZ));
+  [[3, W / 2 - GUT / 2], [W / 2 + GUT / 2, W - 3]].forEach(([a, b]) => { const [r, i] = rings(a, 3, b, D - 3, 4, 1.2); put(solid(g), prism(P, front, r, i, CZ, PZ)); });
+  // the spine's stitching, down the gutter
+  mk("path", { d: [14, 30, 46, 62, 78].map((y) => seg(P(W / 2, y - 4, CZ), P(W / 2, y + 4, CZ))).join(""), class: "nf lo" }, g);
+  // the pockets, drawn on the pages
+  mk("path", { d: POCKETS.map(([x0, y0, x1, y1]) => poly(ringAt(P, rrect(x0, y0, x1, y1, 2, 3), PZ))).join(""), class: "nf lo" }, g);
+
+  // the prints, in landing order: each a thin plate with a picture's border inside
+  const prints = ORDER.map((p) => {
+    const [x0, y0, x1, y1] = POCKETS[p], grp = mk("g", {}, g);
+    return { plate: mk("path", { class: "sil" }, grp), pic: mk("path", { class: "nf lo" }, grp), ring: rrect(x0 + 1.2, y0 + 1.2, x1 - 1.2, y1 - 1.2, 1.6, 3), in: rrect(x0 + 4.5, y0 + 4.5, x1 - 4.5, y1 - 8, 1, 3), drawn: NaN };
+  });
+
+  const o = spring(REST);
+  let lit = -2, said = "";
+  function draw(t) {
+    const at = t * N;
+    prints.forEach((pr, k) => {
+      // print k falls while the scrub passes from k to k + 1; before that it hangs, higher the later its turn
+      const f = clamp(at - k, 0, 1), ease = f * f * (3 - 2 * f);
+      const z = PZ + 0.6 + (1 - ease) * (drop + (k - Math.min(at, k)) * 4);
+      if (Math.abs(z - pr.drawn) < 0.01) return;
+      pr.drawn = z;
+      pr.plate.setAttribute("d", poly(ringAt(P, pr.ring, z)));
+      pr.pic.setAttribute("d", poly(ringAt(P, pr.in, z)));
+    });
+    // the bright edge rides on the print that is falling; once all are in, on the last one landed
+    const now = clamp(Math.floor(at), 0, N - 1);
+    if (now !== lit) { lit = now; prints.forEach((pr, k) => pr.plate.classList.toggle("hi", k === now)); }
+  }
+  function say(t, on) {
+    const s = on ? "foto " + String(clamp(Math.round(t * N), 0, N)).padStart(2, "0") : "rest";
+    if (s !== said) { said = s; read.textContent = s; }
+  }
+  draw(REST); say(REST, false);
+
+  let over = false;
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(o.t, over); return m; });
+  bag.add(B.unregister);
+
+  // the pointer's x across the stage is the scrub: nothing drawn is tested, so nothing can flicker
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 96) / 208, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+
+  return {
+    set: (v) => { drop = clamp(v, 6, 60); prints.forEach((pr) => { pr.drawn = NaN; }); draw(o.x); },
+    destroy: bag.dispose,
+  };
+}
+
+
+  return function album(el, options) {
+    return create({
+      id: "album",
+      label: 'An open album and four prints from the guests: moving across lets them drop into their pockets one by one.',
+      rest: "rest",
+      engine: mount,
+      tour: [[110, 160], [200, 150], [300, 170], null]
+    }, el, options);
+  };
+})();
+export { album };

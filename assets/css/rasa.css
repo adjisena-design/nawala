@@ -33,3 +33,8 @@
 .ask .garis--plug{position:absolute;right:.6rem;top:.4rem;width:104px;pointer-events:auto}
 /* footer: the phone beside the button */
 .foot .garis--phone{width:120px;margin:0 auto -.4rem}
+
+/* Pass D (23 Nov 2026): Nawala's own figures are the ones meant to be looked at, so they stand larger than the borrowed ones */
+.svc .garis--besar{width:132px}
+@media (min-width:700px){.svc .garis--besar{width:150px}}
+@media (min-width:900px){.svc .garis--besar{width:210px;margin:0 0 .2rem -1.2rem}}
