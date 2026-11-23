@@ -100,10 +100,19 @@
         finish(this);
         var src = fresh();
         native.apply(this, arguments);
+        if (modal) lock(true);
         if (src && !this.contains(src)) sources.set(this, src); else sources.delete(this);
         grow(this, sources.get(this), modal);
       };
     }
+    /* The page behind a modal dialog holds still (audit I2, 23 Nov 2026): one lock for every dialog. `html.is-modal`
+       is styled in kit.css; pages that do not load kit.css are not affected. The scrollbar's width is kept as padding. */
+    function lock(on) {
+      var h = doc.documentElement;
+      if (on) { if (!h.classList.contains('is-modal')) { var w = window.innerWidth - h.clientWidth; if (w > 0) h.style.paddingRight = w + 'px'; h.classList.add('is-modal'); } }
+      else if (!doc.querySelector('dialog[open]:modal')) { h.classList.remove('is-modal'); h.style.paddingRight = ''; }
+    }
+    doc.addEventListener('close', function (e) { if (e.target instanceof HTMLDialogElement) lock(false); }, true);
     P.showModal = opener(null, nShowModal, true);
     P.show = opener(null, nShow, false);
     P.close = function (rv) {

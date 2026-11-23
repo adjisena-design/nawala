@@ -684,3 +684,17 @@ body{font-size:.9375rem;line-height:1.5}
   .over__low .empty{padding:.6rem}
   .todo li{padding:.22rem 0}
 }
+
+/* Pass C (audit K1 to K3, 23 Nov 2026) */
+/* K1. Tablets (700 to 1099px) already have their own layout; its type was phone-sized on a large screen. */
+@media (min-width:700px) and (max-width:1099px){html{font-size:110%}}
+/* K2. A row of chips that scrolls shows it: the right edge fades instead of cutting a word. */
+.chips--scroll{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 44px),transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 44px),transparent 100%);scroll-padding-right:44px}
+/* K3. Touch targets reach 44px on touch screens. */
+@media (pointer:coarse){
+  .k__lang button{min-width:44px;min-height:44px}
+  .card__head a,.card > a,.link{min-height:44px;display:inline-flex;align-items:center}
+  #logout{min-width:44px}
+}
+/* stat labels never under 13px */
+.stat__l,.stat__d,.stage__l,.axis span{font-size:.8125rem}

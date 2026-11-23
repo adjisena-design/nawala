@@ -217,6 +217,9 @@
   }
   menuBtn.addEventListener('click', function () { setMenu(!root.classList.contains('menu-open')); });
   veil.addEventListener('click', function () { setMenu(false); });
+  /* a swipe on the page behind closes the menu too; the page itself is held by html.menu-open (kit.css) */
+  veil.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); setMenu(false); }, { passive: false });
+  window.addEventListener('resize', function () { if (desktop.matches && root.classList.contains('menu-open')) setMenu(false); });
   sheet.addEventListener('click', function (e) { if (e.target.closest('a, [data-open]')) setMenu(false); });
   doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('menu-open')) { setMenu(false); menuBtn.focus(); } });
 
@@ -302,7 +305,8 @@
     flips.forEach(function (f, i) {
       var fx, fy, o;
       /* a link is gone before the edge reaches its label, so no letter is ever left outside the glass */
-      if (a < 1) { fx = f.dx; fy = f.dy; o = clamp((edge - (f.bx + f.w) - 10) / 46); }
+      /* with the bar fully open every item is at full strength (audit V11: the last one, Masuk, used to stay faded) */
+      if (a < 1) { fx = f.dx; fy = f.dy; o = a <= 0 ? 1 : clamp((edge - (f.bx + f.w) - 10) / 46); }
       else { var k = clamp((b - .25) / .75); fx = 0; fy = f.dy * (1 - k); o = clamp((b - .25 - i * .035) / .3); }
       f.el.style.setProperty('--fx', fx.toFixed(1)); f.el.style.setProperty('--fy', fy.toFixed(1)); f.el.style.setProperty('--fo', o.toFixed(3));
     });
@@ -358,7 +362,8 @@
       var foot = Math.round(vh * (desktop.matches ? .1 : .1));   // the band of leaves held at the bottom of the screen
       svcItems.forEach(function (li) {
         var t = absTop(li), h = li.offsetHeight, room = vh - head - foot - 16;
-        if (h <= room) list.push(Math.round(t + h / 2 - (vh + head - foot) / 2));
+        /* phones: a card that fits rests with its top just under the menu line (audit I4); tablets and desktop centre it */
+        if (h <= room) list.push(Math.round(desktop.matches || window.innerWidth >= 700 ? t + h / 2 - (vh + head - foot) / 2 : t - head - 8));
         else { list.push(Math.round(t - head - 12)); list.push(Math.round(t + h - vh + foot + 16)); }
       });
       /* keep them in order and apart, so no two stops land on the same place */
@@ -409,7 +414,8 @@
       lastY = y;
     }, { passive: true });
     addEventListener('touchstart', function (e) {
-      tOn = inside(window.scrollY, stops()) && !(e.target.closest && e.target.closest('dialog,.nav__items'));
+      /* never while the phone menu is open: that swipe only closes the menu (audit I1) */
+      tOn = inside(window.scrollY, stops()) && !(e.target.closest && e.target.closest('dialog,.nav__items,.menu-veil')) && !document.documentElement.classList.contains('menu-open');
       tY = e.touches[0].clientY;
     }, { passive: true });
     addEventListener('touchmove', function (e) { if (tOn) e.preventDefault(); }, { passive: false });
@@ -457,8 +463,10 @@
     nwBase = D ? 300 : 190;
     var br = ask.getBoundingClientRect(), bT = br.top + window.scrollY;
     var ph = D ? $('.services__phone').getBoundingClientRect() : null;
-    var perchS = D ? .5 : .78, perchY = bT - nwBase * .26 * perchS + (D ? 20 : 6);
-    var side = D ? ph.left - 84 : vw - 58, sideS = D ? .5 : .42;
+    /* phones and tablets (audit V2): a smaller letter that stands on the box's top edge inside the clear strip the layout keeps above the box */
+    var perchS = D ? .5 : .5, perchY = bT - nwBase * .26 * perchS + (D ? 20 : -4);
+    /* phones (audit V2): Nawala keeps to the row of the menu button, above where a card comes to rest */
+    var side = D ? ph.left - 84 : vw - 52, sideS = D ? .5 : .36;
     var cx = D ? .4 : .5;
     var pan = $('#themes-panel'), panR = pan ? pan.getBoundingClientRect().right : 0;
     var bn = $('#branch').getBoundingClientRect(), tipX = bn.left + bn.width * .1, tipY = bn.top + window.scrollY + bn.height * .3;
@@ -471,18 +479,18 @@
         { t: 5.6, x: hx + vw * .016, y: hy + vh * .02, s: hs * .97, r: -7, pose: 'fly' },
         { t: 8.4 } ] },
       about: { loop: true, k: [
-        { t: 0, x: (cx + .04) * vw, y: (D ? .6 : .74) * vh, s: .85, r: -6, pose: 'fly' },
-        { t: 1.8, x: cx * vw, y: (D ? .56 : .7) * vh, s: .7, r: 0, pose: 'fly', cue: 'flip' },
-        { t: 2.6, x: (cx - .015) * vw, y: (D ? .52 : .66) * vh, s: .55, r: -3, pose: 'back34' },
-        { t: 5.4, x: (cx - .04) * vw, y: (D ? .47 : .6) * vh, s: .3, r: 0, pose: 'back34' },
-        { t: 6.8, x: cx * vw, y: (D ? .52 : .68) * vh, s: .82, r: 0, pose: 'open' },
-        { t: 9.6, x: (cx + .02) * vw, y: (D ? .5 : .66) * vh, s: .95, r: 0, pose: 'open' },
-        { t: 11.4, x: (cx + .05) * vw, y: (D ? .56 : .72) * vh, s: .9, r: -8, pose: 'tilt' },
+        { t: 0, x: (cx + .04) * vw, y: (D ? .6 : .82) * vh, s: .85, r: -6, pose: 'fly' },
+        { t: 1.8, x: cx * vw, y: (D ? .56 : .79) * vh, s: .7, r: 0, pose: 'fly', cue: 'flip' },
+        { t: 2.6, x: (cx - .015) * vw, y: (D ? .52 : .76) * vh, s: .55, r: -3, pose: 'back34' },
+        { t: 5.4, x: (cx - .04) * vw, y: (D ? .47 : .72) * vh, s: .3, r: 0, pose: 'back34' },
+        { t: 6.8, x: cx * vw, y: (D ? .52 : .78) * vh, s: .82, r: 0, pose: 'open' },
+        { t: 9.6, x: (cx + .02) * vw, y: (D ? .5 : .76) * vh, s: .95, r: 0, pose: 'open' },
+        { t: 11.4, x: (cx + .05) * vw, y: (D ? .56 : .83) * vh, s: .9, r: -8, pose: 'tilt' },
         { t: 12.6 } ] },
       services: { loop: true, k: [
-        { t: 0, x: side, y: D ? .3 * vh : 60, s: sideS, r: -5, pose: 'fly' },
-        { t: 3.2, x: side - (D ? 10 : 4), y: D ? .48 * vh : 66, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
-        { t: 6.4, x: side + (D ? 6 : 0), y: D ? .62 * vh : 58, s: sideS, r: 0, pose: 'fly' },
+        { t: 0, x: side, y: D ? .3 * vh : 42, s: sideS, r: -5, pose: 'fly' },
+        { t: 3.2, x: side - (D ? 10 : 4), y: D ? .48 * vh : 46, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
+        { t: 6.4, x: side + (D ? 6 : 0), y: D ? .62 * vh : 40, s: sideS, r: 0, pose: 'fly' },
         { t: 9.6 } ] },
       /* comes in from the right, flies straight into the tip of the branch, tumbles, gathers itself;
          on desktop it never crosses the panel's writing or the carousel (it keeps to the right edge and the top), on phones it keeps to the top edge */
@@ -496,7 +504,7 @@
         { t: 10.6 } ] },
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
-        { t: 3.2, x: br.right - (D ? 96 : 70), dy: perchY + (D ? 6 : 4), s: perchS * 1.15, r: 0, pose: 'rest' } ] }
+        { t: 3.2, x: br.right - (D ? 96 : 58), dy: perchY + (D ? 6 : 2), s: perchS * (D ? 1.15 : 1.05), r: 0, pose: 'rest' } ] }
     };
     Object.keys(R).forEach(function (n) {
       var k = R[n].k, last = k[k.length - 1];
@@ -889,7 +897,8 @@
       function wrapD(d) { var N = n(); d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; }
       function front() { var N = n(); return ((Math.round(pos) % N) + N) % N; }
       function draw() {
-        var wide = desktop.matches, gap = wide ? 172 : 118, depth = wide ? 150 : 110;
+        /* the fan's spacing follows the card's real width, so smaller cards on narrow or short desktops stand closer (audit V4) */
+        var wide = desktop.matches, cw = cards[0] ? cards[0].offsetWidth : 0, gap = cw ? Math.round(cw * (wide ? .73 : .79)) : (wide ? 172 : 118), depth = wide ? 150 : 110;
         cards.forEach(function (c, i) {
           var d = wrapD(i - pos), a = Math.abs(d), show = a < 3.2;
           var dx = d * gap * (1 - .18 * Math.min(a, 2) / 2) * (1 - tuck * .82);
@@ -946,7 +955,7 @@
         var dx = e.clientX - sx, dy = e.clientY - sy;
         if (!decided) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; decided = true; if (Math.abs(dy) * 1.15 >= Math.abs(dx)) { drag = false; return; } }
         moved = true;
-        var now = performance.now(), gap = desktop.matches ? 172 : 118;
+        var now = performance.now(), cw = cards[0] ? cards[0].offsetWidth : 0, gap = cw ? Math.round(cw * (desktop.matches ? .73 : .79)) : (desktop.matches ? 172 : 118);
         v = (e.clientX - lastX) / Math.max(1, now - lastT); lastX = e.clientX; lastT = now;
         pos = sp - dx / gap; kick();
       }, { passive: true });
@@ -1006,6 +1015,8 @@
         /* the others tuck in first, then the card grows into the panel */
         tuckGoal = 1; kick();
         setTimeout(function () { fr.src = url(th); pop.showModal(); }, calm ? 0 : 240);
+        /* Esc inside the running invitation closes the pop-up as well (audit I3): the frame is our own page */
+        fr.onload = function () { try { fr.contentWindow.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop.open) pop.close(); }); } catch (e) {} };
       }
       if (pop) pop.addEventListener('close', function () {
         var fr = $('#pt-frame'); setTimeout(function () { fr.src = 'about:blank'; }, 400);   /* stops the invitation's music */

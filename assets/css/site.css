@@ -1243,3 +1243,147 @@ main{overflow-x:clip}
   .pt__actions{margin-top:.6rem;flex-wrap:nowrap}.pt__actions .btn{white-space:nowrap;justify-content:center}.pt__actions .btn--glow{flex:1}
   .pt .pop__x{top:.6rem;right:.6rem;background:rgba(255,255,255,.86)}
 }
+
+
+/* ================= Pass C (audit of 23 Nov 2026) =================
+   Fixes from the pass B audit, kept together so each can be found by its number. */
+
+/* I4. Phones and tablets: one swipe, one service card. Each card fits one screen (the sample screen is capped,
+   the line figure sits beside the name instead of above it) and the cards stand far enough apart that a card
+   resting under the menu line has no neighbour on screen. The stops themselves are in site.js (stops()). */
+@media (max-width:899px){
+  .services__list{gap:40svh;padding-bottom:34svh}
+  .svc{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.2rem;align-items:center}
+  .svc > *{grid-column:1 / -1}
+  .svc > .garis{grid-column:1;width:72px;margin:.6rem 0 0 .2rem}
+  .svc > .garis + h3,.svc > .garis + h2{grid-column:2;margin:.6rem .6rem 0 0}
+  .svc > .scr{max-height:34svh;width:100%}
+  .svc--lead > .garis{width:84px;margin:0}
+  .svc--lead > .garis + h2{margin:0}
+  .svc .svc__link{justify-self:start}
+}
+@media (max-width:899px) and (max-height:720px){
+  .svc > .scr{max-height:24svh}
+  .svc h3{font-size:1.4rem;margin-top:.5rem}
+  .svc{padding-bottom:1rem}
+  .svc--lead h2{font-size:1.8rem}
+  .svc--lead p{font-size:1.0625rem;margin-top:.5rem}
+  .svc--lead .scr{margin-top:.8rem}
+  .svc--lead .day{--rh:38px}
+}
+
+/* V1. The light between Tema and Kontak no longer paints over the tier doors: the band is lower there and the
+   themes section keeps a clear stretch of scenery for it. Each band's fill now has the colour of the top of
+   the white picture it leads into, so no seam ends on a hard edge. */
+.about{--veil:#F6F4F0;background:#F6F4F0}
+.services{--veil:#FAF8F3;background:#FAF8F3}
+.themes{--veil:#F1EFEB;background:#F1EFEB}
+.contact{--veil:#FDFBF7;background:#FDFBF7}
+.themes__shade{background:linear-gradient(rgba(255,255,255,.42),rgba(255,255,255,.42)),radial-gradient(ellipse 70% 60% at 50% 50%,rgba(255,255,255,.5),rgba(255,255,255,.12) 70%)}
+.contact > .sweep{height:34vh}
+.themes{padding-bottom:calc(36vh + 1.5rem)}
+@media (min-width:900px){.themes{min-height:142svh;padding-bottom:calc(42vh + 2rem)}}
+@media (min-width:900px){.contact > .sweep{height:40vh}}
+
+/* V5. Phones: what scrolls under the menu button fades out completely before it reaches the button. */
+@media (max-width:899px){
+  .top-shade,[data-sec="services"] .top-shade,[data-sec="themes"] .top-shade{height:calc(104px + env(safe-area-inset-top));
+    background:linear-gradient(180deg,#FBF9F6 0%,#FBF9F6 58%,rgba(251,249,246,.82) 76%,rgba(251,249,246,0) 100%)}
+}
+
+/* V6. Phones: the carousel comes up under the log instead of leaving an empty band, the log stays clear of the
+   cards, and the theme's name stands on a soft fade. */
+@media (max-width:899px){
+  .crs{margin-top:15vh}
+  .themes__branch{top:1%;width:104vw;right:-30vw}
+  .crs__cap{position:relative}
+  .crs__cap::before{content:"";position:absolute;z-index:-1;inset:-14px -30% -18px;background:radial-gradient(closest-side,rgba(255,255,255,.86),rgba(255,255,255,0))}
+}
+
+/* V4. Narrow or short desktops (iPad landscape, 1280 x 720 laptops): a narrower panel, a smaller fan that fades
+   out toward the panel instead of standing on it, and a shorter log held above the cards. */
+@media (min-width:900px) and (max-width:1339px),(min-width:900px) and (max-height:820px){
+  .themes__panel{flex:0 1 27rem;padding:1.9rem 1.8rem 1.8rem}
+  .themes__panel h2{font-size:clamp(2rem,3vw,2.7rem)}
+  .themes__panel p{font-size:1.0625rem}
+  .crs{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 100%);mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 100%);padding-block:40px;margin-top:9vh}
+  .crs__stage{height:330px}
+  .cc{width:188px;height:282px;margin:-141px 0 0 -94px;border-radius:22px}
+  .themes__branch{top:-1%;right:-8vw;width:min(44vw,640px)}
+}
+
+/* V7. Sample screens after the white pass: dimmed rows stay readable, the opening picture keeps its envelope. */
+.day li span{color:rgba(58,48,53,.72)}
+.scr--invite::before{background:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.34) 38%,rgba(255,255,255,.7) 72%)}
+.scr--day::before{background:rgba(255,255,255,.8)}
+
+/* V8. The third message: three equal columns whose labels wrap instead of running past the box. */
+.dm--steps li b{white-space:normal}
+.dm--steps li{min-width:0}
+.dm--steps li > span{overflow-wrap:anywhere}
+
+/* V9. Doves keep clear of the headline and the lead at every size. */
+@media (min-width:900px){.hero .flock{top:9%}.hero .flock--b{top:70%}}
+@media (min-width:900px) and (max-height:820px){.hero .flock{top:6%}.hero .flock--b{top:78%}.hero .flock--near{top:70%}}
+@media (max-width:899px){.hero .flock{top:52%}.hero .flock--b{top:62%}.hero .flock--near{top:44%}}
+
+/* V10. A lighter, neutral veil behind pop-ups. */
+.pop::backdrop{background:rgba(58,48,53,.2)}
+@media (min-width:900px){.pop::backdrop{background:rgba(58,48,53,.16)}}
+.menu-veil{background:rgba(58,48,53,.14)}
+
+/* V12. Nothing under 17px on this page; language buttons reach 44px. */
+.tiers a span,.tiers a small,.ask__count,.contact__note,.pair__cap,.foot__line,.foot__doors a,.bar-login{font-size:1.0625rem}
+.nav__lang button{height:44px;font-size:1rem}
+
+/* V3. Tablets in portrait (700 to 899px wide). They keep the stacked, one-swipe-one-card structure of phones,
+   but at their own scale: larger type, the hero copy and the messages set in the middle of the scene, each
+   service card with its sample screen beside its text, and the contact box beside its heading. */
+@media (min-width:700px) and (max-width:899px){
+  html{font-size:118%}
+  .wrap{padding-inline:2.4rem}
+  .hero__copy{max-width:none;padding:calc(120px + env(safe-area-inset-top)) 2.4rem 0;text-align:center}
+  .hero__title{font-size:5.4rem}
+  .hero__lead{font-size:1.3rem;max-width:30rem;margin-inline:auto}
+  .about__says{left:50%;right:auto;width:min(36rem,calc(100vw - 4.8rem));margin-left:calc(min(36rem,100vw - 4.8rem) / -2);top:calc(96px + env(safe-area-inset-top));height:46%}
+  .say h2{font-size:2.5rem}
+  .services__list{gap:52svh}
+  .svc{grid-template-columns:minmax(0,45%) auto minmax(0,1fr);column-gap:1rem;align-items:start;align-content:center;padding:16px 1.6rem 16px 16px}
+  .svc > *{grid-column:2 / -1}
+  .svc > .scr{grid-column:1;grid-row:1 / span 6;max-height:none;align-self:center}
+  .svc > .garis{grid-column:2;width:84px;margin:.4rem 0 0}
+  .svc > .garis + h3,.svc > .garis + h2{grid-column:3;align-self:center;margin:.4rem 0 0}
+  .svc h3{font-size:1.7rem}
+  .svc p{margin-inline:0}
+  .svc > .scr{aspect-ratio:1 / 1}
+  /* the lead is not a card: heading and text across the width, its screen beneath them */
+  .svc--lead{display:block;padding:0;max-width:36rem;margin-inline:auto;text-align:center}
+  .svc--lead > .garis{width:110px;margin:0 auto .2rem}
+  .svc--lead h2{font-size:2.9rem}
+  .svc--lead p{margin-inline:auto}
+  .svc--lead .scr{margin-top:1.4rem;aspect-ratio:auto;text-align:left}
+  .svc--lead .scr--day{--rh:58px}
+  .svc--lead .svc__link{margin-top:1rem}
+  .themes__panel{max-width:38rem}
+  .crs{max-width:none}
+  .crs__stage{height:340px}
+  .cc{width:190px;height:285px;margin:-142px 0 0 -95px}
+  .contact__inner{padding-top:4rem}
+  .contact__lead{max-width:34rem}
+  .ask{max-width:30rem}
+  .contact__lead h2{font-size:2.6rem}
+  .ask{margin-top:5.6rem}
+  .foot a.foot__wa{width:auto}
+  .nav__items{width:320px}
+}
+/* I4, follow-up: on phones the lead has no line figure, so its heading keeps its width and the item fits one screen */
+@media (max-width:699px){.svc--lead > .garis{display:none}.svc--lead > h2{grid-column:1 / -1}}
+
+/* V4, follow-up: on every desktop the fan fades out before it reaches the panel, and the four doors stand two by two
+   so their notes keep to one or two lines at 17px. */
+@media (min-width:900px){
+  .crs{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 100%);padding-block:44px}
+  .tiers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiers a{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.6rem;align-items:center;text-align:left}
+  .tiers a > .garis{grid-row:1 / span 2;width:84px;margin:0}
+}

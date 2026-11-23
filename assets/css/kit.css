@@ -57,3 +57,7 @@
 .chips > button.chip[aria-pressed="true"],.chips > button.chip[aria-selected="true"]{background:var(--kg-pick);color:var(--kg-pick-ink)}
 
 @media (prefers-reduced-motion:reduce){.btn--glow,.btn--main{animation:none}}
+
+/* The page holds still behind a modal dialog and behind the open phone menu (audit I1, I2; 23 Nov 2026) */
+html.is-modal,html.menu-open{overflow:hidden}
+dialog{overscroll-behavior:contain}
