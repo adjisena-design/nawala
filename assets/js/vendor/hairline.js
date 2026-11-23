@@ -6647,3 +6647,415 @@ function mount({ stage, svg, read }, value) {
   };
 })();
 export { susun };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "kartu" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/kartu.js ---- */
+TABLE.kartu = [3, 7, 11];
+var kartu = (() => {
+
+const N = 5, W = 36, D = 50, TH = 1.7, GAP = 2.3, REST = 0.3;
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let fan = value;
+
+  const C = Cam(45, 0.5, 2.3);
+  fit(C, [[-10, -8, -3], [W + 52, D + 8, -3], [W + 52, -8, 0], [-10, D + 8, 0], [0, 0, 30], [W + 48, D, 30]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(-10, -8, W + 52, D + 8, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+
+  const cards = [];
+  for (let i = 0; i < N; i++) {
+    const grp = mk("g", {}, g);
+    cards.push({ body: solid(grp), edge: mk("path", { class: "nf lo" }, grp), frame: mk("path", { class: "nf lo" }, grp), lines: mk("path", { class: "nf lo" }, grp) });
+  }
+  const o = spring(REST);
+  let drawn = NaN, lit = -1;
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    const s = t * (N - 1), now = clamp(Math.round(s), 0, N - 1);
+    cards.forEach((c, i) => {
+      const x0 = i * fan * (0.35 + 0.65 * t), z0 = i * GAP + 9 * clamp(i - s + 0.5, 0, 1), zt = z0 + TH;
+      const [r, inn] = rings(x0, 0, x0 + W, D, 3, 0.8);
+      put(c.body, prism(P, front, r, inn, z0, zt));
+      c.edge.setAttribute("d", poly(rrect(x0 + 3.5, 3.5, x0 + W - 3.5, D - 3.5, 2, 4).map((q) => P(q.u, q.v, zt))));
+      const ring = []; for (let k = 0; k < 16; k++) { const a = (k / 16) * Math.PI * 2; ring.push(P(x0 + W / 2 + Math.cos(a) * 7, 17 + Math.sin(a) * 8.5, zt)); }
+      c.frame.setAttribute("d", poly(ring));
+      c.lines.setAttribute("d", seg(P(x0 + 9, 33, zt), P(x0 + W - 9, 33, zt)) + seg(P(x0 + 12, 39, zt), P(x0 + W - 12, 39, zt)));
+    });
+    if (now !== lit) { lit = now; cards.forEach((c, i) => { c.body.sil.classList.toggle("hi", i === now); c.frame.setAttribute("class", i === now ? "nf" : "nf lo"); }); }
+  }
+  let over = false, said = "";
+  function say() { const s = over ? "kartu " + (clamp(Math.round(o.t * (N - 1)), 0, N - 1) + 1) : "rest"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { fan = clamp(v, 0, 16); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function kartu(el, options) {
+    return create({ id: "kartu", label: "A stack of paper invitation cards: moving across fans it and opens it at one card, which takes the bright edge.", rest: "rest", engine: mount, tour: [[110, 180], [200, 170], [300, 180], null] }, el, options);
+  };
+})();
+export { kartu };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "dunia" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/dunia.js ---- */
+TABLE.dunia = [12, 18, 23];
+var dunia = (() => {
+
+const W = 15, H = 50, REST = 0.36;
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let gap = value;
+
+  const C = Cam(45, 0.5, 2.3);
+  fit(C, [[-24, -74, -3], [24, 14, -3], [24, -74, 0], [-24, 14, 0], [-W, -70, H + 6], [W, 4, H]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(-24, -74, 24, 14, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+
+  // far to near: sun, arch, leaves, then the phone
+  const sheets = [2, 1, 0].map((k) => { const grp = mk("g", {}, g); return { k, grp, body: solid(grp), art: mk("path", { class: "nf lo" }, grp) }; });
+  const ph = solid(g);
+  { const [r, i] = rings(-W, 0, W, 3.6, 2.4, 0.8); put(ph, prism(P, front, r, i, 0, H)); }
+  mk("path", { d: poly(rrect(-W + 2.2, 3, W - 2.2, H - 3, 1.6, 4).map((q) => P(q.u, 3.6, q.v))), class: "nf lo" }, g);
+  const mark = mk("path", { class: "nf hi" }, g);
+  { const pts = [[-5, 14]]; for (let k = 0; k <= 10; k++) { const a = Math.PI - (k / 10) * Math.PI; pts.push([Math.cos(a) * 5, 26 + Math.sin(a) * 5]); } pts.push([5, 14]); mark.setAttribute("d", open(pts.map(([u, v]) => P(u, 3.6, v)))); }
+
+  const art = (k, y) => {
+    if (k === 0) { const pts = []; for (let i = 0; i <= 12; i++) pts.push([-W + 2 + (i / 12) * (2 * W - 4), 16 + (i % 2 ? 7 : 0) + (i % 4 === 1 ? 5 : 0)]); return open(pts.map(([u, v]) => P(u, y, v))); }
+    if (k === 1) { const pts = [[-8, 4]]; for (let i = 0; i <= 12; i++) { const a = Math.PI - (i / 12) * Math.PI; pts.push([Math.cos(a) * 8, 28 + Math.sin(a) * 8]); } pts.push([8, 4]); return open(pts.map(([u, v]) => P(u, y, v))); }
+    const ring = []; for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2; ring.push(P(Math.cos(a) * 8, y, 34 + Math.sin(a) * 8)); } return poly(ring);
+  };
+  const o = spring(REST);
+  let drawn = NaN, lit = -2;
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    sheets.forEach((s) => {
+      const e = clamp(t * 3 - s.k * 0.85, 0, 1), y1 = -1.5 - (s.k + 1) * gap * e, hh = H - 4 + s.k * 3 * e;
+      const [r, i] = rings(-W + 1, y1 - 1.6, W - 1, y1, 1.6, 0.6);
+      put(s.body, prism(P, front, r, i, 0, hh));
+      s.art.setAttribute("d", art(s.k, y1));
+      if (e < 0.06) s.grp.setAttribute("display", "none"); else s.grp.removeAttribute("display");
+    });
+    const now = t < 0.12 ? -1 : clamp(Math.floor(t * 3 + 0.15), 0, 2);
+    if (now !== lit) { lit = now; mark.setAttribute("class", now < 0 ? "nf hi" : "nf lo"); sheets.forEach((s) => s.art.setAttribute("class", s.k === now ? "nf hi" : "nf lo")); }
+  }
+  let over = false, said = "";
+  function say() { const s = over ? "lapis " + clamp(Math.floor(o.t * 3 + 0.15), 0, 3) : "rest"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { gap = clamp(v, 6, 26); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function dunia(el, options) {
+    return create({ id: "dunia", label: "A phone that opens into a world: moving across draws out sheets of scenery behind it, leaves, an arch, a sun.", rest: "rest", engine: mount, tour: [[110, 190], [200, 170], [310, 150], null] }, el, options);
+  };
+})();
+export { dunia };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "kunci" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/kunci.js ---- */
+TABLE.kunci = [8, 14, 20];
+var kunci = (() => {
+
+const W = 24, H = 32, SZ = 17, REST = 0.3;
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let rise = value;
+
+  const C = Cam(45, 0.5, 2.45);
+  fit(C, [[-32, -14, -3], [32, 52, -3], [32, -14, 0], [-32, 52, 0], [-W, 0, H + 22], [W, 0, H + 22]], 200, 172);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(-32, -14, 32, 52, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+
+  const back = mk("path", { class: "nf lo" }, g);
+  const card = solid(g), cline = mk("path", { class: "nf lo" }, g);
+  const env = solid(g);
+  { const [r, i] = rings(-W, -2.2, W, 2.2, 1.4, 0.6); put(env, prism(P, front, r, i, 0, H)); }
+  const flap = mk("path", { class: "nf lo" }, g), seal = mk("path", { class: "nf" }, g);
+  const key = mk("g", {}, g), bow = mk("path", {}, key), eye = mk("path", { class: "nf lo" }, key), shaft = mk("path", {}, key);
+
+  const o = spring(REST);
+  let drawn = NaN, state = "";
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    const a = clamp(t / 0.78, 0, 1), e = clamp((t - 0.8) / 0.2, 0, 1), ee = e * e * (3 - 2 * e);
+    // the card inside
+    const cz = 3 + rise * ee, [cr, ci] = rings(-W + 3, -0.8, W - 3, 0.8, 1, 0.4);
+    put(card, prism(P, front, cr, ci, cz, cz + H - 4));
+    cline.setAttribute("d", seg(P(-W + 9, 0.8, cz + H - 10), P(W - 9, 0.8, cz + H - 10)) + seg(P(-W + 12, 0.8, cz + H - 15), P(W - 12, 0.8, cz + H - 15)));
+    if (ee < 0.2) cline.setAttribute("display", "none"); else cline.removeAttribute("display");
+    // the flap: shut it points down to the seal, open it stands up behind the top edge
+    const fl = (z, y) => seg(P(-W + 1, y, H - 1), P(0, y, z)) + seg(P(W - 1, y, H - 1), P(0, y, z));
+    if (ee < 0.5) { flap.setAttribute("d", fl(SZ + 1 + (H - 2 - SZ) * ee * 2, 2.2)); flap.removeAttribute("display"); back.setAttribute("display", "none"); }
+    else { back.setAttribute("d", fl(H - 1 + 14 * (ee * 2 - 1), -2.2)); back.removeAttribute("display"); flap.setAttribute("display", "none"); }
+    const ring = []; for (let k = 0; k < 14; k++) { const q = (k / 14) * Math.PI * 2; ring.push(P(Math.cos(q) * 3.2, 2.2, SZ + Math.sin(q) * 3.2)); }
+    seal.setAttribute("d", poly(ring));
+    // the key, in the plane x = 0, its bit toward the seal
+    const ky = 2.6 + (1 - a) * 32, kz = SZ, bq = [];
+    for (let k = 0; k < 16; k++) { const q = (k / 16) * Math.PI * 2; bq.push(P(0, ky + 19 + Math.cos(q) * 5.2, kz + Math.sin(q) * 5.2)); }
+    bow.setAttribute("d", poly(bq));
+    const eq = []; for (let k = 0; k < 10; k++) { const q = (k / 10) * Math.PI * 2; eq.push(P(0, ky + 19.6 + Math.cos(q) * 2, kz + Math.sin(q) * 2)); }
+    eye.setAttribute("d", poly(eq));
+    shaft.setAttribute("d", poly([[ky, kz + 0.9], [ky + 14, kz + 0.9], [ky + 14, kz - 0.9], [ky + 5.4, kz - 0.9], [ky + 5.4, kz - 3.6], [ky + 3.8, kz - 3.6], [ky + 3.8, kz - 0.9], [ky + 2.4, kz - 0.9], [ky + 2.4, kz - 4.6], [ky, kz - 4.6]].map(([y, z]) => P(0, y, z))));
+    const s = e > 0.5 ? "open" : "shut";
+    if (s !== state) { state = s; bow.setAttribute("class", s === "shut" ? "hi" : ""); card.sil.classList.toggle("hi", s === "open"); }
+  }
+  let over = false, said = "";
+  function say() { const s = !over ? "rest" : o.t > 0.9 ? "terbuka" : "satu kunci"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 210, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { rise = clamp(v, 4, 24); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function kunci(el, options) {
+    return create({ id: "kunci", label: "One sealed letter and its one key: moving across brings the key to the seal, the flap lifts and the card rises.", rest: "rest", engine: mount, tour: [[110, 190], [210, 180], [310, 170], null] }, el, options);
+  };
+})();
+export { kunci };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "papan" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/papan.js ---- */
+TABLE.papan = [26, 34, 42];
+var papan = (() => {
+
+const BW = 96, BD = 66, TOP = 4, REST = 0.42;
+// the design, as strokes on the sheet
+const STROKES = (() => {
+  const a = [[24, 52], [24, 32]];
+  for (let k = 1; k <= 12; k++) { const q = Math.PI - (k / 12) * Math.PI; a.push([38 + Math.cos(q) * 14, 32 - Math.sin(q) * 14]); }
+  a.push([52, 52]);
+  const b = [[14, 52], [84, 52]];
+  const c = []; for (let k = 0; k <= 16; k++) { const q = (k / 16) * Math.PI * 2 - Math.PI / 2; c.push([72 + Math.cos(q) * 7, 24 + Math.sin(q) * 7]); }
+  return [a, b, c];
+})();
+const LEN = STROKES.map((s) => s.length - 1), ALL = LEN.reduce((x, y) => x + y, 0);
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let pen = value;
+
+  const C = Cam(45, 0.5, 2.25);
+  fit(C, [[-6, -6, -3], [BW + 6, BD + 6, -3], [BW + 6, -6, 0], [-6, BD + 6, 0], [40, 20, 44]], 200, 176);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(0, 0, BW, BD, 7, 2);
+  reflect(svg, g, P, front, fr, 0, 12);
+  put(solid(g), prism(P, front, fr, fi, 0, TOP));
+  mk("path", { d: poly(rrect(7, 7, BW - 7, BD - 7, 2, 4).map((q) => P(q.u, q.v, TOP))), class: "nf lo" }, g);
+  [[10, 10], [BW - 10, 10], [10, BD - 10], [BW - 10, BD - 10]].forEach(([x, y]) => place(flatDot(g, C, 1.3, "dot off"), P(x, y, TOP)));
+  const done = mk("path", { class: "nf" }, g), live = mk("path", { class: "nf hi" }, g);
+  const pencil = mk("path", {}, g), nib = mk("path", { class: "nf lo" }, g);
+
+  const o = spring(REST);
+  let drawn = NaN;
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    let left = t * ALL, dDone = "", dLive = "", tip = STROKES[0][0];
+    STROKES.forEach((s, k) => {
+      if (left <= 0) return;
+      const n = Math.min(left, LEN[k]), full = Math.floor(n), f = n - full, pts = s.slice(0, full + 1);
+      if (f > 0.001 && full < LEN[k]) pts.push([s[full][0] + (s[full + 1][0] - s[full][0]) * f, s[full][1] + (s[full + 1][1] - s[full][1]) * f]);
+      const d = open(pts.map(([x, y]) => P(x, y, TOP)));
+      if (left > LEN[k] + 0.001) dDone += d; else { dLive = d; tip = pts[pts.length - 1]; }
+      left -= LEN[k];
+    });
+    if (!dLive) tip = STROKES[2][STROKES[2].length - 1];
+    done.setAttribute("d", dDone); live.setAttribute("d", dLive);
+    // the pencil leans back from its point
+    const a = P(tip[0], tip[1], TOP), b = P(tip[0] - 7, tip[1] - 7, TOP + pen), dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = (-dy / l) * 2.6, ny = (dx / l) * 2.6;
+    const at = (f, sgn) => [a[0] + dx * f + nx * sgn, a[1] + dy * f + ny * sgn];
+    pencil.setAttribute("d", poly([a, at(0.2, 1), at(1, 1), at(1, -1), at(0.2, -1)]));
+    nib.setAttribute("d", open([at(0.2, 1), at(0.2, -1)]) + open([at(0.86, 1), at(0.86, -1)]));
+  }
+  let over = false, said = "";
+  function say() { const s = over ? "sketsa " + Math.round(o.t * 10) * 10 : "rest"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x]) => { over = true; o.t = clamp((x - 90) / 220, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { pen = clamp(v, 14, 48); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function papan(el, options) {
+    return create({ id: "papan", label: "A drawing board: moving across draws the design on the pinned sheet, arch, ground and sun, the pencil on the line's end.", rest: "rest", engine: mount, tour: [[110, 180], [200, 190], [310, 180], null] }, el, options);
+  };
+})();
+export { papan };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "terbang" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/terbang.js ---- */
+TABLE.terbang = [6, 48, 100];
+var terbang = (() => {
+
+const L = 150, PX = 124, R = 15, X0 = 16;
+const at = (ring, cx, cy) => ring.map((q) => ({ u: q.u + cx, v: q.v + cy, nu: q.nu, nv: q.nv }));
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+
+  const C = Cam(45, 0.5, 1.9);
+  fit(C, [[0, -24, -3], [L, 24, -3], [L, -24, 0], [0, 24, 0], [X0, 0, 52], [PX, 0, 52]], 200, 176);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const [fr, fi] = rings(0, -24, L, 24, 12, 2);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+  const way = mk("path", { class: "nf dash" }, g);
+  const pad = solid(g);
+  put(pad, prism(P, front, at(circ(R, 30), PX, 0), at(circ(R - 1.6, 30), PX, 0), 0, 4));
+  const marks = [0, 1, 2].map(() => flatDot(g, C, 1.5, "dot off"));
+  marks.forEach((el, k) => place(el, P(PX + Math.cos((k / 3) * Math.PI * 2) * 8, Math.sin((k / 3) * Math.PI * 2) * 8, 4)));
+  const lg = mk("g", {}, g), wings = mk("path", { class: "sil" }, lg), env = solid(lg), vee = mk("path", { class: "nf lo" }, lg), seal = mk("path", { class: "nf hi" }, lg);
+
+  const o = spring(value, { k: 60, c: 14 }), h = spring(0);
+  let drawnA = NaN, drawnB = NaN, landed = null;
+  function draw(v, lift) {
+    if (Math.abs(v - drawnA) < 0.01 && Math.abs(lift - drawnB) < 0.002) return;
+    drawnA = v; drawnB = lift;
+    const p = clamp(v / 100, 0, 1), cx = X0 + (PX - X0) * p, down = clamp((p - 0.86) / 0.14, 0, 1);
+    const z0 = 4.6 + (1 - down) * (15 + Math.sin(p * Math.PI * 3) * 3) + lift * 9 * (1 - down), w = 14, hh = 18, y1 = 1.3, y0 = -1.3, top = z0 + hh;
+    way.setAttribute("d", p < 0.9 ? seg(P(cx + 6, 0, 0), P(PX - R - 2, 0, 0)) : "");
+    const [er, ei] = rings(cx - w, y0, cx + w, y1, 1, 0.5);
+    put(env, prism(P, front, er, ei, z0, top));
+    vee.setAttribute("d", seg(P(cx - w + 1, y1, top - 1), P(cx, y1, top - 8.5)) + seg(P(cx + w - 1, y1, top - 1), P(cx, y1, top - 8.5)));
+    const ring = []; for (let k = 0; k < 12; k++) { const a = (k / 12) * Math.PI * 2; ring.push(P(cx + Math.cos(a) * 2.4, y1, top - 9.2 + Math.sin(a) * 2.4)); }
+    seal.setAttribute("d", poly(ring));
+    // wings: up while it flies, higher under the pointer, folded low once it has landed
+    const up = (1 - down) * (7 + lift * 7) - down * 5;
+    const wing = (sg, x) => poly(fillet([[x + sg * 3, top - 6], [x - sg * 3, top - 1], [x - sg * 12, top + up], [x - sg * 13, top + up - 5], [x - sg * 7, top - 6]], [1, 1.6, 2, 2, 2.4]).map(([u, q]) => P(u, y0, q)));
+    wings.setAttribute("d", wing(1, cx - w) + wing(-1, cx + w));
+    const L2 = down > 0.6;
+    if (L2 !== landed) { landed = L2; pad.sil.classList.toggle("hi", L2); seal.setAttribute("class", L2 ? "nf" : "nf hi"); marks.forEach((el) => el.setAttribute("class", L2 ? "dot m" : "dot off")); }
+  }
+  let over = false, said = "";
+  function say() { const s = !over ? "rest" : o.t >= 96 ? "tiba" : "mendekat"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(value, 0); say();
+
+  const B = register(stage, (dt) => { const a = stepS(o, dt), b = stepS(h, dt); draw(o.x, h.x); say(); return a || b; });
+  bag.add(B.unregister);
+  bag.add(pointer(stage, {
+    move: ([x, y]) => { over = true; const p = clamp(o.t / 100, 0, 1), c = P(X0 + (PX - X0) * p, 0, 24); h.t = clamp(1 - Math.hypot(x - c[0], y - c[1]) / 150, 0, 1); B.wake(); say(); },
+    leave: () => { over = false; h.t = 0; B.wake(); say(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { o.t = clamp(v, 0, 100); B.wake(); }, destroy: bag.dispose };
+}
+
+
+  return function terbang(el, options) {
+    return create({ id: "terbang", label: "Nawala, the winged letter, flying to its landing pad: the slider is how far it has come, and the pointer lifts its wings.", rest: "rest", engine: mount, tour: [[150, 150], [220, 140], [150, 190], null] }, el, options);
+  };
+})();
+export { terbang };
+
+/* ---- Nawala's own figure, not part of @lucasmarkes/hairline: "sapa" (pass D, 23 Nov 2026).
+   Source: assets/js/garis-src/sapa.js ---- */
+TABLE.sapa = [22, 28, 34];
+var sapa = (() => {
+
+const W = 13, H = 44, REST = 0.46;
+const at = (ring, cx, cy) => ring.map((q) => ({ u: q.u + cx, v: q.v + cy, nu: q.nu, nv: q.nv }));
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let wide = value;
+
+  const C = Cam(45, 0.5, 2.3);
+  fit(C, [[-30, -30, -3], [30, 30, -3], [30, -30, 0], [-30, 30, 0], [-W, 0, H + 24], [W + 34, 0, H + 24]], 200, 176);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+  const fr = at(circ(31, 40), 4, 0), fi = at(circ(29, 40), 4, 0);
+  reflect(svg, g, P, front, fr, -3, 12);
+  put(solid(g), prism(P, front, fr, fi, -3, 0));
+  const ph = solid(g);
+  { const [r, i] = rings(-W, -1.8, W, 1.8, 2.4, 0.8); put(ph, prism(P, front, r, i, 0, H)); }
+  mk("path", { d: poly(rrect(-W + 2, 3, W - 2, H - 3, 1.6, 4).map((q) => P(q.u, 1.8, q.v))), class: "nf lo" }, g);
+  const heart = mk("path", { class: "nf hi" }, g);
+  { const ring = []; for (let k = 0; k < 12; k++) { const a = (k / 12) * Math.PI * 2; ring.push(P(Math.cos(a) * 3, 1.8, 26 + Math.sin(a) * 3)); } heart.setAttribute("d", poly(ring)); }
+  const bub = [0, 1].map((k) => { const grp = mk("g", {}, g); return { k, grp, body: solid(grp), line: mk("path", { class: "nf lo" }, grp), dots: k ? [0, 1, 2].map(() => mk("circle", { r: 1.5, class: "dot m" }, grp)) : [] }; });
+
+  const o = spring(REST);
+  let drawn = NaN, lit = -2;
+  function draw(t) {
+    if (Math.abs(t - drawn) < 0.0004) return;
+    drawn = t;
+    bub.forEach((b) => {
+      const e = clamp(t * 2.2 - b.k * 0.9, 0, 1), ee = e * e * (3 - 2 * e);
+      if (ee < 0.05) { b.grp.setAttribute("display", "none"); return; }
+      b.grp.removeAttribute("display");
+      const x0 = 4 + 12 * ee, x1 = x0 + (b.k ? wide * 0.72 : wide) * (0.3 + 0.7 * ee), z0 = (b.k ? 40 : 20) + 8 * ee, z1 = z0 + 13 * (0.4 + 0.6 * ee);
+      const [r, i] = rings(x0, 3.2, x1, 6.4, 1.6, 0.6);
+      put(b.body, prism(P, front, r, i, z0, z1));
+      if (b.k) { b.line.setAttribute("d", ""); b.dots.forEach((el, k) => place(el, P(x0 + (x1 - x0) * (0.28 + k * 0.22), 6.4, (z0 + z1) / 2))); }
+      else b.line.setAttribute("d", `M${P(x0 + 4, 6.4, z0 + 8.4).join(" ")}L${P(x1 - 4, 6.4, z0 + 8.4).join(" ")}M${P(x0 + 4, 6.4, z0 + 4.6).join(" ")}L${P(x1 - 9, 6.4, z0 + 4.6).join(" ")}`);
+    });
+    const now = t > 0.86 ? 1 : t > 0.3 ? 0 : -1;
+    if (now !== lit) { lit = now; heart.setAttribute("class", now < 0 ? "nf hi" : "nf lo"); bub.forEach((b) => b.body.sil.classList.toggle("hi", b.k === now)); }
+  }
+  let over = false, said = "";
+  function say() { const s = !over ? "rest" : o.t > 0.86 ? "mengetik" : "halo"; if (s !== said) { said = s; read.textContent = s; } }
+  draw(REST); say();
+
+  const B = register(stage, (dt) => { const m = stepS(o, dt); draw(o.x); say(); return m; });
+  bag.add(B.unregister);
+  const c = P(8, 0, 30);
+  bag.add(pointer(stage, {
+    move: ([x, y]) => { over = true; o.t = clamp(1.25 - Math.hypot(x - c[0], y - c[1]) / 130, 0, 1); B.wake(); },
+    leave: () => { over = false; o.t = REST; B.wake(); },
+  }));
+  bag.add(() => svg.replaceChildren());
+  return { set: (v) => { wide = clamp(v, 14, 40); drawn = NaN; draw(o.x); }, destroy: bag.dispose };
+}
+
+
+  return function sapa(el, options) {
+    return create({ id: "sapa", label: "A phone and its conversation: as the pointer nears, two message bubbles rise from it, the last one a reply being written.", rest: "rest", engine: mount, tour: [[110, 220], [170, 170], [215, 140], null] }, el, options);
+  };
+})();
+export { sapa };

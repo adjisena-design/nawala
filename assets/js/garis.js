@@ -3,7 +3,7 @@
    Nawala's pink as the highlight on dark ground, deep green on light ground (CSS in rasa.css).
    The contact box's plug comes one step nearer the socket with each answer (event "nawala-ask").
    Library: assets/js/vendor/hairline.js (@lucasmarkes/hairline, MIT). */
-import * as H from './vendor/hairline.js?v=4';
+import * as H from './vendor/hairline.js?v=5';
 const LABEL = {
   relay: ['Satu pusat yang menghubungkan semuanya', 'One hub linking everything'],
   phosphor: ['Titik-titik yang bisa dilukis seperti kode QR', 'A dot matrix you paint like a QR code'],
@@ -23,6 +23,12 @@ const LABEL = {
   album: ['Ponsel tamu mengirim foto ke album pengantin', "A guest's phone sending photos into the couple's album"],
   hari: ['Satu surat melewati enam langkah hari pernikahan', 'One letter passing the six steps of the wedding day'],
   pintu: ['Ponsel tamu dipindai di gerbang masuk', "A guest's phone read at the entrance gate"],
+  kartu: ['Setumpuk kartu undangan kertas yang bisa dibuka satu per satu', 'A stack of paper invitation cards that opens one by one'],
+  dunia: ['Ponsel yang terbuka menjadi lapisan-lapisan sebuah dunia', 'A phone opening into the layers of a world'],
+  kunci: ['Satu surat bersegel dengan satu kuncinya', 'One sealed letter with its one key'],
+  papan: ['Papan gambar tempat rancangan undangan digambar', 'A drawing board where the invitation is sketched'],
+  terbang: ['Nawala terbang mendekat setiap satu jawaban diisi', 'Nawala flying nearer with each answer'],
+  sapa: ['Ponsel dengan balon percakapan', 'A phone with message bubbles'],
   susun: ['Meja diletakkan di denah, lalu tamu didudukkan', 'A table set on the plan, then a guest seated']
 };
 const en = () => document.documentElement.lang === 'en';
@@ -54,8 +60,9 @@ function mount(el) {
   const l = LABEL[name];
   /* The big figures (garis--panggung) play their own lap in a loop while on screen, on every device, and give way
      to a pointer or a finger; nothing plays under reduced motion. */
-  const big = el.classList.contains('garis--panggung');
-  const play = big && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const big = el.classList.contains('garis--panggung'), own = /^(kartu|dunia|kunci|papan|sapa)$/.test(name);
+  /* the small figures of our own play by themselves only on touch screens, where nothing hovers */
+  const play = (big || (own && matchMedia('(hover: none)').matches)) && !matchMedia('(prefers-reduced-motion: reduce)').matches;
   const f = fn(el, { theme: 'light', intensity: Number(el.getAttribute('data-intensity') || .5), label: l ? l[en() ? 1 : 0] : undefined, play: play,
     onRead: big ? (k) => caption(el, name, k) : undefined });
   figs.set(el, f);
@@ -69,7 +76,7 @@ if ('IntersectionObserver' in window) {
 } else els.forEach(mount);
 /* the contact box: each answer brings the plug a step nearer */
 document.addEventListener('nawala-ask', (e) => {
-  const el = document.querySelector('.garis[data-garis="plug"]'); if (!el) return;
+  const el = document.querySelector('.garis[data-garis="terbang"]'); if (!el) return;
   mount(el); const f = figs.get(el); if (!f) return;
   f.update({ intensity: [.15, .45, .75, 1][Math.max(0, Math.min(3, e.detail | 0))] });
 });
