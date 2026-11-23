@@ -20,7 +20,7 @@
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');window.NAWALA_BASE='../';})();
 </script>
-<link rel="stylesheet" href="../assets/css/tema.css?v=20261123p1">
+<link rel="stylesheet" href="../assets/css/tema.css?v=20261123q1">
 <link rel="stylesheet" href="../assets/css/kit.css?v=20261123n1">
 </head>
 <body class="tm">
@@ -131,6 +131,7 @@ d.classList.add('js');window.NAWALA_BASE='../';})();
         <div class="d__actions">
           <a class="btn btn--glow" id="d-open" data-en="Open the invitation">Buka undangan</a>
           <button class="btn btn--glass" type="button" id="d-save" data-en="Save">Simpan</button>
+          <a class="btn btn--glass" id="d-imj" data-en="Try it with your photos">Coba dengan foto kalian</a>
           <a class="btn btn--glass" id="d-use" data-en="Use this theme">Gunakan tema ini</a>
         </div>
         <p class="d__msg" id="d-msg" hidden></p>
@@ -144,8 +145,9 @@ d.classList.add('js');window.NAWALA_BASE='../';})();
   <div class="sheet__box">
     <button class="sheet__x" type="button" data-close aria-label="Tutup" data-en-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <h2 id="u-h" data-en="Open the whole collection">Buka seluruh koleksi</h2>
-    <p data-en="Every theme opens with an access code from us. Ask for one on WhatsApp; it is free. With it, your saved themes are also kept in your own room with Nawala.">Semua tema terbuka dengan kode akses dari kami. Mintalah lewat WhatsApp, tanpa biaya. Dengan kode itu, tema yang kalian simpan juga tersimpan di ruang kalian di Nawala.</p>
-    <a class="btn btn--glow" id="u-wa" target="_blank" rel="noopener" data-en="Ask for a code on WhatsApp">Minta kode lewat WhatsApp</a>
+    <p data-en="Every theme opens with an access code. Fill in your name, WhatsApp number and wedding month once and you receive it straight away, free. With it, your saved themes are also kept in your own room with Nawala.">Semua tema terbuka dengan kode akses. Isi nama, nomor WhatsApp, dan bulan pernikahan sekali saja, dan kodenya langsung kalian terima, tanpa biaya. Dengan kode itu, tema yang kalian simpan juga tersimpan di ruang kalian di Nawala.</p>
+    <button type="button" class="btn btn--glow" data-pintu="kode" data-source="tema" data-en="Get my code now">Dapatkan kode sekarang</button>
+    <a class="btn btn--glass" id="u-wa" target="_blank" rel="noopener" data-en="Or ask on WhatsApp">Atau minta lewat WhatsApp</a>
     <form class="u__form" id="u-form" novalidate>
       <label for="u-code" data-en="I already have a code">Saya sudah punya kode</label>
       <div class="u__row">
@@ -160,8 +162,9 @@ d.classList.add('js');window.NAWALA_BASE='../';})();
 <script src="../assets/js/origin.js?v=3"></script>
 <script src="../assets/js/db.js?v=20261121o" defer></script>
 <script src="../assets/js/simpan.js?v=20261121o" defer></script>
+<script src="../assets/js/pintu.js?v=1" defer></script>
 <script src="../assets/js/themes.js?v=20261122a" defer></script>
 <script src="../assets/js/tema-tags.js?v=20261122a" defer></script>
-<script src="../assets/js/tema.js?v=20261122c" defer></script>
+<script src="../assets/js/tema.js?v=20261123q1" defer></script>
 </body>
 </html>

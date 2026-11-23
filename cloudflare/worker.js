@@ -9,7 +9,7 @@
 const SUPA = 'https://erwddnobnagpglkpvdfm.supabase.co';
 const KEY = 'sb_publishable_S1QUgptDBKUYn_yn0lPc0A_9hVsKwQe';
 const RESERVED = new Set(['tim', 'ruang', 'undangan', 'assets', 'supabase', 'cloudflare', 'admin', 'api', 'www', 'index', 'favicon',
-  'robots', 'sitemap', 'cname', 'readme', 'claude', 'u', 'contoh', 'nawala', 'login', 'masuk', 'tema', 'koleksi', 'layanan', 'faq', 'mitra', 'kabar', 'paket', 'demo', 'tools']);
+  'robots', 'sitemap', 'cname', 'readme', 'claude', 'u', 'contoh', 'nawala', 'login', 'masuk', 'tema', 'koleksi', 'layanan', 'faq', 'mitra', 'kabar', 'paket', 'demo', 'tools', 'sayembara', 'docs']);
 const DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 

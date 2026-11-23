@@ -299,3 +299,11 @@ p,li{text-wrap:pretty}
   box-shadow:0 0 14px rgba(244,166,192,.55),0 0 26px rgba(246,196,69,.22);animation:kit-spin 6s linear infinite}
 .lang button{background:transparent}
 @media (prefers-reduced-motion:reduce){.top__links > a.is-here,.lang button[aria-pressed="true"]{animation:none}}
+
+/* journal cards with their drawings (tools/seni.py), and the contest page's percentages */
+.post--art{padding:0;overflow:hidden;gap:.45rem}
+.post--art > :not(.post__art){margin-inline:1.2rem}
+.post--art > :last-child{margin-bottom:1.3rem}
+.post__art{display:block;aspect-ratio:400/240;background:#FBDCE6;margin:0 0 .5rem}
+.post__art svg{display:block;width:100%;height:100%}
+.say-pct{display:block;font:560 clamp(2.6rem,6vw,3.4rem)/1 var(--display, Fraunces, serif);color:#8E2F52;letter-spacing:-.02em;margin-bottom:.3rem}

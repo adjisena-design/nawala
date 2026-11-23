@@ -1752,3 +1752,113 @@ html[data-sec="valley"]{background:#FAF8F6}
 .lembah__in{position:relative;z-index:6}
 html[data-sec="valley"] .nw{z-index:3}
 @media (max-width:699px){.lb-udara{min-height:108svh;padding-top:8svh}}
+
+/* ================= The valley, third pass (owner, 23 Nov 2026, 17:46) =================
+   Platform cards carry a drawn illustration (tools/seni.py), lean with a swipe (geser.js sets --sw on the track) and tilt
+   under the pointer (Rasa); a counter "2 / 5" replaces the dots. After the platform the valley becomes bands that
+   alternate like the Jabar Open page: deep rose (the contest, with the venue photo fading in), white (comparison),
+   pink (packages, small cards, alternating pink), white (questions), deep rose (journal). */
+.lembah{padding-bottom:0}
+.lembah__in{gap:0}
+.lb-platform{padding:0 0 5.5rem}
+.geser__track::after{display:none}
+.geser__end{display:block;flex:0 0 0;height:1px}
+.geser__count{margin:-10px 0 0;text-align:center;font-weight:650;font-size:1.0625rem;color:rgba(58,48,53,.72);font-variant-numeric:tabular-nums}
+.geser__count b{font-size:1.25rem;color:#8E2F52}
+.geser.is-static .geser__count{visibility:hidden}
+.geser__card{transform:perspective(1100px) rotateY(calc(var(--sw, 0) * -10deg));transform-origin:50% 50%}
+.geser__card{flex-basis:min(80vw,21.5rem)}
+@media (min-width:700px){.geser__card{flex-basis:min(44vw,22rem)}}
+@media (min-width:900px){.geser__card{flex-basis:clamp(280px,25vw,360px)}}
+@media (prefers-reduced-motion:reduce){.geser__card{transform:none}}
+
+.lb-art{display:block;aspect-ratio:400/240;overflow:hidden;background:#FBDCE6}
+.lb-art svg{display:block;width:100%;height:100%}
+.lb-prod.geser__card{padding:0;gap:0;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(216,67,107,.1),0 26px 50px -34px rgba(120,60,85,.5)}
+.lb-prod__in{display:flex;flex-direction:column;gap:.6rem;flex:1;padding:1.15rem 1.25rem 1.35rem}
+.lb-prod.geser__card h3{font-size:clamp(1.45rem,2vw,1.75rem)}
+.lb-prod .btn{margin-top:auto;align-self:flex-start}
+.lb-prod.is-cur,.lb-post.is-cur{box-shadow:0 0 0 1.5px rgba(255,255,255,.95),0 0 20px rgba(244,166,192,.5),0 0 42px rgba(246,196,69,.22),0 26px 50px -30px rgba(120,60,85,.5)}
+.lb-platform .lb-nums{max-width:none;margin-top:1.6rem}
+.lb-num{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:.8rem;align-items:center;background:rgba(255,255,255,.9)}
+.lb-num .lb-ic{grid-row:span 2;width:44px;height:44px;padding:10px}
+.lb-num b{font-size:clamp(2rem,4vw,2.6rem)}
+.lb-num span{margin-top:.1rem}
+
+/* the contest band */
+.lb-say{position:relative;display:grid;min-height:min(100svh,880px);background:#8E2F52;color:#FFFDFB;overflow:hidden;isolation:isolate}
+.lb-say__photo{position:absolute;top:0;right:0;bottom:0;left:36%;display:block;z-index:0}
+.lb-say__photo img{width:100%;height:100%;object-fit:cover;object-position:50% 55%}
+.lb-say__photo::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,#8E2F52 0%,rgba(142,47,82,.92) 14%,rgba(142,47,82,.45) 42%,rgba(142,47,82,.08) 72%,rgba(142,47,82,0) 100%),
+             linear-gradient(0deg,rgba(142,47,82,.55) 0%,rgba(142,47,82,0) 34%)}
+.lb-say__news{position:absolute;right:4vw;bottom:1.4rem;z-index:2;display:grid;gap:.1rem;max-width:21rem;padding:.75rem 1rem .8rem;border-radius:16px;
+  background:rgba(255,253,251,.94);color:#3A3035;box-shadow:0 18px 40px -24px rgba(40,10,20,.6);transition:translate .25s var(--spring)}
+.lb-say__news b{font-weight:700;line-height:1.3}
+.lb-say__news span{font-size:1.0625rem;color:rgba(58,48,53,.72)}
+.lb-say__photo:hover .lb-say__news{translate:0 -3px}
+.lb-say__photo:focus-visible{outline:3px solid #FFE9A8;outline-offset:-6px}
+.lb-say__in{position:relative;z-index:1;align-self:center;max-width:37rem;padding:7rem 1.25rem 7rem;pointer-events:none}
+.lb-say__in > *{pointer-events:auto}
+.lb-say h2{font-size:clamp(2.2rem,4.8vw,3.5rem);line-height:1.08;color:#FFFDFB;text-wrap:balance}
+.lb-say__lead{margin-top:1rem;font-size:1.1875rem;color:rgba(255,253,251,.9)}
+.lb-say__tracks{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1.6rem}
+.lb-say__track{display:grid;align-content:start;gap:.2rem;padding:1rem 1.05rem 1.1rem;border-radius:22px;background:rgba(255,253,251,.1);box-shadow:inset 0 0 0 1px rgba(255,253,251,.24)}
+.lb-say__track b{font:560 clamp(2.4rem,5vw,3.2rem)/1 var(--display);color:#FFE9A8;letter-spacing:-.02em}
+.lb-say__track .n{font-weight:700;font-size:1.125rem}
+.lb-say__track span:last-child{color:rgba(255,253,251,.82)}
+.lb-say__fine{margin-top:1rem;color:rgba(255,253,251,.82)}
+.lb-say__acts{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.5rem}
+@media (min-width:900px){.lb-say__in{max-width:calc(40rem + var(--rail) + 3vw);padding-left:calc(var(--rail) + 3vw)}}
+@media (max-width:899px){
+  .lb-say{min-height:0}
+  .lb-say__photo{position:relative;left:auto;right:auto;height:44svh;min-height:250px}
+  .lb-say__photo::after{background:linear-gradient(0deg,#8E2F52 0%,rgba(142,47,82,.65) 20%,rgba(142,47,82,0) 58%)}
+  .lb-say__news{right:1rem;left:auto;bottom:1rem;max-width:calc(100% - 2rem)}
+  .lb-say__in{padding:2.2rem 1.25rem 4.5rem}
+}
+@media (max-width:420px){.lb-say__tracks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.lb-say__news{transition:none}}
+
+/* the bands */
+.lb-band{position:relative;padding:6rem 0;scroll-margin-top:70px}
+.lb-band--white{background:#FFFDFB}
+.lb-band--blush{background:#FBE1EA}
+.lb-band--rose{background:#8E2F52;color:#FFFDFB}
+.lb-band .lb-head{margin-bottom:1.6rem}
+.lb-cmp .scroll-x{background:#fff}
+.lb-faq .lb-qa details{background:#FFF6F8}
+.lb-faq .lb-head h2,.lb-cmp .lb-head h2{font-size:clamp(2rem,5vw,3rem)}
+
+/* packages: small cards in one grid, alternating white and pink, the complete package deep rose */
+.lb-packs{display:grid !important;grid-template-columns:repeat(auto-fit,minmax(min(100%,13.25rem),1fr));gap:.9rem}
+.lb-pack{display:flex;flex-direction:column;gap:.45rem;padding:1.2rem 1.1rem 1.25rem;border-radius:22px;background:#fff;box-shadow:0 0 0 1px rgba(216,67,107,.12),0 20px 40px -32px rgba(120,60,85,.5)}
+.lb-pack:nth-child(even){background:#F7C6D6}
+.lb-pack:nth-child(even) .lb-ic{background:rgba(255,255,255,.7)}
+.lb-pack h3{font-size:1.4rem;margin-top:.2rem}
+.lb-pack .lb-ic{width:42px;height:42px;padding:9px;border-radius:13px}
+.lb-pack ul{gap:.3rem;margin:.1rem 0 .5rem}
+.lb-pack .btn{margin-top:auto;align-self:stretch;justify-content:center}
+.lb-pack.is-hi{background:#8E2F52;color:#FFFDFB;box-shadow:0 0 0 1.5px rgba(255,255,255,.9),0 0 24px rgba(244,166,192,.55),0 0 46px rgba(246,196,69,.25),0 24px 50px -30px rgba(120,40,70,.6)}
+.lb-pack.is-hi p,.lb-pack.is-hi li{color:rgba(255,253,251,.9)}
+.lb-pack.is-hi li::before{background:#FFE9A8}
+.lb-pack.is-hi .lb-ic{background:rgba(255,253,251,.14);stroke:#FFFDFB}
+.lb-paket .lb-terms{background:rgba(255,255,255,.66)}
+.lb-free{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.8rem;margin-top:1.6rem;font-weight:650}
+@media (min-width:1200px){.lb-packs{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+/* the journal on deep rose: a row of cards with their drawings */
+.lb-kabar{padding:6rem 0 7rem}
+.lb-kabar .geser__head .lb-head{background:none;box-shadow:none;padding:0;color:#FFFDFB}
+.lb-kabar .lb-head h2{background:none;padding:0;color:#FFFDFB}
+.lb-kabar .lb-head p{color:rgba(255,253,251,.86)}
+.lb-kabar .lb-head .btn{margin-top:1rem}
+.lb-kabar .geser__count{color:rgba(255,253,251,.8)}
+.lb-kabar .geser__count b{color:#FFE9A8}
+.lb-post.geser__card{padding:0;gap:0;overflow:hidden;display:flex;flex-direction:column;color:#3A3035}
+.lb-post__in{display:flex;flex-direction:column;gap:.45rem;padding:1.1rem 1.2rem 1.35rem}
+.lb-post.geser__card h3{font-size:1.35rem}
+.lb-post.geser__card:hover{transform:perspective(1100px) rotateY(calc(var(--sw, 0) * -10deg))}
+
+@media (max-width:899px){[data-sec="air"] .top-shade{background:linear-gradient(180deg,rgba(142,47,82,.94) 0%,rgba(142,47,82,.7) 55%,rgba(142,47,82,0) 100%)}}
+.lb-post.geser__card{background:#FFFDFB}

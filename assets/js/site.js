@@ -426,19 +426,22 @@
         { t: 3.4, x: D ? vw - 78 : vw - 56, y: D ? .36 * vh : 46, s: D ? .42 : .34, r: 4, pose: 'fly', cue: 'flip' },
         { t: 6.8, x: D ? vw - 66 : vw - 50, y: D ? .5 * vh : 40, s: D ? .4 : .34, r: 0, pose: 'fly' },
         { t: 10.2 } ] },
-      /* the open stretch between the platform and the comparison: Nawala crosses the clear band between the line
-         (high) and the numbers (low), pinned to the page, turning once on the way */
+      /* the contest band (owner, 23 Nov 2026): Nawala keeps to the venue photo, which is on the right on desktop and on
+         top on phones, pinned to the page, and never crosses the writing or the credit in the photo's corner */
       air: (function () {
-        var u = udara ? udara.getBoundingClientRect() : { top: 0, height: vh }, uy = u.top + window.scrollY + u.height * .52;
-        /* the clear band: halfway between the end of the line and the top of the numbers */
-        var ln = udara && $('.lb-udara__line', udara), nm = udara && $('.lb-nums', udara);
-        if (ln && nm) uy = (ln.getBoundingClientRect().bottom + nm.getBoundingClientRect().top) / 2 + window.scrollY + (D ? 0 : 8);
+        var ph = udara && $('.lb-say__photo', udara), r = ph ? ph.getBoundingClientRect() : { left: vw * .5, right: vw, top: 0, bottom: vh, height: vh, width: vw * .5 };
+        var top = r.top + window.scrollY, x0 = D ? Math.max(r.left + r.width * .35, vw * .58) : r.left + r.width * .2, x1 = D ? r.right - 90 : r.right - 60;
+        var y0 = top + r.height * (D ? .2 : .22), y1 = top + r.height * (D ? .48 : .5);
+        /* phones: the writing runs under the photo and the band is tall, so Nawala keeps to the menu button's row */
+        if (!D) return { loop: true, k: [
+          { t: 0, x: vw - 54, y: 42, s: .34, r: -5, pose: 'fly' },
+          { t: 3.4, x: vw - 60, y: 46, s: .34, r: 4, pose: 'fly', cue: 'flip' },
+          { t: 6.8 } ] };
         return { loop: true, k: [
-          { t: 0, x: vw * (D ? .3 : .18), dy: uy, s: D ? .95 : .6, r: -6, pose: 'fly' },
-          { t: 3.6, x: vw * (D ? .62 : .62), dy: uy - (D ? 40 : 24), s: D ? 1 : .64, r: 3, pose: 'fly', cue: 'flip' },
-          { t: 6.4, x: vw * (D ? .82 : .84), dy: uy + 10, s: D ? .92 : .58, r: 6, pose: 'tilt' },
-          { t: 9.6, x: vw * (D ? .5 : .5), dy: uy + (D ? 30 : 18), s: D ? .9 : .6, r: -4, pose: 'fly' },
-          { t: 12.8 } ] };
+          { t: 0, x: x0, dy: y0, s: D ? .8 : .52, r: -6, pose: 'fly' },
+          { t: 3.6, x: x1, dy: y0 + (D ? 30 : 12), s: D ? .84 : .54, r: 4, pose: 'fly', cue: 'flip' },
+          { t: 6.8, x: (x0 + x1) / 2, dy: y1, s: D ? .78 : .5, r: 6, pose: 'tilt' },
+          { t: 10 } ] };
       })(),
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
@@ -507,7 +510,7 @@
     rLastT = -1;
   }
   /* the phone's status bar takes the colour of the section under it, so the top of the screen is seamless */
-  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', valley: '#FAF8F6', air: '#FAF8F6', contact: '#F7F3F1' };
+  var barMeta = doc.querySelector('meta[name="theme-color"]'), BAR = { hero: '#FBF9F7', about: '#F8F6F5', services: '#FAF8F6', themes: '#F8F6F4', valley: '#FAF8F6', air: '#8E2F52', contact: '#F7F3F1' };
   function barTone(name) { if (barMeta && BAR[name] && barMeta.content !== BAR[name]) barMeta.content = BAR[name]; }
   var running = false;
   function frame(now) {
@@ -1220,13 +1223,18 @@
       if (!valid()) return;
       if (i < steps.length - 1) return show(i + 1);
       var a = answers();
-      if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) return handOver(a);
+      /* the single door (owner, 23 Nov 2026, point 6): the same lead_door() as every other form, which answers an access code */
+      var DB = window.NAWALA_DB;
+      if (!DB) return handOver(a);
       next.disabled = true; next.textContent = t('Mengirim', 'Sending');
-      fetch(CONFIG.supabaseUrl + '/rest/v1/leads', {
-        method: 'POST',
-        headers: { apikey: CONFIG.supabaseKey, Authorization: 'Bearer ' + CONFIG.supabaseKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify(a)
-      }).then(function (r) { if (!r.ok) throw new Error(String(r.status)); finish(false); })
+      DB.rpc('lead_door', { p_name: a.name, p_whatsapp: a.whatsapp, p_month: a.wedding_month, p_year: a.wedding_year,
+                            p_needs: ['kode', 'konsultasi'], p_theme: a.theme, p_source: a.source, p_lang: a.lang })
+        .then(function (r) {
+          if (!r || !r.code) throw new Error('door');
+          try { sessionStorage.setItem('nawala-code', r.code); localStorage.setItem('nawala-code', r.code); } catch (e) {}
+          var cb = $('.ask__code'); if (cb) { $('#ask-code').textContent = r.code; cb.hidden = false; }
+          finish(false);
+        })
         .catch(function () { next.disabled = false; handOver(a); });
     });
   })();

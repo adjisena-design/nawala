@@ -220,6 +220,7 @@
         '<div class="lead__more">' +
           (th ? '<span class="lead__theme"><img src="' + N.cover(th, 's') + '" alt="" loading="lazy">' + esc(K.themeName(th)) + '</span>' : '<span>' + t('Belum memilih tema', 'No theme chosen yet') + '</span>') +
           '<span>' + (l.wedding_month ? t('Menikah ', 'Wedding in ') + K.month(l.wedding_month) + ' ' + l.wedding_year : t('Tanggal belum ditentukan', 'Date not set yet')) + '</span><span>' + K.ago(l.created_at) + '</span>' +
+          (l.source && l.source !== 'home' ? '<span>' + t('Dari: ', 'From: ') + esc(String(l.source).replace(/\+konsultasi/, t('+ minta konsultasi', '+ wants a consultation')).replace(/\+harga/, t('+ minta daftar harga', '+ wants the price list'))) + '</span>' : '') +
           (code ? '<span class="code">' + esc(code.code) + '</span>' : '') +
           '<span class="lead__acts">' +
             '<a class="btn btn--sm ' + (l.stage === 'baru' ? 'btn--main' : 'btn--line') + '" target="_blank" rel="noopener" href="' + esc(DB.wa(hello, intl(l.whatsapp))) + '"' + (l.stage === 'baru' ? ' data-reply="' + l.id + '"' : '') + '>' + (l.stage === 'baru' ? t('Balas', 'Reply') : 'WhatsApp') + '</a>' +

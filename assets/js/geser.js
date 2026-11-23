@@ -2,15 +2,26 @@
    never allow diagonal card swipe"). The track never scrolls by itself (overflow hidden, touch-action pan-y): the
    page keeps every vertical gesture, and a gesture that starts sideways moves only the cards. Touch and mouse: drag,
    with a flick going one card further; trackpad and wheel: the first movement of a gesture picks the axis; arrows,
-   dots and the arrow keys. It settles on a card after every move. Nothing glides under reduced motion. */
+   the counter and the arrow keys. It settles on a card after every move. Nothing glides under reduced motion.
+   Second pass (owner, 23 Nov 2026, 17:46: the dots could not tell the third card from the fourth, and the cards were
+   dull): a spacer at the end lets every card reach the left edge, so "2 / 5" always means the second card; the cards
+   lean with the speed of a swipe or a wheel turn (transform on the card, so Rasa's hover tilt still adds on top). */
 (function () {
   'use strict';
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   Array.prototype.forEach.call(document.querySelectorAll('[data-geser]'), function (g) {
     var track = g.querySelector('.geser__track'); if (!track) return;
     var cards = Array.prototype.slice.call(track.children);
-    var dots = g.querySelector('.geser__dots'), prev = g.querySelector('[data-dir="-1"]'), next = g.querySelector('[data-dir="1"]');
+    var dots = g.querySelector('.geser__dots'), cnt = g.querySelector('.geser__count'), prev = g.querySelector('[data-dir="-1"]'), next = g.querySelector('[data-dir="1"]');
     if (dots) cards.forEach(function () { dots.appendChild(document.createElement('i')); });
+    if (cnt) cnt.querySelector('span').textContent = String(cards.length);
+    /* the spacer: room after the last card so it too can stand at the left edge */
+    var spacer = document.createElement('i'); spacer.className = 'geser__end'; spacer.setAttribute('aria-hidden', 'true'); track.appendChild(spacer);
+    function room() {
+      spacer.style.flexBasis = '0px';
+      var last = cards[cards.length - 1], need = (last.offsetLeft - cards[0].offsetLeft) - max();
+      spacer.style.flexBasis = Math.max(0, need) + 'px';
+    }
     function lefts() { var o = cards[0].offsetLeft; return cards.map(function (c) { return c.offsetLeft - o; }); }
     function max() { return Math.max(0, track.scrollWidth - track.clientWidth); }
     function idx() {
@@ -29,16 +40,32 @@
     function paint() {
       var x = track.scrollLeft, m = max(), L = lefts(), i = 0;
       L.forEach(function (l, k) { if (l <= x + 4) i = k; });
-      if (x >= m - 2) i = cards.length - 1;
+      if (x >= m - 2 && countTail(L) > 0) i = cards.length - 1;
       if (dots && i !== painted) Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('is-on', k === i); });
+      if (cnt && i !== painted) cnt.querySelector('b').textContent = String(i + 1);
+      if (i !== painted) cards.forEach(function (c, k) { c.classList.toggle('is-cur', k === i); });
       painted = i;
       if (prev) prev.disabled = x <= 2;
       if (next) next.disabled = x >= m - 2;
       g.classList.toggle('is-static', m <= 2);
     }
     var raf = 0;
-    track.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); }); }, { passive: true });
-    window.addEventListener('resize', paint);
+    /* the lean: follows how fast the row moves, springs back when it stops */
+    var lean = 0, lastX = track.scrollLeft, leanRaf = 0;
+    function leanTick() {
+      leanRaf = 0;
+      var x = track.scrollLeft, v = x - lastX; lastX = x;
+      var target = Math.max(-1, Math.min(1, v / 40));
+      lean += (target - lean) * .22;
+      if (Math.abs(lean) < .004 && Math.abs(target) < .004) { lean = 0; track.style.removeProperty('--sw'); return; }
+      track.style.setProperty('--sw', lean.toFixed(3));
+      leanRaf = requestAnimationFrame(leanTick);
+    }
+    track.addEventListener('scroll', function () {
+      if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); });
+      if (!reduce && !leanRaf) { leanRaf = requestAnimationFrame(leanTick); }
+    }, { passive: true });
+    window.addEventListener('resize', function () { room(); paint(); });
     if (prev) prev.addEventListener('click', function () { step(-1); });
     if (next) next.addEventListener('click', function () { step(1); });
     function step(d) {
@@ -109,6 +136,7 @@
       clearTimeout(snap); snap = setTimeout(function () { snap = 0; settle(wDir); }, 180);
     }, { passive: false });
 
-    paint();
+    room(); paint();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { room(); paint(); });
   });
 })();

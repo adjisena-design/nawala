@@ -295,6 +295,8 @@
     var one = $('#d-one'); one.hidden = !isX;
     one.textContent = owned(th) ? t('Tema ini sudah dimiliki satu pasangan dan tidak dijual lagi.', 'This theme already belongs to a couple and is no longer for sale.')
       : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');
+    var imj = $('#d-imj'); imj.hidden = !can;
+    imj.href = can ? '../undangan/' + (th[0] === 'dasar' ? 'dasar.html' : '') + '?tema=' + encodeURIComponent(kitOf(th)) + '&to=Bapak+dan+Ibu+Santoso&imajinasi=buka' + (lang === 'en' ? '&lang=en' : '') : '#';
     var use = $('#d-use'); use.hidden = owned(th); use.href = '../?pilih=' + encodeURIComponent(sl) + '#kontak';
     $('#d-save').hidden = owned(th) || !SAVE; saveLabel(); tell('');
     if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', '');
@@ -338,6 +340,68 @@
       umsg(t('Kode diterima. Seluruh koleksi terbuka.', 'Code accepted. The whole collection is open.'));
       if (SAVE) SAVE.reopen().then(function () { render(); savedChip(); setTimeout(function () { if (un.open) un.close(); }, 1200); });
     }, function () { umsg(later); });
+  });
+
+  /* ---------- Peek (owner, 23 Nov 2026, point 7, after invitato.id/design): resting the pointer on a card with a working
+     sample slides a long picture of that invitation (assets/img/peek/<kit>.webp, made by a script from the real samples)
+     up through the card, so the visitor sees the whole invitation without opening it. On touch screens the open card
+     nearest the middle of the screen plays by itself. Transform only; nothing moves under reduced motion. ---------- */
+  var PEEK = '../assets/img/peek/', peekOn = null, peekWait = 0;
+  function bySlug(sl) { return N.ALL.filter(function (x) { return slug(x) === sl; })[0]; }
+  function peekStart(btn) {
+    if (calm || !btn || btn === peekOn) return;
+    var th = bySlug(btn.getAttribute('data-slug'));
+    if (!th || !ready(th) || owned(th) || btn.getAttribute('aria-hidden') === 'true') return;
+    peekStop();
+    peekOn = btn;
+    var art = btn.querySelector('.card__art'), box = document.createElement('span'), img = new Image();
+    box.className = 'card__peek'; box.setAttribute('aria-hidden', 'true');
+    img.alt = ''; img.decoding = 'async';
+    img.onload = function () {
+      if (peekOn !== btn) return;
+      var h = img.naturalHeight * (art.clientWidth / img.naturalWidth), dist = Math.max(0, h - art.clientHeight);
+      box.style.setProperty('--py', (-dist).toFixed(0) + 'px');
+      box.style.setProperty('--pd', Math.max(4, dist / 160).toFixed(1) + 's');
+      box.classList.add('is-on');
+    };
+    img.src = PEEK + kitOf(th) + '.webp';
+    box.appendChild(img); art.appendChild(box);
+  }
+  function peekStop() {
+    if (!peekOn) return;
+    var box = peekOn.querySelector('.card__peek'); peekOn = null;
+    if (box) { box.classList.add('is-off'); setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 320); }
+  }
+  var fineP = matchMedia('(hover: hover) and (pointer: fine)');
+  document.addEventListener('pointerover', function (e) {
+    if (!fineP.matches) return;
+    var b = e.target.closest && e.target.closest('.card[data-slug]');
+    clearTimeout(peekWait);
+    if (!b) { peekStop(); return; }
+    if (b !== peekOn) peekWait = setTimeout(function () { peekStart(b); }, 220);
+  });
+  document.addEventListener('pointerout', function (e) {
+    if (!fineP.matches || !peekOn) return;
+    if (!(e.relatedTarget && peekOn.contains(e.relatedTarget))) { clearTimeout(peekWait); peekStop(); }
+  });
+  var peekRaf = 0;
+  function peekNearest() {
+    peekRaf = 0;
+    if (fineP.matches || calm) return;
+    var mid = innerHeight / 2, best = null, bd = 1e9;
+    Array.prototype.forEach.call(document.querySelectorAll('.card[data-slug]:not([aria-hidden="true"])'), function (c) {
+      var r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+      var th = bySlug(c.getAttribute('data-slug')); if (!th || !ready(th) || owned(th)) return;
+      var dd = Math.abs(r.top + r.height / 2 - mid); if (dd < bd) { bd = dd; best = c; }
+    });
+    if (best && bd < innerHeight * .3) peekStart(best); else peekStop();
+  }
+  addEventListener('scroll', function () { if (!peekRaf) peekRaf = requestAnimationFrame(function () { clearTimeout(peekWait); peekWait = setTimeout(peekNearest, 450); }); }, { passive: true });
+
+  /* the single door (point 6): a code made there opens the collection here at once */
+  document.addEventListener('nawala-pintu', function () {
+    if (un.open) un.close();
+    if (SAVE) SAVE.reopen().then(function () { render(); savedChip(); }); else render();
   });
 
   /* ---------- Start ---------- */

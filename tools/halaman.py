@@ -12,7 +12,7 @@ no all-caps labels, no middle-dot taglines, no arrows inside buttons.
 import html, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = '20261123n2'   # bump when halaman.css / halaman.js change
+V = '20261123p1'   # bump when halaman.css / halaman.js change
 
 def esc(s): return html.escape(s, quote=True)
 def T(p, tag='span', cls='', attrs=''):
@@ -80,16 +80,24 @@ IC = {
  'ruang': 'M4 10.5 12 4l8 6.5V20H4v-9.5ZM9.5 20v-5.5h5V20',
  'wa': 'M20.5 11.5a8 8 0 0 1-11.6 7.1L4 20l1.3-4.4A8 8 0 1 1 20.5 11.5ZM9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8c-1-.5-2.3-1.8-2.8-2.8l.8-1-1-2L9 8.5Z',
  'perisai': 'M12 3 4.5 6v5.5c0 4.6 3.1 8 7.5 9.5 4.4-1.5 7.5-4.9 7.5-9.5V6L12 3Z',
+ 'telepon': 'M6.5 3.5h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2 4.5 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2Z',
+ 'label': 'M3.5 12.5V4.5h8l9 9-8 8-9-9ZM8 8.5h.01',
+ 'undian': 'M4 7.5h16v3a2 2 0 0 0 0 3v3H4v-3a2 2 0 0 0 0-3v-3ZM14.5 7.5v9',
+ 'mobil': 'M4 15.5V12l2-5h12l2 5v3.5H4ZM4 12h16M7.5 18.5a1.5 1.5 0 1 0 0-.01M16.5 18.5a1.5 1.5 0 1 0 0-.01',
+ 'selamanya': 'M8 15.5a3.5 3.5 0 1 1 0-7c3 0 5 7 8 7a3.5 3.5 0 1 0 0-7c-3 0-5 7-8 7Z',
+ 'acara': 'M4.5 6h15v14h-15zM4.5 10h15M8.5 3.5v4M15.5 3.5v4M8 14h3M13 14h3M8 17h3',
+ 'kuota': 'M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 19.5c.8-2.8 3-4.5 5.5-4.5s4.7 1.7 5.5 4.5M16 11a2.5 2.5 0 1 0 0-5M17 15c2 .4 3.4 2 4 4.5',
  'kota': 'M4 20V9l5-3v14M9 20V4l6 3v13M15 20v-9l5 2v7M3 20h18',
 }
 def icon(k, cls='ic'): return f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="{IC[k]}"/></svg>'
 TICK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'
 CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
 
-# ---------- the four products ----------
+# ---------- the five products ----------
 PRODUCTS = [
  ('undangan-digital', 'surat', ('Undangan digital', 'Digital invitation'), ('Atas nama tiap tamu, dikirim otomatis lewat WhatsApp.', "In each guest's name, sent automatically on WhatsApp.")),
  ('buku-tamu-digital', 'qr', ('Buku tamu digital', 'Digital guestbook'), ('Pindai QR di pintu, layar sapaan, meja, dan souvenir.', 'QR at the door, a greeting screen, tables and souvenirs.')),
+ ('rsvp-asisten', 'telepon', ('Asisten RSVP', 'RSVP Assistance'), ('Tim kami menanyakan kehadiran setiap tamu, lewat chat dan telepon.', 'Our team asks every guest whether they are coming, by chat and by phone.')),
  ('live-streaming', 'kamera', ('Live streaming', 'Live streaming'), ('Siaran sinematik untuk yang tidak bisa hadir.', 'A cinematic broadcast for those who cannot come.')),
  ('persiapan', 'kanban', ('Persiapan pernikahan', 'Wedding planning'), ('WBS, kanban, gantt, anggaran, vendor, dan rundown bersama tim.', 'WBS, kanban, gantt, budget, vendors and rundown with our team.')),
 ]
@@ -166,7 +174,7 @@ def topbar(B, here=''):
 def ajak(B, title, text, msg=WA_BOOK):
     return f'''<section class="ajak"><div class="wrap"><div class="ajak__box" data-rise>
   <div>{T(title, 'h2')}{T(text, 'p')}</div>
-  <div class="ajak__acts">{wa_btn(('Pesan sekarang', 'Book now'), msg)}{link_btn(('Coba demo gratis', 'Try a free demo'), B + '?buka=demo')}</div>
+  <div class="ajak__acts">{wa_btn(('Pesan sekarang', 'Book now'), msg)}<button type="button" class="btn btn--glass" data-pintu="konsultasi" data-en="Free consultation">Konsultasi gratis</button>{link_btn(('Coba demo gratis', 'Try a free demo'), B + '?buka=demo')}</div>
 </div></div></section>
 '''
 
@@ -175,7 +183,7 @@ def footer(B):
     col1 += f'<li><a href="{B}tema/" data-en="Themes">Tema</a></li><li><a href="{B}#paket" data-en="Packages">Paket</a></li>'
     col2 = ''.join(f'<li><a href="{h}" data-en="{esc(p[1])}">{esc(p[0])}</a></li>' for h, p in [
         (B + 'faq/', ('Pertanyaan umum', 'Questions')), (B + '?buka=demo', ('Coba demo', 'Try a demo')), (B + 'mitra/', ('Kemitraan', 'Partnership')),
-        (B + 'kabar/', ('Kabar Nawala', 'Nawala journal')), (B + 'ruang/', ('Ruang pasangan', "The couple's room")), (B + 'tim/', ('Konsol tim', 'Team console'))])
+        (B + 'sayembara/', ('Sayembara karya', 'Art contest')), (B + 'kabar/', ('Kabar Nawala', 'Nawala journal')), (B + 'ruang/', ('Ruang pasangan', "The couple's room")), (B + 'tim/', ('Konsol tim', 'Team console'))])
     return f'''<footer class="foot">
   <div class="wrap">
     <div class="foot__grid">
@@ -193,7 +201,7 @@ def footer(B):
 
 def scripts(B, garis=False):
     g = f'<script type="module" src="{B}assets/js/garis.js?v=6"></script>\n' if garis else ''
-    return f'<script src="{B}assets/js/tanya.js?v=1" defer></script>\n<script src="{B}assets/js/halaman.js?v={V}" defer></script>\n{g}</body>\n</html>\n'
+    return f'<script src="{B}assets/js/origin.js?v=3" defer></script>\n<script src="{B}assets/js/db.js" defer></script>\n<script src="{B}assets/js/pintu.js?v=1" defer></script>\n<script src="{B}assets/js/tanya.js?v=1" defer></script>\n<script src="{B}assets/js/halaman.js?v={V}" defer></script>\n{g}</body>\n</html>\n'
 
 def crumb(B, items):
     out = [f'<a href="{B}" data-en="Home">Beranda</a>']
@@ -341,6 +349,24 @@ Q = {
  'tema': (('Ada berapa tema?', 'How many themes are there?'),
    (f'Saat ini {N["tema"]} tema dalam empat tingkat: {N["dasar"]} Dasar, {N["premium"]} Premium, {N["eksklusif"]} Eksklusif, ditambah Kustom yang dibuat khusus. {N["contoh"]} di antaranya sudah punya undangan contoh yang bisa dibuka.',
     f'Right now there are {N["tema"]} themes in four tiers: {N["dasar"]} Basic, {N["premium"]} Premium, {N["eksklusif"]} Exclusive, plus Custom, made just for you. {N["contoh"]} of them already have a sample invitation you can open.')),
+ 'rsvpasisten': (('Apa bedanya Asisten RSVP dengan RSVP di undangan?', 'How is RSVP Assistance different from the RSVP in the invitation?'),
+   ('RSVP di undangan menunggu tamu menjawab sendiri. Asisten RSVP berarti tim Nawala yang aktif menanyakan: mengirim, mengingatkan, dan pada skema duduk menelepon, sampai jawabannya lengkap.',
+    'The RSVP in the invitation waits for guests to answer on their own. RSVP Assistance means the Nawala team actively asks: sending, reminding and, in the seated scheme, calling, until the answers are complete.')),
+ 'selamanya': (('Berapa lama undangan bisa dibuka?', 'How long can the invitation be opened?'),
+   ('Selamanya. Tautan undangan tidak kedaluwarsa, sehingga kalian dan tamu bisa membukanya lagi sebagai kenang-kenangan.',
+    'For good. The invitation link does not expire, so you and your guests can open it again as a keepsake.')),
+ 'acaralain': (('Apakah Nawala juga untuk acara selain pernikahan?', 'Is Nawala also for events other than weddings?'),
+   ('Ya. Lamaran, aqiqah, khitanan, ulang tahun, dan syukuran memakai tema dan fitur yang sama, termasuk buku tamu digital.',
+    'Yes. Engagements, aqiqah, khitanan, birthdays and thanksgivings use the same themes and features, the digital guestbook included.')),
+ 'transport': (('Apakah ada biaya transportasi untuk kru?', 'Is there a transport charge for the crew?'),
+   ('Untuk acara di Kota Bandung, tidak ada biaya transportasi tambahan. Untuk kota lain, kami menghitungnya bersama kalian saat menyusun penawaran.',
+    'For events in the city of Bandung there is no extra transport charge. For other cities we work it out with you when we put the quote together.')),
+ 'konsultasi': (('Apakah konsultasinya gratis?', 'Is the consultation free?'),
+   ('Gratis. Isi nama, nomor WhatsApp, dan bulan pernikahan sekali saja; kalian langsung mendapat kode akses untuk membuka semua tema, dan tim kami menghubungi untuk konsultasi atau mengirim daftar harga.',
+    'Free. Fill in your name, WhatsApp number and wedding month once; you get an access code that opens every theme straight away, and our team contacts you for the consultation or sends the price list.')),
+ 'imajinasi': (('Bisakah kami mencoba tema dengan foto kami sendiri?', 'Can we try a theme with our own photos?'),
+   ('Bisa. Buka undangan contoh mana pun, lalu ketuk Ruang Imajinasi. Masukkan foto, nama, dan tanggal kalian, dan undangan langsung menampilkannya. Foto tetap di ponsel kalian dan tidak dikirim ke mana pun.',
+    'Yes. Open any sample invitation and tap Imagination Room. Put in your photos, names and date, and the invitation shows them at once. The photos stay on your phone and are not sent anywhere.')),
 }
 def qs(*keys, pop=()): return qa([Q[k] for k in keys], keys, pop)
 
@@ -370,7 +396,8 @@ def page_product(slug):
     out += '<main id="isi">\n'
     fig = stage(C['fig'], C.get('fignote')) if C.get('fig') else C.get('figure', lambda B: '')(B)
     chips = '<div class="head__chips">' + ''.join(f'<span class="chip"><i></i>{T(c)}</span>' for c in C['chips']) + '</div>'
-    acts = wa_btn(('Pesan sekarang', 'Book now'), C['wa']) + ''.join(link_btn(l, h, lang=True) for l, h in C['acts'])
+    acts = (wa_btn(('Pesan sekarang', 'Book now'), C['wa']) + '<button type="button" class="btn btn--glass" data-pintu="konsultasi" data-en="Free consultation">Konsultasi gratis</button>'
+            + ''.join(link_btn(l, h, lang=True) for l, h in C['acts']))
     out += f'''<section class="head"><div class="wrap head__grid">
   <div>{crumb(B, [(B + 'layanan/', ('Layanan', 'Services')), (None, name)])}
     <h1 data-en="{esc(C['h1'][1])}">{esc(C['h1'][0])}</h1>{T(C['lead'], 'p', 'head__lead')}
@@ -423,6 +450,10 @@ def _ud_blocks():
             'Guests write their wishes to you in the invitation. You can hide any message that does not belong.')),
           ('kado', ('Amplop digital dan kado', 'Digital gift and registry'), ('Rekening untuk angpao digital, sampai tiga rekening, ditambah alamat pengiriman kado. Tamu menyalin nomornya dengan satu ketukan.',
             'Accounts for a digital angpao, up to three, plus an address for gifts. Guests copy the number with one tap.')),
+          ('kuota', ('Kuota per tamu', 'A quota per guest'), ('Tentukan berapa orang yang boleh datang untuk setiap undangan, misalnya dua orang untuk pasangan suami istri. Tamu memilih jumlahnya di RSVP, tidak bisa melebihi kuotanya.',
+            'Set how many people may come on each invitation, for example two for a married couple. Guests choose their number in the RSVP and cannot go over it.'), None, True),
+          ('acara', ('Acara per tamu', 'Events per guest'), ('Tandai setiap tamu untuk akad, resepsi, atau keduanya. Undangannya hanya menampilkan acara yang memang untuknya, dan hitungan tamu per acara terpisah dengan sendirinya.',
+            'Mark each guest for the akad, the reception or both. Their invitation shows only the events meant for them, and the guest count for each event is kept separately.'), None, True),
           ('kunci', ('Dikunci dengan kata sandi', 'Password protection'), ('Untuk pernikahan yang ingin tetap intim: undangan hanya terbuka bagi yang mengetahui sandinya.',
             'For a wedding meant to stay intimate: the invitation only opens for those who know the password.')),
           ('kuas', ('Editor desain', 'Design editor'), (f'Sunting sendiri seperti di Canva, tanpa menulis kode: {N["huruf"]} jenis huruf, kotak di balik setiap tulisan, {N["bingkai"]} bingkai foto, {N["elemen"]} elemen hiasan, dan pembuka undangan. Setiap perubahan diperiksa tim sebelum tayang.',
@@ -435,6 +466,12 @@ def _ud_blocks():
             'Every line is there in two languages and guests switch with one button, with no stiff machine translation.')),
           ('musik', ('Musik, peta, dan hitung mundur', 'Music, map and countdown'), ('Musik latar, hitung mundur, tombol simpan ke kalender, peta lokasi tiap acara, galeri foto, kisah kalian, kode busana, dan tautan siaran langsung.',
             'Background music, a countdown, save-to-calendar, a map for each event, a photo gallery, your story, a dress code and the live stream link.')),
+          ('selamanya', ('Aktif selamanya', 'Active for good'), ('Tautan undangan tidak kedaluwarsa. Kalian dan tamu bisa membukanya lagi bertahun-tahun kemudian sebagai kenang-kenangan.',
+            'The invitation link does not expire. You and your guests can open it again years later as a keepsake.'), None, True),
+          ('foto', ('Galeri tanpa batas', 'An unlimited gallery'), ('Masukkan foto prewedding sebanyak yang kalian mau. Foto diperkecil otomatis agar undangan tetap ringan dibuka.',
+            'Add as many prewedding photos as you like. They are resized for you so the invitation stays light to open.')),
+          ('acara', ('Bukan hanya pernikahan', 'Not only weddings'), ('Lamaran, aqiqah, khitanan, ulang tahun, dan syukuran memakai tema dan fitur yang sama: undangan atas nama, RSVP, dan buku tamu.',
+            'Engagements, aqiqah, khitanan, birthdays and thanksgivings use the same themes and features: invitations by name, RSVP and the guestbook.'), None, True),
           ('alamat', ('Alamat kalian sendiri', 'An address of your own'), ('Undangan tinggal di nawalainvite.com/nama-kalian, dan tiap tamu mendapat tautan dengan namanya di ujungnya.',
             "Your invitation lives at nawalainvite.com/your-names, and each guest's link carries their name at the end.")),
           ('kilat', ('Ringan di ponsel apa pun', 'Light on any phone'), ('Kami membangun tanpa pustaka yang berat dan menguji di ukuran ponsel, karena sebagian besar tamu membuka undangan di ponsel Android kelas menengah ke bawah. Lambat berarti ditutup.',
@@ -481,6 +518,8 @@ def _ud_blocks():
           (('Revisi tanpa batas', 'Unlimited revisions'),), (('Undangan terpisah per kelompok tamu', 'Split invitation per guest group'),),
           (('RSVP dan ucapan tersimpan', 'Saved RSVP and wishes'),), (('Amplop digital dan alamat kado', 'Digital gift and gift address'),),
           (('Kunci kata sandi', 'Password lock'),), (('Editor desain', 'Design editor'),),
+          (('Kuota dan acara per tamu', 'Quota and events per guest'),), (('Aktif selamanya', 'Active for good'),),
+          (('Galeri foto tanpa batas', 'Unlimited photo gallery'),), (('Ruang Imajinasi di setiap contoh', 'An Imagination Room in every sample'), ('Coba tema dengan foto kalian sendiri sebelum memesan', 'Try a theme with your own photos before booking')),
           (('Musik latar', 'Background music'),), (('Dua bahasa', 'Two languages'),),
           (('Ruang pasangan', "The couple's room"), ('Tema, data, tamu, desain, dan Persiapan dalam satu tempat', 'Themes, details, guests, design and Persiapan in one place')),
           (('Pendamping khusus dan layanan 24 jam', 'A dedicated companion and 24-hour service'),),
@@ -512,7 +551,17 @@ def _bt_blocks():
           ('tablet', ('Perangkat di lokasi', 'Devices on site'), ('Tablet dan pemindai kode QR kami bawa dan pasang di setiap pintu masuk, jadi kalian tidak perlu menyiapkan apa pun.', 'We bring and set up tablets and QR scanners at every entrance, so you prepare nothing.')),
           ('sinyal', ('Internet sendiri', 'Our own internet'), ('Kami membawa modem internet khusus, sehingga buku tamu tetap berjalan meski sinyal gedung lemah.', 'We bring a dedicated internet modem, so the guestbook keeps working even where the venue signal is weak.')),
           ('orang', ('Kru teknis', 'Technical crew'), ('Kru kami memasang perangkat sebelum acara, memandu penerima tamu, dan berjaga sampai acara selesai.', 'Our crew sets the devices up before the event, briefs the ushers and stays on watch until the end.')),
-          ('seragam', ('Penerima tamu berseragam Nawala', 'Ushers in Nawala uniform'), ('Penerima tamu kami mengenakan seragam khusus Nawala, terlatih menyambut tamu, memindai kode, dan mengarahkan ke meja.', 'Our ushers wear a dedicated Nawala uniform and are trained to welcome guests, scan codes and show them to their table.'), None, True),
+          ('seragam', ('Penerima tamu berseragam Nawala', 'Ushers in Nawala uniform'), ('Penerima tamu kami mengenakan seragam khusus Nawala lengkap dengan tata rias, terlatih menyambut tamu, memindai kode, dan mengarahkan ke meja.', 'Our ushers wear a dedicated Nawala uniform with make-up done, and are trained to welcome guests, scan codes and show them to their table.'), None, True),
+          ('foto', ('Swafoto saat masuk', 'A selfie at check-in'), ('Tamu berfoto di meja penerima saat kodenya dipindai. Fotonya tersimpan bersama catatan kehadiran dan bisa tampil di layar sapaan.',
+            'Guests have their photo taken at the welcome desk as their code is scanned. The photo is kept with the attendance record and can appear on the greeting screen.'), None, True),
+          ('label', ('Pencatatan kado dan angpao', 'Gift and angpao logging'), ('Setiap kado dan amplop dicatat atas nama tamunya, lalu diberi label cetak, sehingga jumlahnya cocok saat dihitung bersama keluarga.',
+            "Every gift and envelope is logged in the guest's name and given a printed label, so the count matches when you go through it with the family."), None, True),
+          ('label', ('Printer label', 'Label printer'), ('Label untuk amplop, info meja, dan kupon souvenir dicetak langsung di meja penerima tamu.',
+            'Labels for envelopes, table information and souvenir coupons are printed right at the welcome desk.')),
+          ('undian', ('Sesi doorprize', 'Doorprize session'), ('Undian diambil dari tamu yang benar-benar hadir, langsung dari catatan buku tamu, dan pemenangnya tampil di layar.',
+            'The draw is taken from guests who are actually present, straight from the guestbook records, and the winners appear on the screen.'), None, True),
+          ('mobil', ('Gratis transportasi di Bandung', 'Free transport in Bandung'), ('Untuk acara di Kota Bandung, perangkat dan kru datang tanpa biaya transportasi tambahan. Kota lain kami hitung bersama.',
+            'For events in the city of Bandung, devices and crew come at no extra transport cost. For other cities we work it out together.')),
           ('layar', ('Layar sapaan', 'Greeting screen'), ('Saat kode dipindai, nama tamu muncul di layar besar di pintu masuk dengan ucapan selamat datang dari kalian.', 'When a code is scanned, the guest\'s name appears on a large screen at the entrance with a welcome from you.')),
           ('denah', ('Manajemen meja dan kursi', 'Table and seat management'), ('Susun ruangan sesuai ukuran asli gedung, letakkan meja dan pelaminan, lalu seret nama tamu ke kursinya. Kelompok tamu diberi warna sendiri.', 'Lay out the room at the venue\'s real size, place tables and the stage, then drag guests\' names onto their chairs. Guest groups get their own colour.')),
           ('meja', ('Penunjuk meja untuk tamu', 'A table finder for guests'), ('Tamu yang sudah menjawab hadir melihat "Meja Anda" di undangannya, lengkap dengan letaknya di denah.', 'Guests who answered yes see "Your table" in their invitation, with where it stands on the plan.')),
@@ -537,8 +586,10 @@ def _bt_blocks():
     def incl_b(B):
         return S(sec_head(('Yang termasuk.', 'What is included.')) + incl([
           (('Tablet dan pemindai QR', 'Tablets and QR scanners'), ('Jumlahnya mengikuti pintu masuk dan jumlah tamu', 'The number follows the entrances and the guest count')),
-          (('Modem internet', 'Internet modem'),), (('Kru teknis di lokasi', 'Technical crew on site'),),
-          (('Penerima tamu berseragam Nawala', 'Ushers in Nawala uniform'),), (('Layar sapaan', 'Greeting screen'),),
+          (('Modem internet, termasuk kuotanya', 'Internet modem, data included'),), (('Kru teknis di lokasi', 'Technical crew on site'),),
+          (('Printer label, pencatatan kado dan angpao', 'Label printer, gift and angpao logging'),), (('Swafoto saat masuk dan sesi doorprize', 'Check-in selfie and doorprize session'),),
+          (('Transportasi gratis di Kota Bandung', 'Free transport in the city of Bandung'),),
+          (('Penerima tamu berseragam Nawala, dengan tata rias', 'Ushers in Nawala uniform, make-up included'),), (('Layar sapaan', 'Greeting screen'),),
           (('Manajemen meja dan kursi', 'Table and seat management'), ('Termasuk halaman penerima tamu dan "Meja Anda" untuk tamu', 'With the ushers\' page and "Your table" for guests')),
           (('QR pribadi dan undangan atas nama tiap tamu', 'A personal QR and invitation for every guest'),),
           (('Berkas QR siap cetak dan QR amplop tercetak', 'Printable QR files and a printed gift QR'),),
@@ -551,6 +602,57 @@ def _bt_blocks():
                  + f'<p class="note"><a href="{B}faq/" data-en="See every question">Lihat semua pertanyaan</a></p>')
     return [feats_b, day_b, demo_b, incl_b, faq_b]
 PRODUCT_COPY['buku-tamu-digital']['blocks'] = _bt_blocks()
+
+# Asisten RSVP (from Invitato's RSVP Assistance, owner 23 Nov 2026: "add anything they have") --------------------
+PRODUCT_COPY['rsvp-asisten'] = dict(
+ title=('Asisten RSVP Nawala', 'Nawala RSVP Assistance'),
+ desc=('Asisten RSVP Nawala: tim kami mengirim undangan, menanyakan kehadiran setiap tamu lewat chat dan telepon, mengingatkan menjelang hari H, dan menyusun meja.', ''),
+ h1=('Setiap tamu ditanya, setiap jawaban tercatat.', 'Every guest asked, every answer recorded.'),
+ lead=('Menanyakan kehadiran ratusan tamu satu per satu menghabiskan minggu-minggu terakhir sebelum pernikahan. Serahkan kepada tim Nawala: kami mengirim undangan, menindaklanjuti tamu yang belum menjawab, menelepon bila perlu, dan menyerahkan angka yang bisa kalian pegang untuk katering dan kursi.',
+       'Asking hundreds of guests one by one eats the last weeks before a wedding. Hand it to the Nawala team: we send the invitations, follow up guests who have not replied, call when needed, and hand you numbers you can rely on for catering and seating.'),
+ chips=[('Jalur resmi WhatsApp', 'Official WhatsApp line'), ('Tindak lanjut chat dan telepon', 'Chat and phone follow-up'), ('Pengingat menjelang hari H', 'Reminders before the day'), ('Susunan meja', 'Table arrangement')],
+ acts=[(('Coba demo denah dan kursi', 'Try the seating demo'), '../../undangan/denah-demo.html')],
+ wa=('Halo Nawala, saya ingin tahu tentang Asisten RSVP.', 'Hello Nawala, I would like to know about RSVP Assistance.'),
+ fig='sapa', fignote=('Pesan terkirim, jawaban kembali. Sentuh atau gerakkan kursor.', 'A message out, an answer back. Touch it or move your cursor.'),
+ ajak=(('Lepaskan urusan menanyakan tamu.', 'Let go of chasing guests.'), ('Ceritakan jumlah tamu dan tanggal kalian. Kami usulkan skema yang pas, berdiri atau duduk.', 'Tell us your guest count and date. We suggest the scheme that fits, standing or seated.')),
+)
+def _rsvp_blocks():
+    def schemes_b(B):
+        return S(sec_head(('Dua skema, sesuai bentuk resepsi.', 'Two schemes, by the shape of the reception.')) + '<div class="split">'
+          + f'<article class="card" data-rise>{T(("Skema berdiri", "Standing scheme"), "h3")}<span class="n" data-en="For standing receptions">Untuk resepsi berdiri</span><ul>' + ''.join(T(x, 'li') for x in [
+              ('Undangan dan RSVP dikirim atas nama setiap tamu', 'Invitation and RSVP sent in each guest\'s name'),
+              ('Dua kali tindak lanjut lewat chat untuk yang belum menjawab', 'Two chat follow-ups for those who have not replied'),
+              ('Pengingat acara menjelang hari H', 'An event reminder before the day'),
+              ('Rekap jawaban yang selalu terkini', 'An answer report that is always current')]) + '</ul></article>'
+          + f'<article class="card card--hi" data-rise>{T(("Skema duduk", "Seated scheme"), "h3")}<span class="n" data-en="For seated receptions">Untuk resepsi duduk</span><ul>' + ''.join(T(x, 'li') for x in [
+              ('Semua yang ada di skema berdiri', 'Everything in the standing scheme'),
+              ('Tindak lanjut ketiga lewat telepon', 'A third follow-up by phone'),
+              ('Susunan meja dan kursi dari jawaban tamu', 'Table and seat arrangement from the answers'),
+              ('Nomor meja di undangan setiap tamu', 'The table number in each guest\'s invitation')]) + '</ul></article></div>')
+    def feats_b(B):
+        return S(sec_head(('Yang dikerjakan tim kami.', 'What our team does.')) + feats([
+          ('kirim', ('Jalur resmi WhatsApp', 'The official WhatsApp line'), ('Semua pesan dikirim lewat akun WhatsApp Business resmi Nawala, sehingga tamu tahu pesan itu sungguhan dan nomor pribadi kalian tetap aman.', "Every message goes through Nawala's official WhatsApp Business account, so guests know it is genuine and your personal number stays safe.")),
+          ('ucap', ('Tindak lanjut yang sopan', 'Polite follow-ups'), ('Tamu yang belum menjawab disapa lagi dengan pesan yang ramah, pada jam yang wajar, tanpa terasa mendesak.', 'Guests who have not replied are greeted again with a friendly message, at reasonable hours, without feeling pressed.')),
+          ('telepon', ('Telepon bila perlu', 'A call when needed'), ('Pada skema duduk, tamu yang tetap belum menjawab kami telepon, karena kursi yang kosong atau kurang sama-sama merepotkan.', 'In the seated scheme, guests who still have not replied get a phone call, because empty or missing seats are both a problem.'), None, True),
+          ('kuota', ('Kuota dan acara per tamu', 'Quota and events per guest'), ('Setiap tamu ditanya untuk acaranya sendiri dan tidak bisa melebihi jumlah orang yang kalian tentukan.', 'Each guest is asked about their own events and cannot exceed the number of people you set.')),
+          ('lonceng', ('Pengingat hari H', 'Day reminders'), ('Tamu yang hadir menerima pengingat beberapa hari sebelumnya, lengkap dengan waktu, lokasi, dan tautan peta.', 'Guests who are coming receive a reminder a few days before, with the time, place and a map link.')),
+          ('denah', ('Susunan meja', 'Table arrangement'), ('Dari jawaban yang masuk, kami susun meja bersama kalian di denah, lalu nomor meja muncul di undangan setiap tamu.', 'From the answers that come in, we arrange the tables with you on the floor plan, then the table number appears in each guest\'s invitation.')),
+          ('unduh', ('Laporan yang bisa diunduh', 'A report you can download'), ('Daftar jawaban, jumlah orang per acara, dan catatan tamu, siap dibuka di Excel untuk katering dan keluarga.', 'The answer list, people per event and guest notes, ready to open in Excel for the caterer and the family.')),
+          ('orang', ('Manusia, bukan robot', 'People, not a bot'), ('Balasan tamu dibaca dan dijawab oleh tim kami, bukan mesin penjawab otomatis.', 'Guests\' replies are read and answered by our team, not an automatic responder.')),
+        ]))
+    def how_b(B):
+        return S(sec_head(('Bagaimana berjalannya.', 'How it runs.')) + steps([
+          (('Daftar tamu', 'The guest list'), ('Kalian menyerahkan daftar tamu dengan nomor WhatsApp, kuota, dan acara tiap tamu, atau kami bantu merapikannya.', 'You hand over the guest list with WhatsApp numbers, quotas and events, or we help tidy it up.'), ('Kalian', 'You')),
+          (('Pesan disetujui', 'Messages approved'), ('Kami siapkan pesan undangan, tindak lanjut, dan pengingat untuk kalian setujui.', 'We prepare the invitation, follow-up and reminder messages for your approval.'), ('Tim Nawala', 'Nawala team')),
+          (('Dikirim dan ditindaklanjuti', 'Sent and followed up'), ('Undangan dikirim, jawaban dicatat, tamu yang belum menjawab disapa lagi, lalu ditelepon pada skema duduk.', 'Invitations go out, answers are recorded, those who have not replied are greeted again, then called in the seated scheme.'), ('Tim Nawala', 'Nawala team')),
+          (('Angka dikunci', 'Numbers locked'), ('Menjelang batas katering, kami serahkan jumlah akhir per acara dan susunan meja.', 'Before the catering deadline we hand over the final count per event and the table arrangement.'), ('Kalian dan tim Nawala', 'You and the Nawala team')),
+          (('Hari H', 'The day'), ('Data yang sama dipakai buku tamu digital di pintu masuk.', 'The same data is used by the digital guestbook at the entrance.'), None),
+        ]))
+    def faq_b(B):
+        return S(sec_head(('Pertanyaan tentang Asisten RSVP.', 'Questions about RSVP Assistance.')) + qs('rsvpasisten', 'blokir', 'kirim', 'data', 'bayar')
+                 + f'<p class="note"><a href="{B}faq/" data-en="See every question">Lihat semua pertanyaan</a></p>')
+    return [schemes_b, feats_b, how_b, faq_b]
+PRODUCT_COPY['rsvp-asisten']['blocks'] = _rsvp_blocks()
 
 # Live streaming --------------------------------------------------------------
 PRODUCT_COPY['live-streaming'] = dict(
@@ -713,9 +815,9 @@ def page_layanan():
 
 # ---------- FAQ page ----------
 FAQ_GROUPS = [
- ('umum', ('Pemesanan dan pembayaran', 'Booking and payment'), ['pesan', 'harga', 'bayar', 'kapan', 'pic', 'kode', 'tema']),
- ('undangan', ('Undangan digital', 'Digital invitation'), ['nol', 'revisi', 'kirim', 'blokir', 'terpisah', 'sandi', 'aplikasi', 'bahasa']),
- ('buku-tamu', ('Buku tamu digital', 'Digital guestbook'), ['masuk', 'tanpaqr', 'internet', 'kru', 'takdiundang']),
+ ('umum', ('Pemesanan dan pembayaran', 'Booking and payment'), ['pesan', 'konsultasi', 'harga', 'bayar', 'kapan', 'pic', 'kode', 'tema', 'acaralain']),
+ ('undangan', ('Undangan digital', 'Digital invitation'), ['nol', 'imajinasi', 'revisi', 'kirim', 'blokir', 'terpisah', 'sandi', 'selamanya', 'aplikasi', 'bahasa']),
+ ('buku-tamu', ('Buku tamu digital', 'Digital guestbook'), ['masuk', 'tanpaqr', 'internet', 'kru', 'takdiundang', 'transport', 'rsvpasisten']),
  ('streaming', ('Live streaming', 'Live streaming'), ['platform', 'siapa', 'rekaman']),
  ('persiapan', ('Persiapan pernikahan', 'Wedding planning'), ['pm', 'pmtambah', 'pmlihat', 'pmlama']),
  ('data', ('Data dan privasi', 'Data and privacy'), ['data']),
@@ -773,8 +875,65 @@ def page_mitra():
     out += '</main>\n' + footer(B) + scripts(B)
     return out
 
+# ---------- the art contest (owner, 23 Nov 2026, points 9 and 10; his answers 18:04) ----------
+def page_sayembara():
+    B = '../'
+    msg = ('Halo Nawala, saya ingin ikut Sayembara Nawala.', 'Hello Nawala, I would like to join the Nawala contest.')
+    out = head(B, 'Sayembara Nawala', 'Sayembara karya seni untuk tema undangan Nawala: 20% untuk karya tangan, 5% untuk karya AI, setiap kali tema dipakai, selama dua tahun dan bisa diperpanjang.', 'The Nawala art contest')
+    out += topbar(B) + '<main id="isi">\n'
+    out += f'''<section class="head"><div class="wrap">{crumb(B, [(None, ('Sayembara Nawala', 'The Nawala contest'))])}
+  <h1 data-en="Your art, in wedding invitations across Indonesia.">Karya kalian, di undangan pernikahan seluruh Indonesia.</h1>
+  {T(('Nawala mencari lukisan dan ilustrasi untuk tema undangan pernikahan. Karya yang kami terima menjadi tema di katalog Nawala, dengan nama kalian di dalamnya, dan setiap kali pasangan memakai tema itu, kalian menerima bagiannya.', 'Nawala is looking for paintings and illustrations for wedding invitation themes. Work we accept becomes a theme in the Nawala catalogue, with your name in it, and every time a couple uses that theme you receive your share.'), 'p', 'head__lead')}
+  <div class="head__acts">{wa_btn(('Daftar lewat WhatsApp', 'Sign up on WhatsApp'), msg)}</div>
+  <div class="head__chips"><span class="chip"><i></i><span data-en="Open to anyone">Terbuka untuk siapa saja</span></span><span class="chip"><i></i><span data-en="Open until we close it">Dibuka sampai kami tutup</span></span><span class="chip"><i></i><span data-en="No entry fee">Tanpa biaya pendaftaran</span></span></div></div></section>
+'''
+    track = lambda pct, name, sub, items: (f'<article class="card" data-rise><b class="say-pct">{pct}</b>{T(name, "h3")}{T(sub, "p")}<ul>' + ''.join(T(x, 'li') for x in items) + '</ul></article>')
+    out += S(sec_head(('Dua jalur, dua bagian.', 'Two tracks, two shares.'), ('Karya tangan dan karya AI dinilai di jalur yang terpisah, dengan bagian yang berbeda. Kerja tangan kami hargai lebih tinggi.', 'Hand-made and AI-made work are judged on separate tracks, with different shares. We value handwork more highly.'))
+        + '<div class="split">'
+        + track('20%', ('Karya tangan', 'Hand-made'), ('Dilukis, digambar, atau dibuat digital oleh kalian sendiri, tanpa gambar buatan AI di bagian mana pun.', 'Painted, drawn or made digitally by you, with no AI-generated image in any part of it.'),
+                [('Cat air, guas, tinta, pastel, cat minyak, atau digital', 'Watercolour, gouache, ink, pastel, oil or digital'), ('Wajib menyertakan bukti proses', 'Proof of process is required'), ('20% dari bagian Nawala setiap undangan', "20% of Nawala's share of each invitation")])
+        + track('5%', ('Karya AI', 'AI-made'), ('Dibuat dengan bantuan AI, lalu disusun utuh menjadi satu tema: lima adegan yang serasi, lapisan depan, dan hiasan bunga.', 'Made with the help of AI, then assembled into one complete theme: five matching scenes, front layers and a flower spray.'),
+                [('Sebutkan alat dan perintah (prompt) yang dipakai', 'Name the tools and prompts used'), ('Kalian memastikan hak pakai atas hasilnya', 'You make sure you have the right to use the result'), ('5% dari bagian Nawala setiap undangan', "5% of Nawala's share of each invitation")])
+        + '</div>', glass=False)
+    SR = 'scope="row"'
+    rows = ''.join(f'<tr>{T(a, "th", attrs=SR)}<td class="num">{b}</td><td class="num">{c}</td></tr>' for a, b, c in [
+        (('Dijual langsung oleh Nawala', 'Sold directly by Nawala'), 'Rp100.000', 'Rp25.000'),
+        (('Dijual lewat mitra dengan komisi 25%', 'Sold through a partner on 25% commission'), 'Rp75.000', 'Rp18.750')])
+    out += S(sec_head(('Contoh hitungan.', 'A worked example.'), ('Untuk satu undangan seharga Rp500.000. Angka ini hanya contoh cara menghitung, bukan harga Nawala.', 'For one invitation at Rp500,000. This only shows how the share is counted; it is not a Nawala price.'))
+        + f'<div class="scroll-x"><table class="tbl"><thead><tr><th scope="col" data-en="When the invitation is">Saat undangan</th><th scope="col" data-en="Hand-made (20%)">Karya tangan (20%)</th><th scope="col" data-en="AI-made (5%)">Karya AI (5%)</th></tr></thead><tbody>{rows}</tbody></table></div>'
+        + T(('Bagian dihitung dari yang diterima Nawala: harga setelah komisi mitra dan pajak. Pembayaran dikirim setiap bulan lewat transfer bank, tanpa batas minimum, lengkap dengan rincian setiap undangan yang memakai karya kalian.', "The share is counted on what Nawala receives: the price after any partner commission and tax. Payment goes out every month by bank transfer, with no minimum, with a statement of every invitation that used your work."), 'p', 'note'))
+    out += S(sec_head(('Cara ikut.', 'How to take part.')) + steps([
+      (('Daftar', 'Sign up'), ('Kirim pesan lewat WhatsApp. Kami kirim berkas ketentuan dan ukuran gambar.', 'Send us a message on WhatsApp. We send the terms and the image sizes.'), ('Kalian', 'You')),
+      (('Kirim karya', 'Send your work'), ('Kirim satu set tema: lima adegan, lapisan depan, dan satu hiasan bunga, bersama bukti proses atau keterangan alat AI.', 'Send one theme set: five scenes, front layers and one flower spray, with proof of process or the AI tools used.'), ('Kalian', 'You')),
+      (('Dinilai tim Nawala', 'Reviewed by the Nawala team'), ('Tim kami menilai secara internal dan menjawab diterima atau belum, selalu dengan catatan. Tidak ada pemungutan suara publik.', 'Our team reviews it internally and answers accepted or not yet, always with notes. There is no public vote.'), ('Tim Nawala', 'Nawala team')),
+      (('Dijadikan tema', 'Made into a theme'), ('Karya yang diterima kami bangun menjadi undangan yang berfungsi. Kalian melihat pratinjaunya dan menyetujuinya sebelum tayang.', 'Accepted work is built into a working invitation. You see the preview and approve it before it goes live.'), ('Tim Nawala dan kalian', 'Nawala team and you')),
+      (('Tayang dan dibayar', 'Live and paid'), ('Tema masuk katalog dengan nama kalian. Setiap undangan yang memakainya tercatat, dan bagian kalian dikirim setiap bulan.', 'The theme enters the catalogue with your name. Every invitation that uses it is recorded, and your share is sent every month.'), None),
+    ]))
+    out += S(sec_head(('Yang perlu dikirim.', 'What to send.'), ('Ukuran ini mengikuti kerangka undangan Nawala, sehingga karya kalian langsung bisa dipakai di semua fitur: Ruang Imajinasi, editor desain, dan buku tamu.', "These sizes follow Nawala's invitation framework, so your work works at once with every feature: the Imagination Room, the design editor and the guestbook.")) + incl([
+      (('Lima adegan tegak, 720 x 1290 piksel atau lebih besar', 'Five portrait scenes, 720 x 1290 pixels or larger'), ('Sampul, sapaan, acara, galeri, dan penutup; bagian tengah cukup tenang untuk tulisan', 'Cover, greeting, events, gallery and closing; calm enough in the middle for text')),
+      (('Lapisan depan untuk tiap adegan', 'A front layer for each scene'), ('Bunga, daun, atau bentuk lain di bagian bawah, dengan latar transparan', 'Flowers, leaves or other forms along the bottom, on a transparent background')),
+      (('Satu hiasan bunga terpisah', 'One separate flower spray'), ('Untuk sudut kartu, latar transparan', 'For card corners, on a transparent background')),
+      (('Usulan palet warna', 'A suggested colour palette'),),
+      (('Bukti proses (karya tangan)', 'Proof of process (hand-made)'), ('Sketsa, berkas berlapis, foto proses, atau rekaman layar', 'Sketches, layered files, process photos or a screen recording')),
+      (('Keterangan alat dan perintah (karya AI)', 'Tools and prompts (AI-made)'),),
+    ]))
+    out += S(sec_head(('Ketentuan pokok.', 'The main terms.')) + qa([
+      (('Siapa yang boleh ikut?', 'Who can take part?'), ('Siapa saja, pelajar maupun bukan, dari seluruh Indonesia. Peserta di bawah 18 tahun ikut dengan persetujuan orang tua atau wali.', 'Anyone, student or not, from anywhere in Indonesia. Entrants under 18 take part with the consent of a parent or guardian.')),
+      (('Sampai kapan sayembara dibuka?', 'How long is the contest open?'), ('Sayembara selalu dibuka sampai kami umumkan ditutup. Karya bisa dikirim kapan saja.', 'It stays open until we announce that it has closed. Work can be sent at any time.')),
+      (('Bagaimana karya dinilai?', 'How is work judged?'), ('Secara internal oleh tim Nawala. Setiap karya mendapat jawaban diterima atau belum, dengan catatan. Tidak ada juri publik dan tidak ada pemungutan suara.', 'Internally, by the Nawala team. Every entry gets an answer, accepted or not yet, with notes. There is no public jury and no vote.')),
+      (('Berapa lama bagian saya berjalan?', 'How long does my share run?'), ('Dua tahun sejak tema tayang. Menjelang akhir masa itu kami bertanya apakah kalian ingin memperpanjang; bila tidak, tema itu kami pensiunkan.', 'Two years from when the theme goes live. Near the end of that time we ask whether you wish to renew; if not, the theme is retired.')),
+      (('Apakah saya tetap memiliki karya saya?', 'Do I keep my work?'), ('Hak cipta tetap milik kalian. Nawala mendapat izin memakai karya itu sebagai tema undangan selama masa berlaku. Untuk tema Eksklusif, yang dijual kepada satu pasangan saja, izinnya eksklusif: karya itu tidak dipakai di tempat lain selama masa berlaku.', 'The copyright stays yours. Nawala receives a licence to use the work as an invitation theme while the term runs. For Exclusive themes, sold to one couple only, the licence is exclusive: the work is not used elsewhere while the term runs.')),
+      (('Apakah boleh ada wajah manusia?', 'Can there be human faces?'), ('Tidak. Nawala tidak memakai wajah manusia, nyata maupun buatan. Nawala, surat bersayap kami, menggantikan pasangan di dalam gambar.', 'No. Nawala uses no human faces, real or generated. Nawala, our winged letter, stands in for the couple in the pictures.')),
+      (('Bagaimana jika karya tangan ternyata dibuat dengan AI?', 'What if hand-made work turns out to be AI-made?'), ('Karya itu dipindahkan ke jalur AI atau ditarik dari katalog. Karena itu bukti proses wajib disertakan.', 'It is moved to the AI track or withdrawn from the catalogue. That is why proof of process is required.')),
+      (('Kapan bagian saya dibayar?', 'When is my share paid?'), ('Setiap bulan lewat transfer bank, tanpa batas minimum, dengan rincian setiap undangan. Pajak mengikuti ketentuan yang berlaku.', 'Every month by bank transfer, with no minimum, with a statement of every invitation. Tax follows the rules in force.')),
+    ]))
+    out += ajak(B, ('Kirim karya pertama kalian.', 'Send your first work.'), ('Daftar lewat WhatsApp. Kami kirim ketentuan lengkap dan ukuran gambarnya.', 'Sign up on WhatsApp. We send the full terms and image sizes.'), msg)
+    out += '</main>\n' + footer(B) + scripts(B)
+    return out
+
 # ---------- articles ----------
 from kabar_isi import ARTICLES   # the starter articles live beside this file
+from seni import ART             # the drawn illustrations for cards and articles
 
 def page_kabar_index():
     B = '../'
@@ -784,7 +943,7 @@ def page_kabar_index():
   <h1 data-en="Notes for a calmer wedding.">Catatan untuk pernikahan yang lebih tenang.</h1>
   {T(('Panduan praktis dari tim Nawala, dari mengirim undangan sampai menyusun anggaran.', 'Practical guides from the Nawala team, from sending invitations to planning the budget.'), 'p', 'head__lead')}</div></section>
 '''
-    cards = ''.join(f'<a class="post" href="{a["slug"]}/" data-rise>{T(a["kind"], "span", "k")}{T(a["title"], "h3")}{T(a["lead"], "p")}<i data-en="Read">Baca</i></a>' for a in ARTICLES)
+    cards = ''.join(f'<a class="post post--art" href="{a["slug"]}/" data-rise><span class="post__art">{ART[a["slug"]]("p-" + a["slug"])}</span>{T(a["kind"], "span", "k")}{T(a["title"], "h3")}{T(a["lead"], "p")}<i data-en="Read">Baca</i></a>' for a in ARTICLES)
     out += S(f'<div class="posts">{cards}</div>', glass=False)
     out += ajak(B, ('Butuh bantuan langsung?', 'Need a hand right away?'), ('Pendamping dari tim Nawala siap membantu lewat WhatsApp, 24 jam setiap hari.', 'A companion from the Nawala team is ready to help on WhatsApp, around the clock.'))
     out += '</main>\n' + footer(B) + scripts(B)
@@ -823,7 +982,7 @@ def geser(head, cards, label, cls=''):
               '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>')
     return (f'<div class="geser {cls}" data-geser><div class="geser__head">{head}{arrows}</div>'
             f'<div class="geser__track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="{esc(label[0])}" data-en-label="{esc(label[1])}">{cards}</div>'
-            '<div class="geser__dots" aria-hidden="true"></div></div>')
+            '<p class="geser__count" aria-live="polite"><b>1</b> / <span></span></p></div>')
 
 def home_blocks():
     """Blocks for index.html. Class names are prefixed lb- (styled in site.css, "Lembah") so they never meet the home page's own .card, .day or .phone."""
@@ -836,77 +995,82 @@ def home_blocks():
       'live-streaming': [('Siaran sinematik, kamera bergerak', 'Cinematic, moving cameras'), ('YouTube, Instagram, TikTok, Zoom, Meet', 'YouTube, Instagram, TikTok, Zoom, Meet'), ('Live cam ke layar gedung', 'Live cam to the venue screen'), ('Rekaman penuh untuk kalian', 'The full recording is yours')],
       'persiapan': [('WBS, kanban, dan gantt', 'WBS, kanban and gantt'), ('Anggaran dengan tahap bayar', 'Budget with payment stages'), ('Vendor, rundown, rapat, berkas', 'Vendors, rundown, meetings, files'), ('Obrolan dengan tim Nawala', 'Chat with the Nawala team')],
     }
+    bullets['rsvp-asisten'] = [('Tindak lanjut lewat chat dan telepon', 'Follow-up by chat and phone'), ('Kuota dan acara per tamu', 'Quota and events per guest'), ('Pengingat menjelang hari H', 'Reminders before the day'), ('Susunan meja dari jawaban', 'Tables arranged from the answers')]
     for s, ic, n, d in PRODUCTS:
         ul = '<ul>' + ''.join(T(b, 'li') for b in bullets[s]) + '</ul>'
-        cards += (f'<article class="lb-prod geser__card">{icon(ic, "lb-ic")}{T(n, "h3")}{T(d, "p")}{ul}'
-                  f'<a class="btn btn--glass" href="layanan/{s}/" data-en="Read more">Pelajari selengkapnya</a></article>')
+        cards += (f'<article class="lb-prod geser__card" data-rasa><div class="lb-art">{ART[s]("a-" + s)}</div><div class="lb-prod__in">{T(n, "h3")}{T(d, "p")}{ul}'
+                  f'<a class="btn btn--glass" href="layanan/{s}/" data-en="Read more">Pelajari selengkapnya</a></div></article>')
     figs = [('tema', f'{N["tema"]}', ('tema dalam empat tingkat', 'themes in four tiers'), ('ratusan', 'hundreds')),
-            ('contoh', f'{N["contoh"]}', ('undangan contoh siap dibuka', 'sample invitations to open'), ('puluhan', 'dozens')),
-            ('dunia', f'{N["dunia"]}', ('dunia Premium yang bisa dimasuki', 'Premium worlds to walk into'), None),
+            ('surat', f'{N["contoh"]}', ('undangan contoh siap dibuka', 'sample invitations to open'), ('puluhan', 'dozens')),
+            ('platform', f'{N["dunia"]}', ('dunia Premium yang bisa dimasuki', 'Premium worlds to walk into'), None),
             ('demo', f'{N["demo"]}', ('demo langsung tanpa daftar', 'live demos, no sign-up'), None)]
     nums = ''
     for k, n, label, kira in figs:
         val = n if (MODE == 'pasti' or not kira) else kira[0]
         val_en = n if (MODE == 'pasti' or not kira) else kira[1]
-        nums += f'<div class="lb-num"><b data-en="{val_en}">{val}</b>{T(label)}</div>'
+        nums += f'<div class="lb-num">{icon(k, "lb-ic")}<b data-en="{val_en}">{val}</b>{T(label)}</div>'
     blocks['platform'] = geser(
         '<div class="lb-head">' + T(('Satu platform untuk seluruh pernikahan.', 'One platform for the whole wedding.'), 'h2')
         + T(('Undangan hanyalah awalnya. Pesan satu layanan atau semuanya sekaligus, dengan satu pendamping dari tim Nawala dari undangan pertama sampai tamu terakhir pulang.', 'The invitation is only the beginning. Book one service or all of them at once, with one companion from the Nawala team from the first invitation to the last guest going home.'), 'p') + '</div>',
-        cards, ('Empat layanan Nawala', 'The four Nawala services'))
-    blocks['udara'] = f'''
-      <p class="lb-udara__line" data-en="Four services, one letter, one person who knows your wedding from the start.">Empat layanan, satu surat, satu orang yang mengenal pernikahan kalian sejak awal.</p>
-      <div class="lb-nums">{nums}</div>
-    '''
-    blocks['cmp'] = f'''
-      <div class="lb-head">{T(('Apa bedanya dengan undangan digital lain?', 'How is this different from other digital invitations?'), 'h2')}
-        {T(('Delapan hal yang kalian dapatkan di Nawala, dibandingkan dengan yang biasa ditemui di layanan undangan digital.', 'Eight things you get at Nawala, next to what digital invitation services usually offer.'), 'p')}</div>
-      {compare_table('lb-tbl')}{T(COMPARE_NOTE, 'p', 'lb-small')}
-    '''
+        cards, ('Lima layanan Nawala', 'The five Nawala services')) + f'<div class="wrap"><div class="lb-nums">{nums}</div></div>'
+    # the contest band (owner, 23 Nov 2026, points 3 and 10): deep rose, the venue photo fading in from the right,
+    # credited in its corner and linking to its article (rights not cleared: developer mode, owner to settle)
+    PJ = 'https://www.passionjewelry.co.id/news-detail/7-tips-memilih-wedding-organizer-terbaik-untuk-hari-pernikahanmu'
+    PJI = 'https://www.passionjewelry.co.id/uploads/7-tips-memilih-wedding-organizer-terbaik-untuk-hari-pernikahanmu-359-2020-12-30-140411.jpg'
+    tracks = (f'<div class="lb-say__track"><b>20%</b>{T(("Karya tangan", "Hand-made"), "span", "n")}{T(("Dilukis, digambar, atau dibuat digital oleh kalian sendiri, tanpa AI.", "Painted, drawn or made digitally by you, without AI."), "span")}</div>'
+              f'<div class="lb-say__track"><b>5%</b>{T(("Karya AI", "AI-made"), "span", "n")}{T(("Dibuat dengan bantuan AI, disusun utuh menjadi satu tema.", "Made with AI, assembled into one complete theme."), "span")}</div>')
+    blocks['udara'] = (
+        f'<a class="lb-say__photo" href="{PJ}" target="_blank" rel="noopener" aria-label="Bacaan: 7 tips memilih wedding organizer, Passion Jewelry (tab baru)" data-en-label="Reading: 7 tips for choosing a wedding organiser, Passion Jewelry (new tab)">'
+        f'<img src="{PJI}" width="1280" height="853" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
+        '<span class="lb-say__news"><b data-en="7 tips for choosing the best wedding organiser">7 tips memilih wedding organizer terbaik</b><span data-en="Photo and article: Passion Jewelry">Foto dan artikel: Passion Jewelry</span></span></a>'
+        '<div class="lb-say__in">'
+        + T(('Karya kalian, di undangan pernikahan seluruh Indonesia.', 'Your art, in wedding invitations across Indonesia.'), 'h2')
+        + T(('Sayembara Nawala mencari lukisan dan ilustrasi untuk tema undangan. Setiap kali pasangan memakai tema dari karya kalian, kalian menerima bagian dari undangan itu.', 'The Nawala contest is looking for paintings and illustrations for invitation themes. Every time a couple uses a theme made from your work, you receive a share of that invitation.'), 'p', 'lb-say__lead')
+        + f'<div class="lb-say__tracks">{tracks}</div>'
+        + T(('Dihitung dari bagian Nawala setiap undangan, selama dua tahun dan bisa diperpanjang. Terbuka untuk siapa saja, kapan saja.', "Counted on Nawala's share of each invitation, for two years and renewable. Open to anyone, any time."), 'p', 'lb-say__fine')
+        + '<div class="lb-say__acts"><a class="btn btn--glow" href="sayembara/" data-en="Read the terms">Baca ketentuannya</a>'
+        + wa_btn(('Daftar lewat WhatsApp', 'Sign up on WhatsApp'), ('Halo Nawala, saya ingin ikut Sayembara Nawala.', 'Hello Nawala, I would like to join the Nawala contest.'), 'btn btn--glass')
+        + '</div></div>')
+    blocks['cmp'] = ('<div class="wrap"><div class="lb-head">' + T(('Apa bedanya dengan undangan digital lain?', 'How is this different from other digital invitations?'), 'h2')
+        + T(('Delapan hal yang kalian dapatkan di Nawala, dibandingkan dengan yang biasa ditemui di layanan undangan digital.', 'Eight things you get at Nawala, next to what digital invitation services usually offer.'), 'p')
+        + '</div>' + compare_table('lb-tbl') + T(COMPARE_NOTE, 'p', 'lb-small') + '</div>')
     pk = [
       ('surat', ('Undangan digital', 'Digital invitation'), ('Dasar, Premium, Eksklusif, atau Kustom', 'Basic, Premium, Exclusive or Custom'),
-       [('Undangan atas nama tiap tamu, tanpa batas', 'Invitations in each guest\'s name, no limit'), ('Kirim otomatis lewat WhatsApp', 'Automatic sending on WhatsApp'), ('RSVP, ucapan, amplop digital', 'RSVP, wishes, digital gift'), ('Undangan terpisah dan kata sandi', 'Split invitation and password'), ('Editor desain, revisi tanpa batas', 'Design editor, unlimited revisions')],
-       ('Halo Nawala, saya ingin tahu harga undangan digital.', 'Hello Nawala, I would like the price of the digital invitation.'), False),
+       [('Undangan atas nama tiap tamu, tanpa batas', "Invitations in each guest's name, no limit"), ('Kirim otomatis lewat WhatsApp', 'Automatic sending on WhatsApp'), ('RSVP, ucapan, amplop digital', 'RSVP, wishes, digital gift'), ('Kuota dan acara per tamu', 'Quota and events per guest'), ('Editor desain, revisi tanpa batas', 'Design editor, unlimited revisions')], 'undangan', False),
       ('qr', ('Buku tamu digital', 'Digital guestbook'), ('Untuk hari H, di lokasi', 'For the day, on site'),
-       [('Tablet, pemindai, dan modem', 'Tablets, scanners and a modem'), ('Kru teknis dan penerima tamu berseragam', 'Technical crew and uniformed ushers'), ('Layar sapaan', 'Greeting screen'), ('Manajemen meja dan kursi', 'Table and seat management'), ('Souvenir per kelompok, rekap kehadiran', 'Souvenirs per group, attendance report')],
-       ('Halo Nawala, saya ingin tahu harga buku tamu digital.', 'Hello Nawala, I would like the price of the digital guestbook.'), False),
+       [('Tablet, printer label, dan modem', 'Tablets, label printer and a modem'), ('Penerima tamu berseragam, dengan tata rias', 'Uniformed ushers, make-up included'), ('Layar sapaan dan swafoto', 'Greeting screen and selfies'), ('Pencatatan kado, doorprize', 'Gift logging, doorprize'), ('Gratis transportasi di Bandung', 'Free transport in Bandung')], 'buku-tamu', False),
+      ('telepon', ('Asisten RSVP', 'RSVP Assistance'), ('Kami yang menanyakan tamu', 'We ask your guests'),
+       [('Skema berdiri atau duduk', 'Standing or seated scheme'), ('Tindak lanjut chat dan telepon', 'Chat and phone follow-up'), ('Pengingat hari H', 'Day reminders'), ('Susunan meja', 'Table arrangement')], 'rsvp', False),
       ('kamera', ('Live streaming', 'Live streaming'), ('Untuk yang tidak bisa hadir', 'For those who cannot come'),
-       [('Siaran sinematik, kamera bergerak', 'Cinematic, moving cameras'), ('Bingkai sesuai tema', 'A frame to match the theme'), ('Banyak platform sekaligus', 'Several platforms at once'), ('Live cam ke layar gedung', 'Live cam to the venue screen'), ('Rekaman penuh', 'Full recording')],
-       ('Halo Nawala, saya ingin tahu harga live streaming.', 'Hello Nawala, I would like the price of live streaming.'), False),
+       [('Siaran sinematik, kamera bergerak', 'Cinematic, moving cameras'), ('Bingkai sesuai tema', 'A frame to match the theme'), ('Banyak platform sekaligus', 'Several platforms at once'), ('Rekaman penuh', 'Full recording')], 'streaming', False),
       ('paket', ('Paket lengkap', 'The complete package'), ('Semuanya dalam satu pesanan', 'Everything in one booking'),
-       [('Undangan digital', 'Digital invitation'), ('Buku tamu digital', 'Digital guestbook'), ('Live streaming', 'Live streaming'), ('Persiapan pernikahan penuh bila diinginkan', 'Full wedding planning if you wish'), ('Satu pendamping untuk semuanya', 'One companion for all of it')],
-       ('Halo Nawala, saya ingin tahu harga paket lengkap.', 'Hello Nawala, I would like the price of the complete package.'), True),
+       [('Undangan digital dan Asisten RSVP', 'Digital invitation and RSVP Assistance'), ('Buku tamu digital', 'Digital guestbook'), ('Live streaming', 'Live streaming'), ('Persiapan pernikahan penuh bila diinginkan', 'Full wedding planning if you wish'), ('Satu pendamping untuk semuanya', 'One companion for all of it')], 'lengkap', True),
     ]
     cards = ''
-    for ic, n, sub, items, msg, hi in pk:
+    for ic, n, sub, items, key, hi in pk:
         ul = '<ul>' + ''.join(T(b, 'li') for b in items) + '</ul>'
-        btn = wa_btn(('Tanya harga', 'Ask the price'), msg, 'btn btn--glow' if hi else 'btn btn--glass')
-        cards += f'<article class="lb-pack geser__card{" is-hi" if hi else ""}">{icon(ic, "lb-ic")}{T(n, "h3")}{T(sub, "p", "lb-sub")}{ul}{btn}</article>'
-    blocks['paket'] = geser(
-        '<div class="lb-head">' + T(('Pilih paket kalian.', 'Choose your package.'), 'h2')
-        + T(('Harga mengikuti tingkat tema, layanan, jumlah tamu, dan kota acara. Tanyakan lewat WhatsApp; kami balas dengan rincian lengkap untuk pernikahan kalian.', 'Prices follow the theme tier, the services, the number of guests and the city. Ask on WhatsApp and we reply with a full breakdown for your wedding.'), 'p') + '</div>',
-        cards, ('Paket Nawala', 'Nawala packages')) + '''
-      <div class="wrap"><div class="lb-terms">
-        <p><b data-en="Every package:">Setiap paket:</b> <span data-en="a dedicated companion, 24-hour customer service on WhatsApp, and unlimited revisions.">pendamping khusus, layanan pelanggan 24 jam lewat WhatsApp, dan revisi tanpa batas.</span></p>
-        <p><b data-en="Payment:">Pembayaran:</b> <span data-en="in full before the event, by bank transfer. QRIS is coming soon.">dilunasi sebelum hari acara, lewat transfer bank. QRIS segera tersedia.</span></p>
-        <p><b data-en="Planning:">Persiapan:</b> <span data-en="the invitation work is in every booking; full wedding planning is an add-on.">pengerjaan undangan termasuk di setiap pesanan; perencanaan pernikahan penuh adalah layanan tambahan.</span> <a href="layanan/persiapan/" data-en="About Persiapan">Tentang Persiapan</a></p>
-      </div></div>
-    '''
+        btn = f'<button type="button" class="btn {"btn--glow" if hi else "btn--glass"}" data-pintu="harga" data-paket="{key}" data-en="Ask the price">Tanya harga</button>'
+        cards += f'<article class="lb-pack{" is-hi" if hi else ""}" data-rasa="kecil">{icon(ic, "lb-ic")}{T(n, "h3")}{T(sub, "p", "lb-sub")}{ul}{btn}</article>'
+    blocks['paket'] = ('<div class="wrap"><div class="lb-head">' + T(('Pilih paket kalian.', 'Choose your package.'), 'h2')
+        + T(('Harga mengikuti tingkat tema, layanan, jumlah tamu, dan kota acara. Isi data singkat sekali saja: daftar harga lengkap dan kode akses semua tema langsung kalian terima.', 'Prices follow the theme tier, the services, the number of guests and the city. Fill in a few details once: you receive the full price list and an access code to every theme.'), 'p')
+        + f'</div><div class="lb-packs">{cards}</div><div class="lb-terms">'
+        + '<p><b data-en="Every package:">Setiap paket:</b> <span data-en="a dedicated companion, 24-hour customer service on WhatsApp, and unlimited revisions.">pendamping khusus, layanan pelanggan 24 jam lewat WhatsApp, dan revisi tanpa batas.</span></p>'
+        + '<p><b data-en="Payment:">Pembayaran:</b> <span data-en="in full before the event, by bank transfer. QRIS is coming soon.">dilunasi sebelum hari acara, lewat transfer bank. QRIS segera tersedia.</span></p>'
+        + '<p><b data-en="Planning:">Persiapan:</b> <span data-en="the invitation work is in every booking; full wedding planning is an add-on.">pengerjaan undangan termasuk di setiap pesanan; perencanaan pernikahan penuh adalah layanan tambahan.</span> <a href="layanan/persiapan/" data-en="About Persiapan">Tentang Persiapan</a></p>'
+        + '</div><p class="lb-free"><span data-en="Not sure yet?">Belum yakin?</span> <button type="button" class="btn btn--glass" data-pintu="konsultasi" data-en="Free consultation">Konsultasi gratis</button></p></div>')
     allk = [k for _, _, ks in FAQ_GROUPS for k in ks]
-    blocks['faq'] = f'''
-      <div class="lb-head">{T(('Pertanyaan yang sering ditanyakan.', 'Frequently asked questions.'), 'h2')}</div>
-      <div class="tanya" data-tanya="home">{tanya_tools()}{qs(*allk, pop=('pesan', 'bayar', 'kapan', 'revisi', 'kirim', 'aplikasi', 'siapa', 'tema')).replace('class="qa"', 'class="lb-qa"')}{tanya_none()}</div>
-      <p class="lb-more"><a class="btn btn--glass" href="faq/" data-en="See every question">Lihat semua pertanyaan</a></p>
-    '''
-    posts = ''.join(f'<a class="lb-post" href="kabar/{a["slug"]}/">{T(a["kind"], "span", "k")}{T(a["title"], "h3")}{T(a["lead"], "p")}</a>' for a in ARTICLES[:3])
-    blocks['kabar'] = f'''
-      <div class="lb-head lb-head--row">{T(('Kabar Nawala', 'Nawala journal'), 'h2')}<a class="btn btn--glass" href="kabar/" data-en="All articles">Semua tulisan</a></div>
-      <div class="lb-posts">{posts}</div>
-    '''
+    blocks['faq'] = ('<div class="wrap"><div class="lb-head">' + T(('Pertanyaan yang sering ditanyakan.', 'Frequently asked questions.'), 'h2') + '</div>'
+        + '<div class="tanya" data-tanya="home">' + tanya_tools()
+        + qs(*allk, pop=('pesan', 'konsultasi', 'bayar', 'imajinasi', 'revisi', 'kirim', 'siapa', 'tema')).replace('class="qa"', 'class="lb-qa"')
+        + tanya_none() + '</div><p class="lb-more"><a class="btn btn--glass" href="faq/" data-en="See every question">Lihat semua pertanyaan</a></p></div>')
+    posts = ''.join(f'<a class="lb-post geser__card" href="kabar/{a["slug"]}/" data-rasa><span class="lb-art">{ART[a["slug"]]("k-" + a["slug"])}</span><span class="lb-post__in">{T(a["kind"], "span", "k")}{T(a["title"], "h3")}{T(a["lead"], "p")}</span></a>' for a in ARTICLES)
+    blocks['kabar'] = geser('<div class="lb-head">' + T(('Kabar Nawala', 'Nawala journal'), 'h2') + T(('Panduan praktis dari tim Nawala, dari mengirim undangan sampai memilih tema.', 'Practical guides from the Nawala team, from sending invitations to choosing a theme.'), 'p')
+                            + '<a class="btn btn--glass" href="kabar/" data-en="All articles">Semua tulisan</a></div>', posts, ('Tulisan Kabar Nawala', 'Nawala journal articles'))
     col1 = ''.join(f'<li><a href="layanan/{s}/" data-en="{esc(n[1])}">{esc(n[0])}</a></li>' for s, ic, n, d in PRODUCTS)
     blocks['foot'] = f'''
       <div class="foot__cols">
         <div>{T(('Layanan', 'Services'), 'h2')}<ul>{col1}<li><a href="tema/" data-en="Themes">Tema</a></li><li><a href="#paket" data-en="Packages">Paket</a></li></ul></div>
-        <div>{T(('Bantuan', 'Help'), 'h2')}<ul><li><a href="faq/" data-en="Questions">Pertanyaan umum</a></li><li><a href="?buka=demo" data-open="demo" data-en="Try a demo">Coba demo</a></li><li><a href="mitra/" data-en="Partnership">Kemitraan</a></li><li><a href="kabar/" data-en="Nawala journal">Kabar Nawala</a></li></ul></div>
+        <div>{T(('Bantuan', 'Help'), 'h2')}<ul><li><a href="faq/" data-en="Questions">Pertanyaan umum</a></li><li><a href="?buka=demo" data-open="demo" data-en="Try a demo">Coba demo</a></li><li><a href="mitra/" data-en="Partnership">Kemitraan</a></li><li><a href="sayembara/" data-en="Art contest">Sayembara karya</a></li><li><a href="kabar/" data-en="Nawala journal">Kabar Nawala</a></li></ul></div>
         <div>{T(('Layanan pelanggan', 'Customer service'), 'h2')}{T(('24 jam setiap hari lewat WhatsApp.', 'Around the clock, every day, on WhatsApp.'), 'p')}
           <h2 data-en="Payment">Pembayaran</h2><p class="foot__pay"><span data-en="Bank transfer">Transfer bank</span><span data-en="QRIS (soon)">QRIS (segera)</span></p></div>
       </div>
@@ -924,6 +1088,7 @@ def main():
     write('layanan/index.html', page_layanan())
     write('faq/index.html', page_faq())
     write('mitra/index.html', page_mitra())
+    write('sayembara/index.html', page_sayembara())
     write('kabar/index.html', page_kabar_index())
     for a in ARTICLES:
         write(f'kabar/{a["slug"]}/index.html', page_article(a))

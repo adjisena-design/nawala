@@ -9,7 +9,8 @@
   var D = window.NAWALA_INVITE; if (!D) return;
   var mq = window.matchMedia('(min-width:1100px)');
   var root = document.documentElement, PH = D.photos || {};
-  function okPhoto(u) { return typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u); }
+  function okPhoto(u) { return typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u)
+    || (window.NAWALA_IMAJINASI === true && typeof u === 'string' && /^data:image\/(jpeg|webp|png);base64,[A-Za-z0-9+\/=]+$/.test(u)); }
 
   var css = [
     'html.side-on{--colx:clamp(24px,4vw,72px)}',
