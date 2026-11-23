@@ -1013,16 +1013,14 @@ def home_blocks():
         '<div class="lb-head">' + T(('Satu platform untuk seluruh pernikahan.', 'One platform for the whole wedding.'), 'h2')
         + T(('Undangan hanyalah awalnya. Pesan satu layanan atau semuanya sekaligus, dengan satu pendamping dari tim Nawala dari undangan pertama sampai tamu terakhir pulang.', 'The invitation is only the beginning. Book one service or all of them at once, with one companion from the Nawala team from the first invitation to the last guest going home.'), 'p') + '</div>',
         cards, ('Lima layanan Nawala', 'The five Nawala services')) + f'<div class="wrap"><div class="lb-nums">{nums}</div></div>'
-    # the contest band (owner, 23 Nov 2026, points 3 and 10): deep rose, the venue photo fading in from the right,
-    # credited in its corner and linking to its article (rights not cleared: developer mode, owner to settle)
-    PJ = 'https://www.passionjewelry.co.id/news-detail/7-tips-memilih-wedding-organizer-terbaik-untuk-hari-pernikahanmu'
-    PJI = 'https://www.passionjewelry.co.id/uploads/7-tips-memilih-wedding-organizer-terbaik-untuk-hari-pernikahanmu-359-2020-12-30-140411.jpg'
+    # the contest band (owner, 23 Nov 2026, points 3 and 10): deep rose
     tracks = (f'<div class="lb-say__track"><b>20%</b>{T(("Karya tangan", "Hand-made"), "span", "n")}{T(("Dilukis, digambar, atau dibuat digital oleh kalian sendiri, tanpa AI.", "Painted, drawn or made digitally by you, without AI."), "span")}</div>'
               f'<div class="lb-say__track"><b>5%</b>{T(("Karya AI", "AI-made"), "span", "n")}{T(("Dibuat dengan bantuan AI, disusun utuh menjadi satu tema.", "Made with AI, assembled into one complete theme."), "span")}</div>')
+    # our own white branches fading into the rose (owner, 23 Nov 2026, 18:38: the borrowed venue photo did not match our look)
     blocks['udara'] = (
-        f'<a class="lb-say__photo" href="{PJ}" target="_blank" rel="noopener" aria-label="Bacaan: 7 tips memilih wedding organizer, Passion Jewelry (tab baru)" data-en-label="Reading: 7 tips for choosing a wedding organiser, Passion Jewelry (new tab)">'
-        f'<img src="{PJI}" width="1280" height="853" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
-        '<span class="lb-say__news"><b data-en="7 tips for choosing the best wedding organiser">7 tips memilih wedding organizer terbaik</b><span data-en="Photo and article: Passion Jewelry">Foto dan artikel: Passion Jewelry</span></span></a>'
+        '<div class="lb-say__photo" aria-hidden="true"><picture>'
+        '<source media="(max-width: 899px)" srcset="assets/img/putih/plate-branches-mobile-sm.webp">'
+        '<img src="assets/img/putih/plate-branches-desktop-sm.webp" width="1440" height="804" alt="" loading="lazy" decoding="async"></picture></div>'
         '<div class="lb-say__in">'
         + T(('Karya kalian, di undangan pernikahan seluruh Indonesia.', 'Your art, in wedding invitations across Indonesia.'), 'h2')
         + T(('Sayembara Nawala mencari lukisan dan ilustrasi untuk tema undangan. Setiap kali pasangan memakai tema dari karya kalian, kalian menerima bagian dari undangan itu.', 'The Nawala contest is looking for paintings and illustrations for invitation themes. Every time a couple uses a theme made from your work, you receive a share of that invitation.'), 'p', 'lb-say__lead')
