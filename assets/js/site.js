@@ -757,12 +757,12 @@
       var a = pt(x, y);
       return '<text x="' + a[0] + '" y="' + a[1] + '" font-size="' + size + '" fill="' + fill + '"' + (turned && lying ? ' transform="rotate(-90 ' + a[0] + ' ' + a[1] + ')"' : '') + '>' + str + '</text>';
     }
-    var ivory = '251,246,234';
-    o += box(3, 3, W - 6, H - 6, 16, 'fill="rgba(12,29,19,.34)" stroke="rgba(' + ivory + ',.3)" stroke-width="1.5"');
-    [[15, 15], [185, 15], [11, 112], [189, 112], [189, 205]].forEach(function (c) { o += dot(c[0], c[1], 5, 'fill="#4F7A3A"') + dot(c[0] + 3, c[1] - 3, 3, 'fill="#A9C98A"'); });
+    var ivory = '58,48,53';
+    o += box(3, 3, W - 6, H - 6, 16, 'fill="rgba(255,255,255,.6)" stroke="rgba(' + ivory + ',.3)" stroke-width="1.5"');
+    [[15, 15], [185, 15], [11, 112], [189, 112], [189, 205]].forEach(function (c) { o += dot(c[0], c[1], 5, 'fill="#E9E2E0"') + dot(c[0] + 3, c[1] - 3, 3, 'fill="#F7F2F0"'); });
     o += box(92, 46, 16, 178, 7, 'fill="rgba(216,67,107,.5)"');                                   /* the aisle */
     o += box(60, 9, 80, 36, 9, 'fill="#FFE9A8"');                                                  /* the stage */
-    o += label(100, 21, t('Pelaminan', 'Stage'), 8.5, '#16301F', true);
+    o += label(100, 21, t('Pelaminan', 'Stage'), 8.5, '#3A3035', true);
     o += dot(lying ? 100 - 8 : 92, lying ? 35 : 36, 3.6, 'fill="#D8436B"') + dot(lying ? 100 + 8 : 108, lying ? 35 : 36, 3.6, 'fill="#F4A6C0"');
     o += box(28, 15, 24, 13, 5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + box(148, 15, 24, 13, 5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"');
     var seats = [[140, 72], [168, 98], [140, 124], [168, 150], [140, 176], [60, 72], [32, 98], [60, 124], [32, 150], [60, 176]];
@@ -775,7 +775,7 @@
       }
       if (you) o += dot(c[0], c[1], 19, 'class="seat__ring" fill="none" stroke="#F4A6C0" stroke-width="2.5"');
       o += dot(c[0], c[1], 10.5, you ? 'fill="#F4A6C0"' : 'fill="rgba(' + ivory + ',.18)" stroke="rgba(' + ivory + ',.5)" stroke-width="1.2"');
-      o += label(c[0], c[1], i + 1, 9.5, you ? '#16301F' : 'rgba(' + ivory + ',.92)');
+      o += label(c[0], c[1], i + 1, 9.5, you ? '#3A3035' : 'rgba(' + ivory + ',.92)');
     });
     o += box(12, 204, 66, 15, 7.5, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + label(45, 211.5, t('Prasmanan', 'Buffet'), 8, 'rgba(' + ivory + ',.92)', true);
     o += box(146, 204, 38, 15, 6, 'fill="rgba(' + ivory + ',.2)" stroke="rgba(' + ivory + ',.42)"') + label(165, 211.5, t('Kado', 'Gifts'), 8, 'rgba(' + ivory + ',.92)', true);
@@ -787,12 +787,12 @@
   function fakeQr() {
     var n = 21, seed = 7, cells = '';
     function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-    function finder(x, y) { return '<rect x="' + x + '" y="' + y + '" width="7" height="7" rx="1.4"/><rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="5" height="5" rx="1" fill="#FBF6EA"/><rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" rx=".6"/>'; }
+    function finder(x, y) { return '<rect x="' + x + '" y="' + y + '" width="7" height="7" rx="1.4"/><rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="5" height="5" rx="1" fill="#FFFDFB"/><rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" rx=".6"/>'; }
     for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
       var inFinder = (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
       if (!inFinder && rnd() > .52) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
     }
-    return '<svg viewBox="-1 -1 23 23" fill="#16301F" aria-hidden="true">' + cells + finder(0, 0) + finder(14, 0) + finder(0, 14) + '</svg>';
+    return '<svg viewBox="-1 -1 23 23" fill="#3A3035" aria-hidden="true">' + cells + finder(0, 0) + finder(14, 0) + finder(0, 14) + '</svg>';
   }
 
   /* ---------- Themes: the river behind, the collection in a pop-up ---------- */
@@ -944,7 +944,7 @@
       window.addEventListener('pointermove', function (e) {
         if (!drag) return;
         var dx = e.clientX - sx, dy = e.clientY - sy;
-        if (!decided) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; decided = true; if (Math.abs(dy) > Math.abs(dx)) { drag = false; return; } }
+        if (!decided) { if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return; decided = true; if (Math.abs(dy) * 1.15 >= Math.abs(dx)) { drag = false; return; } }
         moved = true;
         var now = performance.now(), gap = desktop.matches ? 172 : 118;
         v = (e.clientX - lastX) / Math.max(1, now - lastT); lastX = e.clientX; lastT = now;
@@ -954,9 +954,28 @@
         if (!drag) return; drag = false;
         if (moved) { goal = Math.round(pos - v * 2.2); lastTouch = Date.now(); kick(); }
       });
-      stage.addEventListener('touchmove', function (e) { if (drag && moved) e.preventDefault(); }, { passive: false });
+      /* One axis per gesture (owner, 23 Nov 2026: never diagonal). The very first touchmove decides: sideways is ours and the
+         page stays still for the whole gesture; up or down belongs to the page and the carousel lets go. iOS only honours
+         preventDefault if the first move is cancelled, so the decision cannot wait for the pointer handler's 6px. */
+      var tAxis = '', tx0 = 0, ty0 = 0;
+      stage.addEventListener('touchstart', function (e) { var p = e.touches[0]; tAxis = ''; tx0 = p.clientX; ty0 = p.clientY; }, { passive: true });
+      stage.addEventListener('touchmove', function (e) {
+        if (e.touches.length > 1) return;
+        if (!tAxis) {
+          var p = e.touches[0], ax = Math.abs(p.clientX - tx0), ay = Math.abs(p.clientY - ty0);
+          if (ax < 2 && ay < 2) { if (e.cancelable) e.preventDefault(); return; }
+          tAxis = ax > ay * 1.15 ? 'x' : 'y';
+          if (tAxis === 'y') { drag = false; if (pos !== Math.round(pos)) { goal = Math.round(pos); kick(); } }
+        }
+        if (tAxis === 'x' && e.cancelable) e.preventDefault();
+      }, { passive: false });
+      window.addEventListener('pointercancel', function () { if (!drag) return; drag = false; goal = Math.round(pos); kick(); });
       stage.addEventListener('wheel', function (e) {
-        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        /* the same lock for a trackpad: the first event of a gesture picks the axis; it holds until 160 ms of quiet */
+        var nowW = performance.now();
+        if (!stage._ax || nowW - (stage._wt || 0) > 160) stage._ax = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.15 ? 'x' : 'y';
+        stage._wt = nowW;
+        if (stage._ax !== 'x') return;
         e.preventDefault(); lastTouch = Date.now();
         if (Math.abs(e.deltaX) > 12 && !stage._w) { go(e.deltaX > 0 ? 1 : -1); stage._w = 1; setTimeout(function () { stage._w = 0; }, 380); }
       }, { passive: false });
