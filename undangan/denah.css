@@ -257,3 +257,26 @@ textarea{min-height:180px;font:12.5px/1.5 ui-monospace,Menlo,monospace}
 @media (prefers-reduced-motion:reduce){.pri,.gate .acts a.main{animation:none}.toast{transition:none}}
 
 /* White overhaul (owner, 23 Nov 2026): no green here either. Ink is warm charcoal, chosen pills are pink, the sky is the white plate. */
+
+/* undo and redo with words, and the history list (riwayat.js) */
+.ico--txt{gap:6px;padding:6px 12px}
+.ico--txt span{font-size:14px;font-weight:600}
+@media (max-width:1180px){.ico--txt span{display:none}.ico--txt{padding:6px}}
+.hist{min-width:280px;max-width:340px;max-height:min(70vh,520px);overflow:auto;gap:2px}
+.hist__h{margin:4px 8px 6px;font-size:13px;color:var(--mute)}
+.hist__e{margin:6px 8px;font-size:14px}
+.hist button{display:grid;gap:1px;padding:8px 10px;border:0;background:transparent;min-height:44px}
+.hist button:hover{background:rgba(244,166,192,.18)}
+.hist button b{font-weight:600;font-size:14px}
+.hist button small{font-size:12px;color:var(--mute)}
+.hist .hist__back{margin-top:6px;border-top:1px solid var(--line);border-radius:0 0 12px 12px;color:var(--warn)}
+/* the guest's phone in the demo fits its pane whole (owner, 23 Nov 2026: it was cut in half inside the home page's box) */
+#v-guest .showcase{height:100%;min-height:0;overflow:hidden}
+#v-guest .phone{height:min(740px,100%);width:auto;max-width:100%;aspect-ratio:360/760;min-height:0}
+/* the title never wraps; redo keeps only its arrow (its tooltip names the step), so the bar stays on one line */
+.top h1{white-space:nowrap}
+#redo.ico--txt span{display:none}
+#redo.ico--txt{padding:6px 10px}
+@media (max-width:1380px){#hist.ico--txt span{display:none}#hist.ico--txt{padding:6px 10px}}
+@media (min-width:900px){.top>div:not(.sp){flex-shrink:0;max-width:12rem}.top .crumb{max-width:12rem}}
+@media (max-width:1500px){#hist.ico--txt span{display:none}#hist.ico--txt{padding:6px 10px}}

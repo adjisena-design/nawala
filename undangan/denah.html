@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Denah &amp; Kursi, Nawala</title>
-<link rel="stylesheet" href="denah.css?v=20261123w">
+<link rel="stylesheet" href="denah.css?v=20261123u3">
 <style>/* Denah & Kursi, the real seating planner. ?as=ruang (the couple, code from "nawala-code") or ?as=tim&u=<address>
    (the team, token from "nawala-tim"). Saves through the seating_* functions (supabase/migrations/20261122_seating.sql),
-   one editor at a time, guests and ushers see only what was published. Look: denah.css?v=20261123w. */</style>
+   one editor at a time, guests and ushers see only what was published. Look: denah.css?v=20261123u3. */</style>
 </head>
 <body>
 <div class="app">
@@ -233,9 +233,10 @@ function autoSeat(){const lay=L(),tables=lay.items.filter(i=>isTbl(i)&&i.type!==
 const snap=()=>JSON.stringify({l:S.layouts,g:S.groups,p:S.showPlan});
 let cur=snap(),pub=null,past=[],future=[],unpub=false;
 function restore(j){const o=JSON.parse(j);S.layouts=o.l;S.groups=o.g;S.showPlan=o.p!==false;unpub=true;queueSave();if(S.active>=S.layouts.length)S.active=0;if(sel&&!L().items.find(i=>i.id===sel))sel=null;renderAll()}
-function commit(){const j=snap();if(j!==cur){past.push(cur);if(past.length>150)past.shift();cur=j;future=[];unpub=true;queueSave()}renderAll()}
-function undo(){if(!past.length||ro())return;future.push(cur);cur=past.pop();restore(cur)}
-function redo(){if(!future.length||ro())return;past.push(cur);cur=future.pop();restore(cur)}
+const H=(k,a,b)=>window.NAWALA_HIST&&window.NAWALA_HIST(k,a,b);
+function commit(){const j=snap();if(j!==cur){const b4=cur;past.push(cur);if(past.length>150)past.shift();cur=j;future=[];H('commit',b4,j);unpub=true;queueSave()}renderAll()}
+function undo(){if(!past.length||ro())return;future.push(cur);cur=past.pop();restore(cur);H('undo')}
+function redo(){if(!future.length||ro())return;past.push(cur);cur=future.pop();restore(cur);H('redo')}
 
 let sel=null,chairMode=false,snapOn=true,view='edit';
 let filt={seat:'un',rsvp:false,q:'',hide:new Set()};
@@ -316,7 +317,7 @@ function renderProps(){const lay=L(),it=lay.items.find(i=>i.id===sel),fs=$('#pro
   <p class="kbd">${t('Ctrl+D duplikat, Delete hapus, panah menggeser 10 cm.','Ctrl+D duplicates, Delete removes, arrows move 10 cm.')}</p></section>${seated}`}
 function renderTabs(){$('#layTabs').innerHTML=`<span class="lbl">${t('Denah:','Plans:')}</span><span class="seg">${S.layouts.map((l,i)=>`<button data-lay="${i}" aria-pressed="${i===S.active}">${esc(l.name)}</button>`).join('')}</span><button id="layAdd" style="min-height:30px;padding:3px 9px;font-size:13px" ${ro()?'disabled':''}>${t('+ Denah baru','+ New plan')}</button><span class="kbd" style="margin-left:auto">${L().room.w} &times; ${L().room.h} m</span>`}
 function renderPalette(){$('#palette').innerHTML=`<span class="lbl">${t('Tambah:','Add:')}</span>`+PAL.map(([n,ks],i)=>`<button class="pal" data-pg="${i}">${icon(ks[0])}${n} <span aria-hidden="true" style="color:rgba(22,48,31,.62)">&#9662;</span></button>`).join('')+`<span class="kbd" style="margin-left:auto">${t('Benda baru muncul di tengah layar.','New things appear in the middle of the view.')}</span>`}
-function renderStatus(){const d=unpub;$('#status').classList.toggle('draft',d);$('#status span').textContent=d?t('Ada perubahan belum terbit','Unpublished changes'):pub?t('Sudah terbit','Published'):t('Belum pernah terbit','Not published yet');$('#publish').disabled=!d||ro();$('#undo').disabled=!past.length||ro();$('#redo').disabled=!future.length||ro()}
+function renderStatus(){H('paint');const d=unpub;$('#status').classList.toggle('draft',d);$('#status span').textContent=d?t('Ada perubahan belum terbit','Unpublished changes'):pub?t('Sudah terbit','Published'):t('Belum pernah terbit','Not published yet');$('#publish').disabled=!d||ro();$('#undo').disabled=!past.length||ro();$('#redo').disabled=!future.length||ro()}
 function renderAll(){render();renderGuests();renderProps();renderTabs();renderStatus();if(view==='guest')renderGuestView();if(view==='usher')renderUsher()}
 
 /* read-only views, from the published version */
@@ -534,7 +535,11 @@ else if(AS==='tim'&&!SLUG)gate(t('Pesanan tidak ditemukan','Order not found'),t(
 else reload();
 renderPalette();
 new ResizeObserver(()=>{if(view==='edit')fit()}).observe(canvas);
+
+/* bridge for riwayat.js (undo words, history list, back to the published version) */
+window.NAWALA_PLAN={get past(){return past},get future(){return future},get cur(){return cur},get pub(){return pub},jump(j,label){past.push(cur);cur=j;future=[];restore(cur);H('jump',label)},undo:()=>undo(),redo:()=>redo(),ro:()=>ro(),t,TYPES,G};
 }
 </script>
+<script src="riwayat.js?v=3"></script>
 </body>
 </html>
