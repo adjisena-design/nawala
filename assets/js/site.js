@@ -495,12 +495,12 @@
       /* comes in from the right, flies straight into the tip of the branch, tumbles, gathers itself;
          on desktop it never crosses the panel's writing or the carousel (it keeps to the right edge and the top), on phones it keeps to the top edge */
       themes: { loop: true, k: [
-        { t: 0, x: D ? Math.min(vw - 90, tipX + vw * .24) : .8 * vw, y: D ? .2 * vh : .1 * vh, s: D ? .56 : .5, r: -8, pose: 'fly' },
-        { t: 2, x: tipX + nwBase * .12, dy: tipY, s: D ? .56 : .5, r: 6, pose: 'fly', cue: 'bump' },
-        { t: 2.15, x: tipX + nwBase * .16, dy: tipY + 8, s: D ? .56 : .5, r: 0, pose: 'tumble' },
-        { t: 3.9, x: D ? vw - 80 : .84 * vw, y: D ? .44 * vh : .2 * vh, s: D ? .56 : .46, r: 400, pose: 'tumble' },
-        { t: 5.1, x: D ? vw - 92 : .8 * vw, y: D ? .26 * vh : .14 * vh, s: D ? .54 : .46, r: 720, pose: 'fly' },
-        { t: 8.6, x: D ? Math.min(vw - 110, tipX + vw * .2) : .74 * vw, y: D ? .13 * vh : .09 * vh, s: D ? .56 : .48, r: 726, pose: 'tilt' },
+        { t: 0, x: D ? Math.min(vw - 90, tipX + vw * .24) : .8 * vw, y: D ? .2 * vh : 46, s: D ? .56 : .38, r: -8, pose: 'fly' },
+        { t: 2, x: tipX + nwBase * .12, dy: tipY, s: D ? .56 : .42, r: 6, pose: 'fly', cue: 'bump' },
+        { t: 2.15, x: tipX + nwBase * .16, dy: tipY + 8, s: D ? .56 : .42, r: 0, pose: 'tumble' },
+        { t: 3.9, x: D ? vw - 80 : .84 * vw, y: D ? .44 * vh : 60, s: D ? .56 : .38, r: 400, pose: 'tumble' },
+        { t: 5.1, x: D ? vw - 92 : .8 * vw, y: D ? .26 * vh : 50, s: D ? .54 : .38, r: 720, pose: 'fly' },
+        { t: 8.6, x: D ? Math.min(vw - 110, tipX + vw * .2) : .74 * vw, y: D ? .13 * vh : 44, s: D ? .56 : .38, r: 726, pose: 'tilt' },
         { t: 10.6 } ] },
       contact: { loop: false, k: [
         { t: 0, x: br.left + (D ? 56 : 48), dy: perchY, s: perchS, r: 0, pose: 'hop', hop: 4 },
