@@ -317,7 +317,6 @@
      --p: 0 when the section's top reaches the top of the screen, 1 when the section has passed. */
   var scrollEls = $$('[data-scroll]').map(function (el) { return { el: el, e: -1, p: -1 }; });
   var about = $('.about'), says = $$('.say');
-  var lastAboutP = -1, aboutStep = -1;
   function measure(vh) {
     scrollEls.forEach(function (s) {
       var r = s.el.getBoundingClientRect();
@@ -327,119 +326,28 @@
       var p = Math.round(clamp(-r.top / Math.max(1, span)) * 1000) / 1000;
       if (e !== s.e) { s.e = e; s.el.style.setProperty('--e', e); }
       /* the light between sections rises once the section is a little way in, and sinks again only when it has left */
-      var rise = s.el.classList.contains('is-rise') ? e > .02 : e > .14;
+      /* owner, 23 Nov 2026: the band must move both ways. It rises once the section is 14% in and sinks again when
+         the visitor scrolls back up past 8%, while the seam is still on screen (before, it sank only out of sight) */
+      var rise = s.el.classList.contains('is-rise') ? e > .08 : e > .14;
       if (rise !== s.el.classList.contains('is-rise')) s.el.classList.toggle('is-rise', rise);
       if (p !== s.p) { s.p = p; s.el.style.setProperty('--p', p); }
-      if (s.el === about && p !== lastAboutP) {
-        /* the scroll only picks the message; each one glides in and out on its own clock */
-        lastAboutP = p;
-        var step = Math.max(0, Math.min(says.length - 1, Math.floor(p * says.length)));
-        if (step !== aboutStep) {
-          aboutStep = step;
-          says.forEach(function (el, i) { el.classList.toggle('is-on', i === step); el.classList.toggle('is-past', i < step); });
-        }
-      }
     });
   }
 
-  /* ---------- Guided stretch: one swipe, one step ----------
-     From the sky down to the last services item the page does not scroll under the finger. A swipe (or one
-     turn of the wheel, or an arrow key) moves exactly one step, gliding on its own clock: the sky, the arch's
-     three messages, then each item of the services (the day in one link, then the five services; on phones a
-     tall card gets a stop at its top and one at its bottom). From the last step a swipe down glides to the
-     themes, where free scrolling begins; from the first, a swipe up goes back to the sky. A fling that comes
-     in from outside is caught at the first (or last) step, so nothing can be skipped by one hard swipe.
-     Owner, 22 Nov 2026: the dark services stretch had no such stop and one hard gesture skipped three items. */
+  /* ---------- Free scroll, motion by intent (owner, 23 Nov 2026) ----------
+     The guided stretch (one swipe, one step) is gone: on iPhone it needed two swipes for tall cards and froze the
+     light. The page scrolls freely; each part plays its own motion when it comes on screen and resets when it leaves.
+     The arch's three messages are three blocks one after another: each is .is-on while it covers the middle of the
+     screen (its demo plays) and keeps .was-on once seen, so a card never goes blank on the way back up. */
   (function () {
-    if (calm || !about) return;
-    var gliding = false, wheelAt = 0, wheelSum = 0, tY = 0, tOn = false, lastY = window.scrollY, jumpUntil = 0;
-    var svcItems = $$('.services__list > .svc'), themesSec = $('.themes');
-    function absTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
-    function stops() {
-      var vh = window.innerHeight, top = absTop(about), span = about.offsetHeight - vh, list = [];
-      [.5 / 3, .5, 2.5 / 3].forEach(function (f) { list.push(Math.round(top + span * f)); });
-      var head = desktop.matches ? 0 : 76;          // phones: room under the menu button
-      var foot = Math.round(vh * (desktop.matches ? .1 : .1));   // the band of leaves held at the bottom of the screen
-      svcItems.forEach(function (li) {
-        var t = absTop(li), h = li.offsetHeight, room = vh - head - foot - 16;
-        /* phones: a card that fits rests with its top just under the menu line (audit I4); tablets and desktop centre it */
-        if (h <= room) list.push(Math.round(desktop.matches || window.innerWidth >= 700 ? t + h / 2 - (vh + head - foot) / 2 : t - head - 8));
-        else { list.push(Math.round(t - head - 12)); list.push(Math.round(t + h - vh + foot + 16)); }
-      });
-      /* keep them in order and apart, so no two stops land on the same place */
-      var out = [];
-      list.forEach(function (y) { if (!out.length || y > out[out.length - 1] + 40) out.push(y); });
-      var exit = themesSec ? Math.round(absTop(themesSec)) : out[out.length - 1] + vh;
-      if (exit <= out[out.length - 1] + 40) exit = out[out.length - 1] + Math.round(vh * .9);
-      return { list: out, last: out[out.length - 1], exit: exit };
-    }
-    /* the hero counts too: from the sky, one swipe glides down to the first message with the light rising in step */
-    function inside(y, S) { return y < S.exit - 6; }   // the stretch below the last step, up to the themes, is guided too
-    function nearest(y, S) { var n = 0; for (var i = 1; i < S.list.length; i++) if (Math.abs(S.list[i] - y) < Math.abs(S.list[n] - y)) n = i; return n; }
-    /* our own glide, eased and of a fixed length (a browser's smooth scroll is too quick on iOS and looks like a jump) */
-    function glide(to) {
-      var from = window.scrollY, d = to - from, ms = Math.min(1300, Math.max(700, 600 + Math.abs(d) * .45)), t0 = 0;
-      gliding = true;
-      requestAnimationFrame(function f(now) {
-        if (!t0) t0 = now;
-        var q = Math.min(1, (now - t0) / ms), e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
-        window.scrollTo({ top: Math.round(from + d * e), behavior: 'instant' });
-        if (q < 1) requestAnimationFrame(f); else setTimeout(function () { gliding = false; lastY = window.scrollY; }, 60);
-      });
-    }
-    function step(dir) {
-      var S = stops(), y = window.scrollY, to;
-      if (y < S.list[0] - 6) { if (dir > 0) glide(S.list[0]); return; }   // in the sky: down goes to the first message, up does nothing
-      if (y > S.last + 6) { glide(dir > 0 ? S.exit : S.last); return; }   // between the last step and the themes
-      var i = nearest(y, S);
-      if (dir > 0) to = i < S.list.length - 1 ? S.list[i + 1] : S.exit;
-      else to = i > 0 ? S.list[i - 1] : 0;
-      glide(Math.max(0, to));
-    }
-    /* a native fling that runs into the stretch is caught at the first or last step */
-    function halt(to) {
-      var html = document.documentElement, was = html.style.overflow;
-      html.style.overflow = 'hidden';                 // stops the momentum on iOS
-      requestAnimationFrame(function () { html.style.overflow = was; glide(to); });
-    }
-    /* a tap on a menu link travels where it was sent, without being caught on the way */
-    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href^="#"]')) jumpUntil = Date.now() + 1800; }, true);
-    addEventListener('scroll', function () {
-      var y = window.scrollY;
-      if (!gliding && !tOn && Date.now() > jumpUntil) {
-        var S = stops();
-        if (lastY < S.list[0] - 6 && y >= S.list[0] - 6 && y < S.exit - 6) halt(S.list[0]);
-        else if (lastY >= S.exit - 6 && y < S.exit - 6 && y > S.list[0]) halt(S.last);
-      }
-      lastY = y;
-    }, { passive: true });
-    addEventListener('touchstart', function (e) {
-      /* never while the phone menu is open: that swipe only closes the menu (audit I1) */
-      tOn = inside(window.scrollY, stops()) && !(e.target.closest && e.target.closest('dialog,.nav__items,.menu-veil')) && !document.documentElement.classList.contains('menu-open');
-      tY = e.touches[0].clientY;
-    }, { passive: true });
-    addEventListener('touchmove', function (e) { if (tOn) e.preventDefault(); }, { passive: false });
-    addEventListener('touchend', function (e) {
-      if (!tOn) return; tOn = false;
-      var dy = tY - (e.changedTouches[0] ? e.changedTouches[0].clientY : tY);
-      if (Math.abs(dy) > 28 && !gliding) step(dy > 0 ? 1 : -1);
-    }, { passive: true });
-    addEventListener('wheel', function (e) {
-      if (e.target.closest && e.target.closest('dialog')) return;
-      if (!inside(window.scrollY, stops()) && !gliding) return;
-      e.preventDefault();
-      var now = Date.now();
-      if (gliding || now - wheelAt < 650) { wheelAt = gliding ? now : wheelAt; return; }
-      wheelSum += e.deltaY;
-      if (Math.abs(wheelSum) > 18) { wheelAt = now; step(wheelSum > 0 ? 1 : -1); wheelSum = 0; }
-    }, { passive: false });
     var next = $('.hero__next');
-    if (next) next.addEventListener('click', function (e) { e.preventDefault(); if (!gliding) glide(stops().list[0]); });
-    addEventListener('keydown', function (e) {
-      if (!inside(window.scrollY, stops()) || /input|textarea|select/i.test(e.target.tagName) || (e.target.closest && e.target.closest('dialog'))) return;
-      var k = e.key, d = (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) ? 1 : (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) ? -1 : 0;
-      if (!d) return; e.preventDefault(); if (!gliding) step(d);
-    });
+    if (next && about) next.addEventListener('click', function (e) { e.preventDefault(); about.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' }); });
+    if (!says.length) return;
+    if (!('IntersectionObserver' in window) || calm) { says.forEach(function (el) { el.classList.add('is-on', 'was-on'); }); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) { en.target.classList.toggle('is-on', en.isIntersecting); if (en.isIntersecting) en.target.classList.add('was-on'); });
+    }, { rootMargin: '-30% 0px -30% 0px' });
+    says.forEach(function (el) { io.observe(el); });
   })();
 
   /* ---------- Nawala: one letter, with a will of its own ----------
@@ -467,7 +375,8 @@
     /* phones and tablets (audit V2): a smaller letter that stands on the box's top edge inside the clear strip the layout keeps above the box */
     var perchS = D ? .5 : .5, perchY = bT - nwBase * .26 * perchS + (D ? 20 : -4);
     /* phones (audit V2): Nawala keeps to the row of the menu button, above where a card comes to rest */
-    var side = D ? ph.left - 40 : vw - 52, sideS = D ? .42 : .36;
+    /* desktop: above the top right corner of the figures' stages, clear of the words (owner's text-first rule) */
+    var side = D ? Math.min(vw - 70, (ph.right || vw * .9) - 70) : vw - 52, sideS = D ? .36 : .36;
     var cx = D ? .4 : .5;
     var pan = $('#themes-panel'), panR = pan ? pan.getBoundingClientRect().right : 0;
     var bn = $('#branch').getBoundingClientRect(), tipX = bn.left + bn.width * .1, tipY = bn.top + window.scrollY + bn.height * .3;
@@ -479,7 +388,7 @@
         { t: 2.8, x: hx - vw * .018, y: hy - vh * .035, s: hs, r: 2, pose: 'fly' },
         { t: 5.6, x: hx + vw * .016, y: hy + vh * .02, s: hs * .97, r: -7, pose: 'fly' },
         { t: 8.4 } ] },
-      about: { loop: true, k: [
+      about: D ? { loop: true, k: [
         { t: 0, x: (cx + .04) * vw, y: (D ? .6 : .82) * vh, s: .85, r: -6, pose: 'fly' },
         { t: 1.8, x: cx * vw, y: (D ? .56 : .79) * vh, s: .7, r: 0, pose: 'fly', cue: 'flip' },
         { t: 2.6, x: (cx - .015) * vw, y: (D ? .52 : .76) * vh, s: .55, r: -3, pose: 'back34' },
@@ -487,11 +396,15 @@
         { t: 6.8, x: cx * vw, y: (D ? .52 : .78) * vh, s: .82, r: 0, pose: 'open' },
         { t: 9.6, x: (cx + .02) * vw, y: (D ? .5 : .76) * vh, s: .95, r: 0, pose: 'open' },
         { t: 11.4, x: (cx + .05) * vw, y: (D ? .56 : .83) * vh, s: .9, r: -8, pose: 'tilt' },
-        { t: 12.6 } ] },
+        { t: 12.6 } ] } : { loop: true, k: [
+        { t: 0, x: vw - 52, y: 42, s: .36, r: -5, pose: 'fly' },
+        { t: 3.2, x: vw - 56, y: 46, s: .36, r: 4, pose: 'fly', cue: 'flip' },
+        { t: 6.4, x: vw - 52, y: 40, s: .36, r: 0, pose: 'fly' },
+        { t: 9.6 } ] },
       services: { loop: true, k: [
-        { t: 0, x: side, y: D ? .3 * vh : 42, s: sideS, r: -5, pose: 'fly' },
-        { t: 3.2, x: side - (D ? 10 : 4), y: D ? .48 * vh : 46, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
-        { t: 6.4, x: side + (D ? 6 : 0), y: D ? .62 * vh : 40, s: sideS, r: 0, pose: 'fly' },
+        { t: 0, x: side, y: D ? .1 * vh : 42, s: sideS, r: -5, pose: 'fly' },
+        { t: 3.2, x: side - (D ? 60 : 4), y: D ? .13 * vh : 46, s: sideS, r: 4, pose: 'fly', cue: 'flip' },
+        { t: 6.4, x: side + (D ? 6 : 0), y: D ? .08 * vh : 40, s: sideS, r: 0, pose: 'fly' },
         { t: 9.6 } ] },
       /* comes in from the right, flies straight into the tip of the branch, tumbles, gathers itself;
          on desktop it never crosses the panel's writing or the carousel (it keeps to the right edge and the top), on phones it keeps to the top edge */
@@ -700,7 +613,24 @@
       }, { rootMargin: '-48% 0px -48% 0px' });
       items.forEach(function (li) { io.observe(li); });
     }
-    if (desktop.addEventListener) desktop.addEventListener('change', function () { replan(); });
+    if (desktop.addEventListener) desktop.addEventListener('change', function () { replan(); fit(); });
+    /* owner, 23 Nov 2026: on phones and tablets each card, button included, fits one screen under the menu line.
+       The words stay as written; the figure takes the height that is left (never wider than its stage, never under 110px). */
+    function fit() {
+      var vh = window.innerHeight, wide = desktop.matches;
+      items.forEach(function (li) {
+        var g = li.querySelector('.garis--panggung'); if (!g) return;
+        if (wide) { g.style.width = ''; return; }
+        g.style.width = '';
+        var room = g.parentNode.clientWidth, rest = li.offsetHeight - g.offsetHeight;
+        var avail = vh - 76 - 28 - rest, w = Math.max(110, Math.min(room, avail * 1.25));
+        g.style.width = Math.round(w) + 'px';
+      });
+    }
+    fit();
+    var fitT = 0; addEventListener('resize', function () { clearTimeout(fitT); fitT = setTimeout(fit, 150); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    new MutationObserver(function () { setTimeout(fit, 30); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   })();
 
   /* A sample reception room: stage with the couple, parents' tables, the aisle, ten round tables of eight,
@@ -801,15 +731,19 @@
   (function () {
     var river = $('#river');
     var riverJob = function () {
-      var rows = desktop.matches ? 3 : 2, per = desktop.matches ? 14 : 8, html = '';
+      if (!river) return;
+      /* owner, 23 Nov 2026: the drifting gallery comes back behind the carousel, in black and white so it never fights
+         the cards; the -g files are baked (grey, lifted toward white), so no CSS filter runs while it moves */
+      var pool = ALL.filter(function (th) { return !(META && META[slug(th)] && META[slug(th)].cover); }); if (!pool.length) return;
+      var rows = desktop.matches ? 3 : 3, per = desktop.matches ? 14 : 8, html = '';
       for (var r = 0; r < rows; r++) {
         var cards = '';
-        for (var c = 0; c < per; c++) { var i = (r * 17 + c * 7) % ALL.length; cards += '<i class="rc" style="background-image:url(' + cover(ALL[i], 's') + ')"></i>'; }
+        for (var c = 0; c < per; c++) { var th = pool[(r * 17 + c * 7) % pool.length]; cards += '<i class="rc" style="background-image:url(assets/img/cover-' + slug(th) + '-g.webp)"></i>'; }
         html += '<div class="river__row">' + cards + cards + '</div>';
       }
       river.innerHTML = html;
     };
-    /* the river gave way to the carousel (owner, 22 Nov 2026, 22:06); riverJob stays for the fallback lists only */
+    riverJob();
     /* when the database's themes arrive: redraw what is already on screen */
     themeWatchers.push(function () {
       if (river && river.innerHTML) riverJob();

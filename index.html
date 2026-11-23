@@ -25,7 +25,7 @@ if(q.get('font')==='2')d.classList.add('font-b');
 try{var l=q.get('lang')||localStorage.getItem('nawala-lang');if(l==='en')d.lang='en'}catch(e){}
 d.classList.add('js');})();
 </script>
-<link rel="stylesheet" href="assets/css/site.css?v=20261123e1">
+<link rel="stylesheet" href="assets/css/site.css?v=20261123f3">
 <link rel="stylesheet" href="assets/css/kit.css?v=20261123c2">
 <link rel="stylesheet" href="assets/css/rasa.css?v=10">
 </head>
@@ -134,10 +134,11 @@ d.classList.add('js');})();
 </section>
 
 <!-- 2. About: the moss arch. A pinned scene; three statements swap as you scroll. -->
-<section class="about" id="tentang" data-scroll data-steps="3">
+<section class="about" id="tentang" data-scroll>
   <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="fade-top" aria-hidden="true"></div>
   <div class="about__stage">
+    <div class="about__bg">
     <div class="plate">
       <picture>
         <source media="(max-width: 520px)" srcset="assets/img/putih/plate-arch-mobile-sm.webp">
@@ -150,6 +151,7 @@ d.classList.add('js');})();
     <div class="fore fore--arch" aria-hidden="true"><img src="assets/img/putih/fg-treetops-mobile-sm.webp" width="720" height="262" alt="" loading="lazy"></div>
     <div class="bflies bflies--arch" aria-hidden="true"><i style="--x:14%;--y:62%;--n:2;--s:0.9;--t:16s;--d:-4s"></i><i style="--x:30%;--y:74%;--n:5;--s:0.75;--t:13s;--d:-8s"></i><i style="--x:44%;--y:58%;--n:0;--s:0.6;--t:19s;--d:-2s"></i><i style="--x:8%;--y:80%;--n:6;--s:1;--t:15s;--d:-11s"></i></div>
     <div class="about__fade" aria-hidden="true"></div>
+    </div>
     <div class="about__says">
       <div class="say" data-step="0">
         <h2 data-en="Every guest receives a letter of their own.">Setiap tamu menerima suratnya sendiri.</h2>
@@ -246,14 +248,7 @@ d.classList.add('js');})();
 <section class="themes" id="tema" data-scroll>
   <div class="sweep" aria-hidden="true"><i></i><i></i><i></i><i></i><s></s><s></s><s></s><s></s><b></b><b></b></div>
   <div class="themes__bg" aria-hidden="true">
-    <div class="plate">
-      <picture>
-        <source media="(max-width: 520px)" srcset="assets/img/putih/plate-branches-mobile-sm.webp">
-        <source media="(max-width: 899px)" srcset="assets/img/putih/plate-branches-mobile.webp">
-        <source media="(max-width: 1500px)" srcset="assets/img/putih/plate-branches-desktop-sm.webp">
-        <img src="assets/img/putih/plate-branches-desktop.webp" width="2400" height="1340" alt="" loading="lazy">
-      </picture>
-    </div>
+    <div class="river" id="river"></div>
     <div class="crs-tint" id="crs-tint"><i></i><i></i></div>
     <div class="themes__shade"></div>
   </div>
@@ -525,6 +520,6 @@ d.classList.add('js');})();
 <script src="assets/js/rasa.js?v=2" defer></script>
 <script type="module" src="assets/js/garis.js?v=6"></script>
 <script src="assets/js/peraga.js?v=1" defer></script>
-<script src="assets/js/site.js?v=20261123e1" defer></script>
+<script src="assets/js/site.js?v=20261123f3" defer></script>
 </body>
 </html>
