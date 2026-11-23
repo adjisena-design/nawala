@@ -174,10 +174,10 @@
     ['rab', 'Anggaran', 'Budget', 'Rencana dan realisasi per pos, dengan tahap bayar DP, termin dan pelunasan. Ketuk satu pos untuk melihatnya.', 'Planned and actual per line, with deposit, instalment and final payment. Tap a line to see it.'],
     ['obrolan', 'Obrolan', 'Chat', 'Bicara langsung dengan tim Nawala. Coba kirim satu pesan.', 'Talk to the Nawala team directly. Try sending a message.']
   ] : [
-    ['beranda', 'Lima pertanyaan', 'Five questions', 'Ini ruang yang dibuka kode akses. Ketuk Atur kecocokan untuk menjawab lima pertanyaan singkat; jawaban kalian mengurutkan tema yang paling cocok.', 'This is the room an access code opens. Tap Set the match to answer five short questions; your answers put the best-matching themes first.'],
-    ['jelajah', 'Geser tema', 'Swipe themes', 'Geser ke kanan untuk menyimpan, ke kiri untuk melewati. Simpan sampai 30 tema.', 'Swipe right to save, left to pass. Save up to 30 themes.'],
-    ['pilihan', 'Persempit pilihan', 'Narrow it down', 'Enam tema sudah kami simpankan sebagai contoh. Lepas yang kurang terasa seperti kalian sampai tersisa satu pilihan akhir.', 'We saved six themes as a sample. Let go of the ones that feel less like you until one final choice is left.'],
-    ['jadwal', 'Jadwalkan panggilan', 'Book a call', 'Pilih waktu panggilan video dengan tim Nawala untuk membahas tema pilihan kalian.', 'Pick a time for a video call with the Nawala team about your chosen theme.']
+    ['cocok', 'Kecocokan', 'Match', 'Jawab lima pertanyaan di sini. Setiap jawaban langsung mengurutkan tema di bawahnya, tanpa jendela tambahan.', 'Answer five questions here. Every answer re-orders the themes below at once, with no extra window.'],
+    ['jelajah', 'Jelajah', 'Browse', 'Semua tema dalam satu halaman. Ketuk hati untuk menyimpan, atau pilih Geser untuk melihatnya satu per satu.', 'Every theme on one page. Tap the heart to save one, or choose Swipe to see them one at a time.'],
+    ['pilihan', 'Persempit', 'Narrow', 'Enam tema sudah kami simpankan sebagai contoh. Bandingkan berdampingan, lepas yang kurang terasa seperti kalian, lalu pilih satu.', 'We saved six themes as a sample. Compare them side by side, let go of the ones that feel less like you, then choose one.'],
+    ['jadwal', 'Panggilan', 'Call', 'Pilih waktu panggilan video dengan tim Nawala untuk membahas tema pilihan kalian.', 'Pick a time for a video call with the Nawala team about your chosen theme.']
   ];
   var cur = 0, bar = null;
   function go(k) {

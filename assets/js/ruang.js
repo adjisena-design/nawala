@@ -40,7 +40,7 @@
   /* every change is sent a moment after the last tap, and once more if the page is being closed */
   function persist() { if (!room) return; dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(push, 900); }
   window.addEventListener('pagehide', function () { if (dirty && room) { clearTimeout(saveTimer); push(true); } });
-  var hist = [], mode = 'deck', tier = 'semua', q = '', warned = false;
+  var hist = [], mode = matchMedia('(min-width:900px)').matches ? 'all' : 'deck', cmpSel = [], tier = 'semua', q = '', warned = false;
   function isSaved(s) { return state.saved.indexOf(s) > -1; }
   function drop(list, s) { var i = list.indexOf(s); if (i > -1) list.splice(i, 1); }
 
@@ -142,8 +142,48 @@
     var b = $('#badge-saved'); b.textContent = n; b.hidden = !n;
   }
 
+  /* ---------- The four stages: one stepper on top of each stage's view ---------- */
+  var STAGES = [['cocok', 'Kecocokan', 'Match'], ['jelajah', 'Jelajah', 'Browse'], ['pilihan', 'Persempit', 'Narrow'], ['jadwal', 'Panggilan', 'Call']];
+  function stageDone(k) { return k === 'cocok' ? answered() : k === 'jelajah' ? state.saved.length > 0 : k === 'pilihan' ? !!state.final : !!state.call; }
+  function stepper(on) {
+    var html = STAGES.map(function (g, i) {
+      var cur = g[0] === on, done = stageDone(g[0]);
+      return '<li><a href="#' + g[0] + '" class="' + (cur ? 'is-on ' : '') + (done ? 'is-done' : '') + '"' + (cur ? ' aria-current="step"' : '') + '><i>' + (done && !cur ? K.ic('check') : i + 1) + '</i><span>' + t(g[1], g[2]) + '</span></a></li>';
+    }).join('');
+    $$('.stepper').forEach(function (el) { el.innerHTML = html; });
+    var r = $('#rail-pilih'); if (r) { if (STAGES.some(function (g) { return g[0] === on; })) r.setAttribute('aria-current', 'page'); else r.removeAttribute('aria-current'); }
+  }
+  /* the five questions, drawn inline; any tap re-orders the themes at once */
+  function qsHTML() {
+    return QS.map(function (Q, qi) {
+      return '<div class="q"><h3><i>' + (qi + 1) + '</i>' + t(Q[0], Q[1]) + '</h3><div class="chips" role="group">' + Q[2].map(function (o, oi) {
+        return '<button type="button" class="chip" data-q="' + qi + '" data-o="' + oi + '" aria-pressed="' + (state.answers[qi].indexOf(oi) > -1) + '">' + t(o[0], o[1]) + '</button>';
+      }).join('') + '</div></div>';
+    }).join('');
+  }
+  function curView() { var v = $('.view.is-on'); return v ? v.getAttribute('data-view') : ''; }
+  function fitCount() { return N.ALL.filter(function (th) { return score(th); }).length; }
+  function cocok() {
+    stepper('cocok');
+    $('#qs').innerHTML = qsHTML();
+    var on = answered(), list = queue().slice(0, 10);
+    $('#best-h').textContent = on ? fitCount() + ' ' + t('tema cocok, terdekat lebih dulu', 'matching themes, closest first') : t('Tema untuk dimulai', 'Themes to start with');
+    $('#best-p').textContent = on ? t('Sepuluh teratas. Semuanya ada di Jelajah, dengan urutan yang sama.', 'The top ten. All of them are in Browse, in the same order.') : t('Jawab satu pertanyaan saja dan urutannya langsung berubah.', 'Answer just one question and the order changes at once.');
+    $('#unmatch').hidden = !on;
+    $('#best').innerHTML = list.map(function (th) { return tcard(th); }).join('');
+  }
+  function answerTap(b) {
+    var qi = +b.getAttribute('data-q'), oi = +b.getAttribute('data-o'), a = state.answers[qi], at = a.indexOf(oi);
+    if (at > -1) a.splice(at, 1); else a.push(oi);
+    warned = false; persist();
+    var v = $('.view.is-on'); v = v && v.getAttribute('data-view');
+    if (v === 'cocok') cocok(); else { var open = $('#ans').open; browse(); $('#ans').open = open; }
+    home();
+  }
+
   /* ---------- Browse ---------- */
   function browse() {
+    stepper('jelajah');
     $('#mode').innerHTML = [['deck', 'cards', t('Geser', 'Swipe')], ['all', 'grid', t('Semua tema', 'All themes')]].map(function (m) {
       return '<button type="button" class="chip" data-mode="' + m[0] + '" aria-pressed="' + (mode === m[0]) + '">' + K.ic(m[1]) + m[2] + '</button>';
     }).join('');
@@ -155,20 +195,17 @@
     }).join('');
     $('#deck').hidden = mode !== 'deck'; $('#all').hidden = mode !== 'all';
     if (mode === 'deck') deck(); else grid();
-    side();
+    answersBar();
+    var n = state.saved.length;
+    $('#browse-next').textContent = n ? n + ' ' + t('tersimpan. Saat terasa cukup, bandingkan dan pilih satu.', 'saved. When it feels like enough, compare them and choose one.') : t('Simpan tema yang terasa seperti kalian dengan tanda hati.', 'Save the themes that feel like you with the heart.');
   }
-  function side() {
-    var m = $('#match');
-    if (answered()) {
-      var chips = '', fit = N.ALL.filter(function (th) { return score(th); }).length;
-      state.answers.forEach(function (picks, qi) { picks.forEach(function (oi) { var o = QS[qi][2][oi]; chips += '<span class="chip">' + t(o[0], o[1]) + '</span>'; }); });
-      m.innerHTML = '<div class="chips">' + chips + '</div><p class="small muted"><b style="color:var(--text)">' + fit + '</b> ' + t('tema cocok dan tampil lebih dulu.', 'themes match and come first.') + '</p>' +
-        '<div class="chips"><button type="button" class="btn btn--line btn--sm" data-match>' + t('Ubah', 'Change') + '</button><button type="button" class="btn btn--line btn--sm" data-unmatch>' + t('Hapus', 'Clear') + '</button></div>';
-    } else {
-      m.innerHTML = '<p class="small muted">' + t('Belum diatur. Tema tampil menurut urutan biasa.', 'Not set yet. Themes come in their usual order.') + '</p><div><button type="button" class="btn btn--main btn--sm" data-match>' + t('Jawab lima pertanyaan', 'Answer five questions') + '</button></div>';
-    }
-    $('#saved-note').textContent = state.saved.length + ' ' + t('dari 30', 'of 30');
-    ladder($('#ladder-mini'));
+  function answersBar() {
+    var chips = '';
+    state.answers.forEach(function (picks, qi) { picks.forEach(function (oi) { var o = QS[qi][2][oi]; chips += '<span class="pill">' + t(o[0], o[1]) + '</span>'; }); });
+    $('#ans-sum').innerHTML = (answered() ? '<span class="ans__l">' + t('Urutan menurut jawaban kalian', 'Ordered by your answers') + ', <b>' + fitCount() + '</b> ' + t('cocok', 'match') + '</span>' + chips
+      : '<span class="ans__l">' + t('Belum ada jawaban. Jawab lima pertanyaan untuk menaruh tema terdekat di depan.', 'No answers yet. Answer five questions to put the closest themes first.') + '</span>') +
+      '<span class="ans__btn">' + t('Ubah jawaban', 'Change answers') + '</span>';
+    $('#qs2').innerHTML = qsHTML();
   }
   function deck() {
     var list = queue(), total = pool().length, el = $('#deck');
@@ -247,21 +284,43 @@
       : '<div class="empty" style="grid-column:1 / -1"><b>' + t('Tidak ada tema dengan nama itu.', 'No theme has that name.') + '</b>' + t('Coba kata lain.', 'Try another word.') + '</div>';
   }
 
-  /* ---------- Saved ---------- */
+  /* ---------- Narrow: two to four saved themes side by side, then one final choice ---------- */
+  function cmpClean() {
+    cmpSel = cmpSel.filter(function (x) { return isSaved(x); });
+    if (!cmpSel.length) cmpSel = (state.final ? [state.final] : []).concat(state.saved.filter(function (x) { return x !== state.final; })).slice(0, Math.min(3, state.saved.length));
+  }
   function saved() {
+    stepper('pilihan'); cmpClean();
     ladder($('#ladder'));
     var f = $('#final'), n = state.saved.length;
+    $('#prog-t').textContent = n + ' ' + t('tersimpan', 'saved');
     f.hidden = !state.final;
     if (state.final) {
       f.innerHTML = '<img src="' + N.BASE + 'assets/img/nawala-open-720.webp" width="720" height="619" alt=""><div><b>' + t('Tema pilihan kalian: ', 'Your chosen theme: ') + esc(K.themeName(bySlug[state.final])) + '</b>' +
         '<span class="small">' + t('Tim Nawala bisa melihat pilihan ini. Kalian masih boleh menggantinya.', 'The Nawala team can see this choice. You may still change it.') + '</span></div>' +
-        '<button type="button" class="btn btn--line btn--sm" style="margin-left:auto" data-unfinal>' + t('Ganti', 'Change') + '</button>';
+        '<div class="chips" style="margin-left:auto"><button type="button" class="btn btn--line btn--sm" data-unfinal>' + t('Ganti', 'Change') + '</button><button type="button" class="btn btn--main btn--sm" data-go="jadwal">' + t('Atur panggilan', 'Book the call') + '</button></div>';
+    }
+    var c = $('#cmp');
+    if (!n) c.innerHTML = '<div class="empty"><b>' + t('Belum ada yang tersimpan.', 'Nothing saved yet.') + '</b>' + t('Simpan tema di Jelajah dengan tanda hati, lalu bandingkan di sini.', 'Save themes in Browse with the heart, then compare them here.') +
+      '<div style="margin-top:1rem"><button type="button" class="btn btn--main" data-go="jelajah">' + t('Mulai menjelajah', 'Start browsing') + '</button></div></div>';
+    else {
+      c.style.setProperty('--n', cmpSel.length);
+      c.innerHTML = cmpSel.map(function (s) {
+        var th = bySlug[s], fin = state.final === s;
+        return '<article class="cmp__col' + (fin ? ' is-final' : '') + '"><div class="cmp__art" data-slug="' + s + '"><img src="' + N.cover(th) + '" alt="" loading="lazy">' +
+          (N.hasFilm(th) ? '<button type="button" class="deck__play" data-film="' + s + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>' + t('Putar film', 'Play the film') + '</button>' : '') +
+          '<button type="button" class="cmp__x round" data-cmp="' + s + '" aria-label="' + t('Keluarkan dari perbandingan', 'Take out of the comparison') + '">' + K.ic('x') + '</button></div>' +
+          '<div class="cmp__in"><span class="pill pill--jalan">' + K.tierName(th[0]) + '</span>' + (answered() && score(th) ? ' <span class="pill pill--tayang">' + t('Cocok', 'A match') + '</span>' : '') +
+          '<b>' + esc(K.themeName(th)) + '</b><p>' + esc(desc(th)) + '</p>' +
+          '<div class="cmp__acts"><button type="button" class="btn btn--line" data-unsave="' + s + '">' + t('Lepas', 'Let go') + '</button>' +
+          '<button type="button" class="btn btn--line' + (fin ? ' is-chosen' : '') + '" data-final="' + s + '"' + (fin ? ' disabled' : '') + '>' + (fin ? t('Terpilih', 'Chosen') : t('Pilih ini', 'Choose this')) + '</button></div></div></article>';
+      }).join('') + (cmpSel.length < 4 && n > cmpSel.length ? '<div class="cmp__add">' + t('Tambah dari daftar di bawah dengan Bandingkan.', 'Add one from the list below with Compare.') + '</div>' : '');
     }
     $('#saved-grid').innerHTML = n ? state.saved.map(function (s) {
-      return tcard(bySlug[s], '<div class="tc__acts"><button type="button" class="btn btn--line btn--sm" data-unsave="' + s + '">' + t('Lepas', 'Let go') + '</button>' +
-        '<button type="button" class="btn btn--main btn--sm" data-final="' + s + '"' + (state.final === s ? ' disabled' : '') + '>' + (state.final === s ? t('Terpilih', 'Chosen') : t('Pilih ini', 'Choose')) + '</button></div>');
-    }).join('') : '<div class="empty" style="grid-column:1 / -1"><b>' + t('Belum ada yang tersimpan.', 'Nothing saved yet.') + '</b>' + t('Simpan tema dari Jelajah, lalu saring di sini.', 'Save themes in Browse, then narrow them here.') +
-      '<div style="margin-top:1rem"><button type="button" class="btn btn--main" data-go="jelajah">' + t('Mulai menjelajah', 'Start browsing') + '</button></div></div>';
+      var on = cmpSel.indexOf(s) > -1;
+      return tcard(bySlug[s], '<div class="tc__acts"><button type="button" class="btn btn--line btn--sm" data-cmp="' + s + '" aria-pressed="' + on + '">' + (on ? t('Dibandingkan', 'Comparing') : t('Bandingkan', 'Compare')) + '</button>' +
+        '<button type="button" class="btn btn--line btn--sm" data-unsave="' + s + '">' + t('Lepas', 'Let go') + '</button></div>');
+    }).join('') : '';
   }
 
   /* ---------- Video call ---------- */
@@ -272,6 +331,7 @@
     return K.day(d) + ', ' + K.date(d) + ', ' + state.call.time + ' WIB, ' + state.call.via;
   }
   function schedule() {
+    stepper('jadwal');
     $('#days').innerHTML = slotDays().map(function (d, i) { return '<button type="button" class="chip" data-d="' + i + '" aria-pressed="' + (pick.d === i) + '">' + K.day(d).slice(0, 3) + ' <b>' + K.date(d, true) + '</b></button>'; }).join('');
     $('#times').innerHTML = ['10.00', '13.00', '16.00', '19.30'].map(function (h) { return '<button type="button" class="chip" data-h="' + h + '" aria-pressed="' + (pick.time === h) + '">' + h + '</button>'; }).join('');
     $('#via').innerHTML = ['Google Meet', 'WhatsApp'].map(function (v) { return '<button type="button" class="chip" data-v="' + v + '" aria-pressed="' + (pick.via === v) + '">' + K.ic('video') + v + '</button>'; }).join('');
@@ -286,30 +346,7 @@
   function openPop(d) { if (d.showModal) { if (!d.open) d.showModal(); } else d.setAttribute('open', ''); }
   function closePop(d) { if (d.close) d.close(); else d.removeAttribute('open'); }
   $$('dialog').forEach(function (d) { d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-close]')) closePop(d); }); });
-  var step = 0, peeked = '';
-  function match() {
-    var Q = QS[step];
-    $('#match-dots').innerHTML = QS.map(function (x, i) { return '<i class="' + (i <= step ? 'is-on' : '') + '"></i>'; }).join('');
-    $('#match-h').textContent = t(Q[0], Q[1]);
-    $('#match-p').textContent = (step + 1) + ' ' + t('dari 5. Boleh pilih lebih dari satu, atau lewati.', 'of 5. Pick more than one, or skip it.');
-    $('#match-opts').innerHTML = Q[2].map(function (o, i) { return '<button type="button" class="chip" data-o="' + i + '" aria-pressed="' + (state.answers[step].indexOf(i) > -1) + '">' + t(o[0], o[1]) + '</button>'; }).join('');
-    $('#match-photo').hidden = step !== 0;
-    $('#match-back').textContent = step ? t('Kembali', 'Back') : t('Tutup', 'Close');
-    $('#match-next').textContent = step < 4 ? t('Lanjut', 'Next') : t('Lihat hasilnya', 'See the result');
-  }
-  $('#match-opts').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-o]'); if (!b) return;
-    var i = +b.getAttribute('data-o'), a = state.answers[step], at = a.indexOf(i);
-    if (at > -1) a.splice(at, 1); else a.push(i);
-    match();
-  });
-  $('#match-back').addEventListener('click', function () { if (step) { step--; match(); } else closePop($('#pop-match')); });
-  $('#match-next').addEventListener('click', function () {
-    if (step < 4) { step++; match(); return; }
-    closePop($('#pop-match')); warned = false; persist(); mode = 'deck'; K.go('jelajah'); browse();
-    var fit = N.ALL.filter(function (th) { return score(th); }).length;
-    K.toast(answered() ? fit + ' ' + t('tema cocok kami taruh di depan.', 'matching themes now come first.') : t('Tidak ada jawaban, urutan tetap seperti biasa.', 'No answers, so the order stays as it was.'));
-  });
+  var peeked = '';
   function peek(s) {
     var th = bySlug[s]; peeked = s;
     $('#peek-stage').innerHTML = bigCard(th);
@@ -327,15 +364,22 @@
   /* ---------- Clicks and keys ---------- */
   document.addEventListener('click', function (e) {
     var el;
-    if ((el = e.target.closest('[data-match]'))) { step = 0; match(); openPop($('#pop-match')); }
-    else if (e.target.closest('[data-unmatch]')) { state.answers = [[], [], [], [], []]; persist(); browse(); }
+    if ((el = e.target.closest('[data-q]'))) answerTap(el);
+    else if (e.target.closest('[data-match]')) K.go('cocok');
+    else if (e.target.closest('[data-unmatch]')) { state.answers = [[], [], [], [], []]; persist(); cocok(); home(); }
+    else if ((el = e.target.closest('[data-cmp]'))) {
+      var cs = el.getAttribute('data-cmp'), ci = cmpSel.indexOf(cs);
+      if (ci > -1) { if (cmpSel.length > 1) cmpSel.splice(ci, 1); }
+      else { if (cmpSel.length >= 4) { K.toast(t('Paling banyak empat berdampingan. Keluarkan satu dulu.', 'Four side by side at most. Take one out first.')); return; } cmpSel.push(cs); }
+      saved(); if (ci < 0) { var top = $('#cmp'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
     else if ((el = e.target.closest('[data-mode]'))) { mode = el.getAttribute('data-mode'); browse(); }
     else if ((el = e.target.closest('[data-tier]'))) { tier = el.getAttribute('data-tier'); browse(); }
     else if ((el = e.target.closest('[data-act]'))) { var a = el.getAttribute('data-act'); if (a === 'undo') undo(); else decide(a); }
-    else if ((el = e.target.closest('[data-heart]'))) { var s = el.getAttribute('data-heart'); if (isSaved(s)) unsave(s); else if (!save(s)) return; persist(); el.setAttribute('aria-pressed', isSaved(s)); side(); home(); }
+    else if ((el = e.target.closest('[data-heart]'))) { var s = el.getAttribute('data-heart'); if (isSaved(s)) unsave(s); else if (!save(s)) return; persist(); el.setAttribute('aria-pressed', isSaved(s)); home(); stepper(curView()); }
     else if ((el = e.target.closest('[data-peek]'))) peek(el.getAttribute('data-peek'));
     else if ((el = e.target.closest('[data-unsave]'))) { unsave(el.getAttribute('data-unsave')); persist(); all(); }
-    else if ((el = e.target.closest('[data-final]'))) { state.final = el.getAttribute('data-final'); persist(); all(); window.scrollTo(0, 0); }
+    else if ((el = e.target.closest('[data-final]'))) { state.final = el.getAttribute('data-final'); if (cmpSel.indexOf(state.final) < 0) cmpSel.unshift(state.final); persist(); all(); window.scrollTo(0, 0); }
     else if (e.target.closest('[data-unfinal]')) { state.final = ''; persist(); all(); }
     else if ((el = e.target.closest('[data-d]'))) { pick.d = +el.getAttribute('data-d'); schedule(); }
     else if ((el = e.target.closest('[data-h]'))) { pick.time = el.getAttribute('data-h'); schedule(); }
@@ -494,7 +538,8 @@
   });
 
   function all() {
-    home(); browse(); saved(); schedule(); order(); guests();
+    home(); cocok(); browse(); saved(); schedule(); order(); guests();
+    stepper(curView());
     if (gateNote) note(gateNote);
     document.title = t('Nawala, ruang pasangan', 'Nawala, the couple\'s room');
   }
@@ -503,7 +548,7 @@
   window.NAWALA_PM.mount({ root: $('#pm-root'), as: 'pasangan', who: function () { return room && room.code; },
     onBadge: function (n) { var b = $('#badge-pm'); b.hidden = !n; b.textContent = n || ''; } });
   K.onShow.persiapan = function () { if (ORD()) window.NAWALA_PM.show(); };
-  K.onShow.beranda = home; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule; K.onShow.tamu = guests;
+  K.onShow.beranda = home; K.onShow.cocok = cocok; K.onShow.jelajah = browse; K.onShow.pilihan = saved; K.onShow.jadwal = schedule; K.onShow.tamu = guests;
   K.onLang(all);
   K.start();
   if (stored()) enter(stored()); else $('#gate-code').focus();

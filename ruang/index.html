@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <title>Nawala, ruang pasangan</title>
 <link rel="icon" href="../assets/img/icon-64.png">
-<link rel="stylesheet" href="../assets/css/console.css?v=20261123d1">
+<link rel="stylesheet" href="../assets/css/console.css?v=20261123p">
 <link rel="stylesheet" href="../assets/css/persiapan.css?v=20261123p1">
 <link rel="stylesheet" href="../assets/css/kit.css?v=20261123c2">
 </head>
@@ -56,9 +56,7 @@
 
 <nav class="k__rail g" aria-label="Ruang pasangan">
   <a href="#beranda" data-ic="home"><span data-en="Home">Beranda</span></a>
-  <a href="#jelajah" data-ic="cards"><span data-en="Browse">Jelajah</span></a>
-  <a href="#pilihan" data-ic="heart"><span data-en="Saved">Pilihan</span><i id="badge-saved" hidden></i></a>
-  <a href="#jadwal" data-ic="calendar"><span data-en="Call">Jadwal</span></a>
+  <a href="#cocok" data-ic="cards" id="rail-pilih"><span data-en="Choose a theme">Pilih tema</span><i id="badge-saved" hidden></i></a>
   <a href="#undangan" data-ic="letter" id="rail-ord" hidden><span data-en="Invitation">Undangan</span></a>
   <a href="#persiapan" data-ic="tasks" id="rail-pm" hidden><span data-en="Plan">Persiapan</span><i id="badge-pm" hidden></i></a>
   <a href="#tamu" data-ic="inbox" id="rail-guests" hidden><span data-en="Guests">Tamu</span></a>
@@ -75,8 +73,8 @@
         <h1 id="hello"></h1>
         <p class="hero__sub" data-en="Your code opens every theme and every film. Save the ones you love, then narrow them down to one.">Kode kalian membuka semua tema dan semua film. Simpan yang kalian suka, lalu saring sampai tersisa satu.</p>
         <div class="hero__go">
-          <button class="btn btn--main" type="button" data-go="jelajah" data-en="Start browsing">Mulai menjelajah</button>
-          <button class="btn btn--line" type="button" data-match data-en="Set our match">Atur kecocokan</button>
+          <button class="btn btn--main" type="button" data-go="cocok" data-en="Start choosing a theme">Mulai memilih tema</button>
+          <button class="btn btn--line" type="button" data-go="jelajah" data-en="See every theme">Lihat semua tema</button>
         </div>
       </div>
 
@@ -116,47 +114,61 @@
   </section>
 
   <!-- 2. Browse: swipe one at a time, or see everything -->
-  <section class="view" data-view="jelajah">
-    <div class="browse">
-      <div class="panel g">
-        <div class="panel__h">
-          <div><h1 data-en="Browse the themes">Jelajah tema</h1><p id="browse-note"></p></div>
-          <div class="panel__tools chips" id="mode" role="group"></div>
-        </div>
-        <div class="chips chips--scroll" id="tier-filter" role="group" style="margin-bottom:1rem"></div>
-        <div class="deck" id="deck"></div>
-        <div id="all" hidden>
-          <label class="field" data-ic="search" style="margin-bottom:1rem"><span class="sr" data-en="Search">Cari</span><input id="search" type="search" placeholder="Cari nama tema" data-en-placeholder="Search a theme name" autocomplete="off"></label>
-          <div class="grid" id="theme-grid"></div>
-        </div>
+  <!-- Choosing a theme: one guided page in four stages (owner, 23 Nov 2026). 1 Match, 2 Browse, 3 Narrow, 4 Call. -->
+  <section class="view" data-view="cocok">
+    <ol class="stepper" aria-label="Empat langkah memilih tema"></ol>
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="What feels like you?">Apa yang terasa seperti kalian?</h1><p data-en="Five short questions. Every answer moves the closest themes to the front at once. Pick more than one, or skip any of them.">Lima pertanyaan singkat. Setiap jawaban langsung menaruh tema terdekat di depan. Boleh pilih lebih dari satu, atau lewati.</p></div>
       </div>
-      <div class="over__side">
-        <section class="card g" aria-labelledby="h-match">
-          <div class="card__h"><div><h2 id="h-match" data-en="Your match">Kecocokan kalian</h2><p data-en="Five short questions put the closest themes first">Lima pertanyaan singkat menaruh tema terdekat di depan</p></div></div>
-          <div class="match" id="match"></div>
-        </section>
-        <section class="card g" aria-labelledby="h-saved">
-          <div class="card__h"><div><h2 id="h-saved" data-en="Saved">Tersimpan</h2><p id="saved-note"></p></div><a href="#pilihan" data-en="Open">Buka</a></div>
-          <div class="ladder" id="ladder-mini"></div>
-        </section>
+      <div class="qs" id="qs"></div>
+    </div>
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h2 id="best-h"></h2><p id="best-p"></p></div>
+        <div class="chips"><button type="button" class="btn btn--line" data-unmatch id="unmatch" data-en="Clear the answers">Hapus jawaban</button><button type="button" class="btn btn--main" data-go="jelajah" data-en="Go on to browse">Lanjut menjelajah</button></div>
       </div>
+      <div class="grid grid--wide" id="best"></div>
     </div>
   </section>
 
-  <!-- 3. Saved: from thirty down to one -->
-  <section class="view" data-view="pilihan">
+  <section class="view" data-view="jelajah">
+    <ol class="stepper" aria-label="Empat langkah memilih tema"></ol>
     <div class="panel g">
       <div class="panel__h">
-        <div><h1 data-en="Your saved themes">Pilihan kalian</h1><p data-en="Save up to 30, then let go of the ones that feel less like you: 30, 15, 10, 5, until one is left.">Simpan sampai 30, lalu lepas yang kurang terasa seperti kalian: 30, 15, 10, 5, sampai tersisa satu.</p></div>
-        <div class="ladder" id="ladder"></div>
+        <div><h1 data-en="Browse the themes">Jelajah tema</h1><p id="browse-note"></p></div>
+        <div class="panel__tools chips" id="mode" role="group"></div>
+      </div>
+      <details class="ans" id="ans"><summary id="ans-sum"></summary><div class="qs qs--in" id="qs2"></div></details>
+      <div class="chips tiers" id="tier-filter" role="group"></div>
+      <div class="deck" id="deck"></div>
+      <div id="all" hidden>
+        <label class="field" data-ic="search" style="margin-bottom:1rem"><span class="sr" data-en="Search">Cari</span><input id="search" type="search" placeholder="Cari nama tema" data-en-placeholder="Search a theme name" autocomplete="off"></label>
+        <div class="grid grid--wide" id="theme-grid"></div>
+      </div>
+      <div class="browse__next"><p id="browse-next"></p><button type="button" class="btn btn--line" data-go="pilihan" data-en="Narrow them down">Persempit pilihan</button></div>
+    </div>
+  </section>
+
+  <section class="view" data-view="pilihan">
+    <ol class="stepper" aria-label="Empat langkah memilih tema"></ol>
+    <div class="panel g">
+      <div class="panel__h">
+        <div><h1 data-en="Narrow them down">Persempit pilihan</h1><p data-en="Put two to four saved themes side by side, let go of the ones that feel less like you, then choose one.">Taruh dua sampai empat tema tersimpan berdampingan, lepas yang kurang terasa seperti kalian, lalu pilih satu.</p></div>
+        <div class="prog"><span id="prog-t"></span><div class="ladder" id="ladder"></div></div>
       </div>
       <div class="booked" id="final" hidden></div>
-      <div class="grid" id="saved-grid" style="margin-top:1rem"></div>
+      <div class="cmp" id="cmp"></div>
+    </div>
+    <div class="panel g">
+      <div class="panel__h"><div><h2 data-en="All saved themes">Semua yang tersimpan</h2><p data-en="Tap Compare to put a theme beside the others.">Ketuk Bandingkan untuk menaruh tema di samping yang lain.</p></div></div>
+      <div class="grid grid--wide" id="saved-grid"></div>
     </div>
   </section>
 
   <!-- 4. Video call -->
   <section class="view" data-view="jadwal">
+    <ol class="stepper" aria-label="Empat langkah memilih tema"></ol>
     <div class="panel g">
       <div class="panel__h">
         <div><h1 data-en="Video call with the team">Panggilan video dengan tim</h1><p data-en="Thirty minutes to go through your saved themes, your families' wishes and the details of the day.">Tiga puluh menit untuk membahas tema pilihan, keinginan keluarga, dan detail hari pernikahan.</p></div>
@@ -214,21 +226,6 @@
   <button type="button" class="btn btn--main room-pv__x" id="room-pv-x" data-en="Close">Tutup</button>
 </div>
 
-<!-- Five tag questions. Answering is optional; every question can be skipped. -->
-<dialog class="pop" id="pop-match" aria-labelledby="match-h">
-  <div class="pop__box">
-    <div class="pop__dots" id="match-dots" aria-hidden="true"></div>
-    <h2 id="match-h"></h2>
-    <p class="muted" id="match-p"></p>
-    <div class="pop__body chips" id="match-opts" role="group"></div>
-    <div class="soon" id="match-photo" hidden><span class="round" style="width:44px;height:44px;flex:none" data-ic="plus"></span><span data-en="Coming later: add a pre-wedding photo and we read its colours and mood. Faces are never stored.">Menyusul: tambahkan foto prewedding, lalu kami membaca warna dan suasananya. Wajah tidak pernah disimpan.</span></div>
-    <div class="pop__acts" style="margin-top:1.2rem">
-      <button class="btn btn--line" type="button" id="match-back" data-en="Back">Kembali</button>
-      <button class="btn btn--main" type="button" id="match-next"></button>
-    </div>
-  </div>
-</dialog>
-
 <!-- One theme, in full colour -->
 <dialog class="pop" id="pop-theme" aria-labelledby="peek-name">
   <div class="pop__box">
@@ -246,11 +243,11 @@
 <script>window.NAWALA_BASE = '../';</script>
 <script src="../assets/js/origin.js?v=3"></script>
 <script src="../assets/js/db.js"></script>
-<script src="../assets/js/demo-db.js?v=1"></script>
+<script src="../assets/js/demo-db.js?v=2"></script>
 <script src="../assets/js/themes.js?v=20261122a"></script>
 <script src="../assets/js/console.js?v=20261123a"></script>
 <script src="../assets/js/builder.js?v=20261122a"></script>
 <script src="../assets/js/persiapan.js?v=20261123a"></script>
-<script src="../assets/js/ruang.js?v=20261123a"></script>
+<script src="../assets/js/ruang.js?v=20261123p"></script>
 </body>
 </html>
