@@ -429,10 +429,12 @@
       /* the contest band (owner, 23 Nov 2026): Nawala keeps to the venue photo, which is on the right on desktop and on
          top on phones, pinned to the page, and never crosses the writing or the credit in the photo's corner */
       air: (function () {
-        var ph = udara && $('.lb-say__photo', udara), r = ph ? ph.getBoundingClientRect() : { left: vw * .5, right: vw, top: 0, bottom: vh, height: vh, width: vw * .5 };
+        /* the slides move sideways, so the photo's area is taken from the band itself: its right 64% */
+        var ub = udara ? udara.getBoundingClientRect() : { left: 0, right: vw, top: 0, height: vh, width: vw };
+        var r = { left: ub.left + ub.width * .36, right: ub.right, top: ub.top, height: ub.height, width: ub.width * .64 };
         var top = r.top + window.scrollY, x1 = D ? r.right - 90 : r.right - 60;
         /* clear of the writing: start beyond the widest line of the text column, half Nawala's width plus a margin */
-        var tr = 0; if (udara) $$('.lb-say__in > *', udara).forEach(function (el) { var b = el.getBoundingClientRect(); if (b.width) { var range = document.createRange(); range.selectNodeContents(el); var rr = range.getBoundingClientRect(); tr = Math.max(tr, Math.min(b.right, rr.right || b.right)); } });
+        var tr = 0; if (udara) $$('.lb-say__slide:first-child .lb-say__in > *', udara).forEach(function (el) { var b = el.getBoundingClientRect(); if (b.width) { var range = document.createRange(); range.selectNodeContents(el); var rr = range.getBoundingClientRect(); tr = Math.max(tr, Math.min(b.right, rr.right || b.right)); } });
         var x0 = D ? Math.max(tr + 120, vw * .6) : r.left + r.width * .2; if (x0 > x1 - 40) x0 = x1 - 40;
         var y0 = top + r.height * (D ? .2 : .22), y1 = top + r.height * (D ? .48 : .5);
         /* phones: the writing runs under the photo and the band is tall, so Nawala keeps to the menu button's row */

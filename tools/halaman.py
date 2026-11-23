@@ -12,7 +12,7 @@ no all-caps labels, no middle-dot taglines, no arrows inside buttons.
 import html, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-V = '20261123p1'   # bump when halaman.css / halaman.js change
+V = '20261123p2'   # bump when halaman.css / halaman.js change
 
 def esc(s): return html.escape(s, quote=True)
 def T(p, tag='span', cls='', attrs=''):
@@ -1013,22 +1013,28 @@ def home_blocks():
         '<div class="lb-head">' + T(('Satu platform untuk seluruh pernikahan.', 'One platform for the whole wedding.'), 'h2')
         + T(('Undangan hanyalah awalnya. Pesan satu layanan atau semuanya sekaligus, dengan satu pendamping dari tim Nawala dari undangan pertama sampai tamu terakhir pulang.', 'The invitation is only the beginning. Book one service or all of them at once, with one companion from the Nawala team from the first invitation to the last guest going home.'), 'p') + '</div>',
         cards, ('Lima layanan Nawala', 'The five Nawala services')) + f'<div class="wrap"><div class="lb-nums">{nums}</div></div>'
-    # the contest band (owner, 23 Nov 2026, points 3 and 10): deep rose
-    tracks = (f'<div class="lb-say__track"><b>20%</b>{T(("Karya tangan", "Hand-made"), "span", "n")}{T(("Dilukis, digambar, atau dibuat digital oleh kalian sendiri, tanpa AI.", "Painted, drawn or made digitally by you, without AI."), "span")}</div>'
-              f'<div class="lb-say__track"><b>5%</b>{T(("Karya AI", "AI-made"), "span", "n")}{T(("Dibuat dengan bantuan AI, disusun utuh menjadi satu tema.", "Made with AI, assembled into one complete theme."), "span")}</div>')
-    # our own white branches fading into the rose (owner, 23 Nov 2026, 18:38: the borrowed venue photo did not match our look)
-    blocks['udara'] = (
-        '<div class="lb-say__photo" aria-hidden="true"><picture>'
-        '<source media="(max-width: 899px)" srcset="assets/img/putih/plate-branches-mobile-sm.webp">'
-        '<img src="assets/img/putih/plate-branches-desktop-sm.webp" width="1440" height="804" alt="" loading="lazy" decoding="async"></picture></div>'
-        '<div class="lb-say__in">'
-        + T(('Karya kalian, di undangan pernikahan seluruh Indonesia.', 'Your art, in wedding invitations across Indonesia.'), 'h2')
-        + T(('Sayembara Nawala mencari lukisan dan ilustrasi untuk tema undangan. Setiap kali pasangan memakai tema dari karya kalian, kalian menerima bagian dari undangan itu.', 'The Nawala contest is looking for paintings and illustrations for invitation themes. Every time a couple uses a theme made from your work, you receive a share of that invitation.'), 'p', 'lb-say__lead')
-        + f'<div class="lb-say__tracks">{tracks}</div>'
-        + T(('Dihitung dari bagian Nawala setiap undangan, selama dua tahun dan bisa diperpanjang. Terbuka untuk siapa saja, kapan saja.', "Counted on Nawala's share of each invitation, for two years and renewable. Open to anyone, any time."), 'p', 'lb-say__fine')
-        + '<div class="lb-say__acts"><a class="btn btn--glow" href="sayembara/" data-en="Read the terms">Baca ketentuannya</a>'
-        + wa_btn(('Daftar lewat WhatsApp', 'Sign up on WhatsApp'), ('Halo Nawala, saya ingin ikut Sayembara Nawala.', 'Hello Nawala, I would like to join the Nawala contest.'), 'btn btn--glass')
-        + '</div></div>')
+    # the contest band (owner, 23 Nov 2026, 18:44): two slides in one band, hand-made and AI-made, each with its own
+    # picture (Higgsfield gpt_image_2_6, jobs 0a630dda and 377a459b), swiped or chosen with the two tabs (assets/js/slaid.js)
+    fine = T(('Dihitung dari bagian Nawala setiap undangan, selama dua tahun dan bisa diperpanjang. Terbuka untuk siapa saja, kapan saja.', "Counted on Nawala's share of each invitation, for two years and renewable. Open to anyone, any time."), 'p', 'lb-say__fine')
+    acts = ('<div class="lb-say__acts"><a class="btn btn--glow" href="sayembara/" data-en="Read the terms">Baca ketentuannya</a>'
+            + wa_btn(('Daftar lewat WhatsApp', 'Sign up on WhatsApp'), ('Halo Nawala, saya ingin ikut Sayembara Nawala.', 'Hello Nawala, I would like to join the Nawala contest.'), 'btn btn--glass') + '</div>')
+    def slide(i, img, h2, lead, pct, name, desc):
+        return (f'<section class="lb-say__slide" data-slaid-item aria-roledescription="slide" aria-label="{i + 1} / 2">'
+                f'<div class="lb-say__photo" aria-hidden="true"><picture><source media="(max-width: 899px)" srcset="assets/img/sayembara-{img}-sm.webp">'
+                f'<img src="assets/img/sayembara-{img}.webp" width="1024" height="688" alt="" loading="lazy" decoding="async"></picture></div>'
+                '<div class="lb-say__in">' + T(h2, 'h2') + T(lead, 'p', 'lb-say__lead')
+                + f'<div class="lb-say__big"><b>{pct}</b>' + T(name, 'span', 'n') + T(desc, 'span') + '</div>' + fine + acts + '</div></section>')
+    tabs = ('<div class="lb-say__tabs" role="tablist" aria-label="Jalur sayembara" data-en-label="Contest tracks">'
+            '<button type="button" role="tab" aria-selected="true" data-slaid-tab="0"><span data-en="Hand-made">Karya tangan</span> <b>20%</b></button>'
+            '<button type="button" role="tab" aria-selected="false" data-slaid-tab="1"><span data-en="AI-made">Karya AI</span> <b>5%</b></button></div>')
+    blocks['udara'] = ('<div class="lb-say__wrap" data-slaid>' + tabs + '<div class="lb-say__track" data-slaid-track>'
+        + slide(0, 'tangan', ('Karya kalian, di undangan pernikahan seluruh Indonesia.', 'Your art, in wedding invitations across Indonesia.'),
+                ('Sayembara Nawala mencari lukisan dan ilustrasi untuk tema undangan. Setiap kali pasangan memakai tema dari karya kalian, kalian menerima bagian dari undangan itu.', 'The Nawala contest is looking for paintings and illustrations for invitation themes. Every time a couple uses a theme made from your work, you receive a share of that invitation.'),
+                '20%', ('Karya tangan', 'Hand-made'), ('Dilukis, digambar, atau dibuat digital oleh kalian sendiri, tanpa AI. Sertakan sketsa atau foto prosesnya.', 'Painted, drawn or made digitally by you, without AI. Include your sketches or process photos.'))
+        + slide(1, 'ai', ('Karya AI juga punya tempatnya sendiri.', 'AI-made work has its own place too.'),
+                ('Tema yang disusun dengan bantuan AI dinilai di jalur terpisah. Lima adegan yang serasi, lapisan depan, dan hiasan bunga, disusun utuh menjadi satu tema undangan.', 'Themes made with the help of AI are judged on a separate track: five matching scenes, front layers and a flower spray, assembled into one complete invitation theme.'),
+                '5%', ('Karya AI', 'AI-made'), ('Sebutkan alat dan perintah (prompt) yang dipakai, dan pastikan kalian berhak memakai hasilnya.', 'Name the tools and prompts used, and make sure you have the right to use the result.'))
+        + '</div><p class="lb-say__count" aria-hidden="true"><b>1</b> / 2</p></div>')
     blocks['cmp'] = ('<div class="wrap"><div class="lb-head">' + T(('Apa bedanya dengan undangan digital lain?', 'How is this different from other digital invitations?'), 'h2')
         + T(('Delapan hal yang kalian dapatkan di Nawala, dibandingkan dengan yang biasa ditemui di layanan undangan digital.', 'Eight things you get at Nawala, next to what digital invitation services usually offer.'), 'p')
         + '</div>' + compare_table('lb-tbl') + T(COMPARE_NOTE, 'p', 'lb-small') + '</div>')
