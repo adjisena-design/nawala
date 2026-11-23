@@ -816,7 +816,9 @@
       if (pops.themes && pops.themes.open && viewing < 0) build();
     });
 
-    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah'), tema: $('#pop-tema') };
+    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah'), tema: $('#pop-tema'), demo: $('#pop-demo'), persiapan: $('#pop-denah'), pilih: $('#pop-denah') };
+    /* the three live demos share one almost full-screen box: [page, title, title in English] */
+    var DEMOS = { denah: ['undangan/denah-demo.html', 'Demo denah dan kursi', 'Demo: floor plan and seats'], persiapan: ['ruang/?demo=persiapan', 'Demo persiapan pernikahan', 'Demo: the wedding plan'], pilih: ['ruang/?demo=tema', 'Demo memilih tema', 'Demo: choosing a theme'] };
     /* ---------- The theme carousel (owner, 22 Nov 2026, 22:06, after the "Glassy Carousel" reel) ----------
        Every theme that has a working sample stands in a fan of glass cards: the front one lifted and lit, its
        neighbours turned away and dimmer. Drag, swipe, the wheel sideways, or the arrow keys turn it; it drifts on
@@ -1072,7 +1074,11 @@
       if (name === 'themes') { if (wantTier) tier = wantTier; build(); showList(false); }
       if (name === 'login') { var m = $('#login-msg'); m.hidden = true; }
       /* the seating planner demo loads only when asked for, in the page's language */
-      if (name === 'denah') { var f = $('.denah__frame', d), src = 'undangan/denah-demo.html' + (lang === 'en' ? '?lang=en' : ''); if (f.getAttribute('src') !== src) f.setAttribute('src', src); }
+      if (DEMOS[name]) {
+        var f = $('.denah__frame', d), dm = DEMOS[name], src = dm[0] + (lang === 'en' && name === 'denah' ? '?lang=en' : '');
+        $('#pop-denah-h').textContent = lang === 'en' ? dm[2] : dm[1]; f.title = dm[1];
+        if (f.getAttribute('src') !== src) f.setAttribute('src', src);
+      }
       d.showModal();
       /* the keyboard waits until the box has finished growing; on touch screens the visitor taps the field */
       if (name === 'login' && matchMedia('(pointer: fine)').matches) setTimeout(function () { try { $('#login-code').focus({ preventScroll: true }); } catch (e) {} }, 540);
@@ -1090,6 +1096,7 @@
       el.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
       if (id === 'kontak') setTimeout(function () { var f = $('#q-name'); if (f && !f.closest('[hidden]')) try { f.focus({ preventScroll: true }); } catch (e) {} }, 900);
     }
+    if (/[?&]buka=demo\b/.test(location.search)) setTimeout(function () { open('demo'); }, 600);
     doc.addEventListener('click', function (e) {
       var o = e.target.closest('[data-open]'); if (o) { e.preventDefault(); return open(o.getAttribute('data-open'), o.getAttribute('data-tier')); }
       var g = e.target.closest('[data-goto]'); if (g) return goTo(g.getAttribute('data-goto'));

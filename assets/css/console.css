@@ -698,3 +698,24 @@ body{font-size:.9375rem;line-height:1.5}
 }
 /* stat labels never under 13px */
 .stat__l,.stat__d,.stage__l,.axis span{font-size:.8125rem}
+
+/* ---------- Demo mode of the couple's room (assets/js/demo-db.js): a guide bar above the room, the door and the
+   parts a sample couple cannot use hidden ---------- */
+.demo-bar{position:relative;z-index:25;display:grid;gap:.5rem .9rem;margin:12px 12px 0;padding:.7rem .8rem;border-radius:24px;align-items:center}
+.demo-bar__steps{display:flex;gap:.35rem;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
+.demo-bar__steps::-webkit-scrollbar{display:none}
+.demo-bar__steps button{flex:none;display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:.3rem .9rem .3rem .35rem;border-radius:999px;border:1px solid var(--line,rgba(58,48,53,.14));background:rgba(255,255,255,.7);color:inherit;font:600 .9375rem/1.2 var(--body);cursor:pointer;white-space:nowrap}
+.demo-bar__steps button i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(244,166,192,.35);font-style:normal;font-weight:700}
+.demo-bar__steps button[aria-current=step]{background:#F4A6C0;border-color:#F4A6C0;color:#3A3035}
+.demo-bar__steps button[aria-current=step] i{background:#FFFDFB}
+.demo-bar__say{margin:0;font-size:1rem;line-height:1.45;max-width:70ch}
+.demo-bar__acts{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.demo-bar__tag{font-size:.875rem;font-weight:600;opacity:.75}
+@media (min-width:1100px){.demo-bar{grid-template-columns:auto minmax(0,1fr) auto;margin:20px 24px 0}.demo-bar__acts{flex-wrap:nowrap}.demo-bar__tag{max-width:13rem}}
+.is-demo .gate,.is-demo #logout,.is-demo .k__brand,.is-demo #me-code{display:none}
+.is-demo body.is-locked .k__top,.is-demo body.is-locked .k__main,.is-demo body.is-locked .k__rail{visibility:hidden}
+.is-demo-persiapan .k__rail{display:none}
+.is-demo-persiapan .k__top{padding-left:14px}
+.is-demo-persiapan .k__main{padding-left:14px;padding-bottom:24px}
+@media (min-width:900px){.is-demo-persiapan .k__top{padding-left:24px}.is-demo-persiapan .k__main{padding-left:24px}.is-demo .k__rail{top:calc(104px + var(--demo-h,80px) + 20px)}}
+@media (max-width:699px){.demo-bar{padding:.55rem .6rem}.demo-bar__say{font-size:.9375rem}.demo-bar__acts{flex-wrap:nowrap}.demo-bar__tag{font-size:.8125rem}}

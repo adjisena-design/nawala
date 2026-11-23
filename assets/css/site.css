@@ -1465,3 +1465,23 @@ main{overflow-x:clip}
   .svc.svc--lead > .svc__fig{order:5;margin-top:1rem}
   .svc .svc__fig .garis--panggung,.svc.svc--lead .svc__fig .garis--panggung{width:min(100%,calc(40svh * 1.25))}
 }
+
+/* ---------- The demo chooser (owner, 23 Nov 2026): "Demo" in the menu opens three named demos ---------- */
+.pop--demo{width:min(1040px,calc(100vw - 24px));margin:auto;height:fit-content;max-height:calc(100svh - 24px)}
+.pop--demo .pop__box{padding:1.4rem 1.4rem 1.6rem;overflow:auto;max-height:calc(100svh - 24px)}
+.pop--demo .pop__head h2{font-size:clamp(1.5rem,3vw,2rem);padding-right:3.6rem}
+.demo__lead{margin:.5rem 0 1.1rem;max-width:60ch;font-size:1.0625rem;line-height:1.5}
+.demo__cards{display:grid;gap:.8rem}
+.demo__card{display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:.9rem;row-gap:.15rem;align-items:center;text-align:left;padding:.8rem 1rem;border:0;border-radius:22px;cursor:pointer;color:var(--ink);font:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,247,250,.9));box-shadow:inset 0 0 0 1px rgba(216,67,107,.16);transition:transform .25s var(--ease,ease),box-shadow .25s}
+.demo__card:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1.5px rgba(216,67,107,.4),0 18px 30px -22px rgba(58,48,53,.5)}
+.demo__card .garis{grid-row:1 / span 3;width:112px;margin:0;pointer-events:none}
+.demo__card b{font:600 1.25rem/1.2 var(--display)}
+.demo__card > span:not(.garis){font-size:1.0625rem;line-height:1.45}
+.demo__card i{font-style:normal;font-weight:700;font-size:1.0625rem;color:#B8324A}
+@media (min-width:860px){
+  .demo__cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .demo__card{grid-template-columns:minmax(0,1fr);align-content:start;padding:1rem 1.1rem 1.2rem;row-gap:.4rem}
+  .demo__card .garis{grid-row:auto;width:min(100%,220px);justify-self:center}
+}
+dialog.pop--demo:focus,dialog.pop--demo:focus-visible{outline:none}
