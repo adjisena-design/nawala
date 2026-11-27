@@ -1,0 +1,137 @@
+/* Nawala Dasar, the living themes (family "hidup", since 27 Nov 2026).
+   A scroll invitation whose scenery is built from separate cut-outs that keep moving:
+   - .hd (inside .backdrop, fixed): the sky, far pieces, a garland along the top, a meadow along the bottom, and the
+     falling or rising particles. Far, top and foot shift with the scroll at their own depth (hidup.js writes one
+     transform per layer); what they hold sways on its own clock.
+   - .hd-gap (inside the page, before a block): an interlude of two or three pieces that slide against each other
+     while the page scrolls, and bloom in once.
+   - the theme's flowers on the corner of every card (--bunga, --bunga2), swaying from the corner.
+   Only transform and opacity move. Everything is still under reduced motion and with ?still=1 (used to bake the
+   theme's still picture). Themes and their pieces come from tools/hidup.py: do not edit the block at the end by hand. */
+
+[data-art="hidup"] .backdrop{background:var(--hd-sky,var(--tone))}
+.hd{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:strict}
+.hd i,.hd b,.hd-gap i,.hd-gap b,.hd-hero i,.hd-hero b{display:block;position:absolute;font-style:normal}
+.hd b,.hd-gap b,.hd-hero b{inset:0;background:50% 50%/contain no-repeat}
+
+/* far pieces: placed by their centre (--x, --y in % of the screen), sized by width (--w) */
+.hd__far{left:var(--x,50%);top:var(--y,50%);width:var(--w,60%);aspect-ratio:var(--r,1);margin-left:calc(var(--w,60%) / -2);opacity:var(--o,1);will-change:transform}
+.hd__far b{transform:translateY(-50%)}
+/* garland: hangs from the top edge; --up hides that share of its own height above the screen */
+.hd__top{top:0;left:var(--x,0);width:var(--w,100%);aspect-ratio:var(--r,2);will-change:transform}
+.hd__top b{transform-origin:50% 0;top:calc(var(--up,0) * -1%);bottom:auto;height:100%}
+.hd__top.is-right{left:auto;right:var(--x,0)}
+/* meadow: stands on the bottom edge; --down sinks that share of its height below the screen */
+.hd__foot{bottom:0;left:var(--x,0);width:var(--w,100%);aspect-ratio:var(--r,2);will-change:transform}
+.hd__foot b{transform-origin:50% 100%;top:auto;bottom:calc(var(--down,0) * -1%);height:100%}
+.hd__foot.is-right{left:auto;right:var(--x,0)}
+.hd .is-flip b,.hd-gap .is-flip b,.hd-hero .is-flip b{scale:-1 1}
+
+/* what the pieces do while nobody scrolls */
+@keyframes hd-sway{from{transform:rotate(calc(var(--a,2deg) * -1))}to{transform:rotate(var(--a,2deg))}}
+@keyframes hd-sway-far{from{transform:translateY(-50%) rotate(calc(var(--a,1.5deg) * -1))}to{transform:translateY(-50%) rotate(var(--a,1.5deg))}}
+@keyframes hd-breathe{from{transform:translateY(-50%) scale(1)}to{transform:translateY(-52%) scale(1.035)}}
+@keyframes hd-turn{from{transform:translateY(-50%) rotate(0)}to{transform:translateY(-50%) rotate(360deg)}}
+@keyframes hd-bob{from{transform:translateY(-4%) rotate(-2deg)}to{transform:translateY(4%) rotate(2deg)}}
+.hd__top b,.hd__foot b{animation:hd-sway var(--t,7s) ease-in-out var(--dl,0s) infinite alternate}
+.hd__far[data-move="sway"] b{animation:hd-sway-far var(--t,8s) ease-in-out var(--dl,0s) infinite alternate}
+.hd__far[data-move="breathe"] b{animation:hd-breathe var(--t,9s) ease-in-out var(--dl,0s) infinite alternate}
+.hd__far[data-move="turn"] b{animation:hd-turn var(--t,120s) linear infinite}
+
+/* particles: the outer piece travels, the inner one sways and turns */
+.hd__fx{position:absolute;inset:0}
+.hd__fx i{left:var(--x);top:0;width:var(--s);height:var(--s);opacity:0;will-change:transform,opacity}
+.hd__fx b{animation:hd-flutter var(--ft,3.4s) ease-in-out var(--dl,0s) infinite alternate}
+.hd__fx .dot b{border-radius:50%;background:radial-gradient(closest-side,var(--hd-dot,#fff) 0,var(--hd-dot,#fff) 35%,transparent 100%)}
+@keyframes hd-fall{0%{transform:translate3d(0,-12vh,0);opacity:0}8%{opacity:var(--o,1)}88%{opacity:var(--o,1)}100%{transform:translate3d(var(--dx,6vw),112vh,0);opacity:0}}
+@keyframes hd-rise{0%{transform:translate3d(0,108vh,0);opacity:0}12%{opacity:var(--o,1)}80%{opacity:var(--o,1)}100%{transform:translate3d(var(--dx,4vw),-10vh,0);opacity:0}}
+@keyframes hd-float{0%{transform:translate3d(0,var(--y0,50vh),0);opacity:0}20%{opacity:var(--o,1)}80%{opacity:var(--o,1)}100%{transform:translate3d(var(--dx,8vw),calc(var(--y0,50vh) - 14vh),0);opacity:0}}
+@keyframes hd-flutter{from{transform:translateX(-9px) rotate(var(--r0,-40deg))}to{transform:translateX(9px) rotate(var(--r1,50deg))}}
+.hd__fx[data-kind="fall"] i{animation:hd-fall var(--d,12s) linear var(--dl,0s) infinite}
+.hd__fx[data-kind="rise"] i{animation:hd-rise var(--d,14s) linear var(--dl,0s) infinite}
+.hd__fx[data-kind="float"] i{animation:hd-float var(--d,10s) ease-in-out var(--dl,0s) infinite}
+/* a creature or a little car crossing the screen, behind the cards */
+.hd__fly{top:var(--y,30%);left:0;width:var(--w,84px);aspect-ratio:var(--r,1);opacity:0;animation:hd-cross var(--d,22s) linear var(--dl,2s) infinite}
+.hd__fly b{animation:hd-bob 1.6s ease-in-out infinite alternate}
+.hd__fly.is-flip{animation-name:hd-cross-back}
+@keyframes hd-cross{0%{transform:translate3d(-120%,0,0);opacity:1}100%{transform:translate3d(calc(min(100vw,var(--col)) + 20%),var(--dy,-6vh),0);opacity:1}}
+@keyframes hd-cross-back{0%{transform:translate3d(calc(min(100vw,var(--col)) + 20%),0,0);opacity:1}100%{transform:translate3d(-120%,var(--dy,-6vh),0);opacity:1}}
+
+/* the cover: one large piece under the names, and room for the scenery */
+.hd-hero{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;overflow:visible}
+.cover > .hd-hero{position:absolute}
+.hd-hero i{left:var(--x,50%);top:var(--y,60%);width:var(--w,70%);aspect-ratio:var(--r,1);margin-left:calc(var(--w,70%) / -2);will-change:transform}
+.hd-hero b{transform:translateY(-50%) scale(.7);opacity:0;transition:transform 1.5s var(--spring) .25s,opacity 1s ease .25s}
+.is-inside .hd-hero b{transform:translateY(-50%);opacity:1}
+[data-art="hidup"] .flap-wrap{position:relative;z-index:1}
+
+[data-art="hidup"][data-tone="light"]{--halo:rgba(255,255,255,.86)}
+[data-art="hidup"][data-tone="dark"]{--halo:rgba(0,0,0,.5)}
+[data-art="hidup"] .cover{padding-top:max(17vh,calc(env(safe-area-inset-top) + 6.5rem))}
+[data-art="hidup"] .cover::before{top:max(9vh,4rem);height:44vh;background:radial-gradient(closest-side,var(--halo) 0,var(--halo) 52%,transparent 100%)}
+[data-art="hidup"] .flap{margin-top:2.5vh}
+[data-art="hidup"] .cover__cue{position:relative;inset:auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);align-self:center;padding:.45rem 1.1rem .3rem;border-radius:999px;color:var(--paper);background:rgba(var(--main-rgb),.84);text-shadow:none}
+
+/* interludes between the blocks */
+.hd-gap{position:relative;height:var(--gh,min(52vw,250px));margin:-.2rem -1.1rem;pointer-events:none}
+.hd-gap i{left:var(--x,50%);top:var(--y,50%);width:var(--w,50%);aspect-ratio:var(--r,1);margin-left:calc(var(--w,50%) / -2);will-change:transform}
+.hd-gap b{transform:translateY(-50%) scale(.55) rotate(var(--r0,-10deg));opacity:0;transition:transform 1.3s var(--spring) var(--dl,0s),opacity .8s ease var(--dl,0s);filter:drop-shadow(0 10px 12px rgba(var(--main-rgb),.16))}
+.hd-gap.is-in b{transform:translateY(-50%);opacity:1}
+@media (max-width:699px){.hd-gap b{filter:none}}
+
+/* cards: the theme's flowers on the corner, alive */
+[data-art="hidup"] .card{margin-top:.9rem}
+[data-art="hidup"] .card::after{content:"";position:absolute;z-index:1;left:-26px;top:-56px;width:min(34%,128px);aspect-ratio:1;background:var(--bunga) 0 0/contain no-repeat;pointer-events:none;transform-origin:18% 22%;animation:hd-corner 6.5s ease-in-out infinite alternate;animation-play-state:paused}
+[data-art="hidup"] .block > .card:nth-of-type(even)::after,[data-art="hidup"] .person:nth-of-type(even) .card::after{left:auto;right:-24px;background-image:var(--bunga2,var(--bunga));transform-origin:82% 22%;animation-name:hd-corner-r;animation-delay:-2.4s}
+[data-art="hidup"] .is-live .card::after{animation-play-state:running}
+[data-art="hidup"] .card > :first-child{margin-left:29%;margin-right:0}
+[data-art="hidup"] .block > .card:nth-of-type(even) > :first-child{margin-left:0;margin-right:29%}
+[data-art="hidup"] .block .card.card--center > :first-child{margin-inline:0}
+[data-art="hidup"][data-corner="none"] .card::after{display:none}
+[data-art="hidup"][data-corner="none"] .card > :first-child{margin-inline:0}
+@keyframes hd-corner{from{transform:rotate(-3.5deg)}to{transform:rotate(3deg) scale(1.03)}}
+@keyframes hd-corner-r{from{transform:scaleX(-1) rotate(-3.5deg)}to{transform:scaleX(-1) rotate(3deg) scale(1.03)}}
+/* the couple's frames and the count keep clear of the scenery */
+[data-art="hidup"] .on-plate h2,[data-art="hidup"] .on-plate p{position:relative}
+[data-art="hidup"] .on-plate{position:relative;padding:.9rem .6rem;border-radius:26px;background:radial-gradient(closest-side,var(--halo) 0,var(--halo) 45%,transparent 100%)}
+[data-art="hidup"] .pairup__and{background:radial-gradient(closest-side,var(--halo) 0,transparent 100%);padding:.4rem 1.6rem;border-radius:50%}
+
+.hd-still .hd *,.hd-still .hd-gap *,.hd-still .hd-hero *,.hd-still .card::after{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){
+  .hd__fx,.hd__fly{display:none}
+  .hd-gap b,.is-inside .hd-hero b,.hd-hero b{transform:translateY(-50%);opacity:1}
+}
+
+/* ---------- The themes: sky, palette, corner flowers and the still picture (tools/hidup.py) ---------- */
+/* gen:tema */
+[data-theme="lili-merona"]{--plate:url("../assets/img/hidup/plate-lili-merona.webp");--hd-sky:linear-gradient(180deg,#FFF6F7 0,#FDE9EE 52%,#F9D6DF 100%);--bunga:url("../assets/img/hidup/h5.webp");--bunga2:url("../assets/img/hidup/h7.webp");--tone:#FDE9EE;--main:#5A2C3B;--main-rgb:90,44,59;--accent:#D0577E;--accent-rgb:208,87,126;--accent-soft:#EAB3C5;--accent-wash:#F7E4EA;--paper:#FDF9FA;--paper-2:#FAEEF2;--mist:#FAEEF2;--deep:#321820}
+[data-theme="lili-gading"]{--plate:url("../assets/img/hidup/plate-lili-gading.webp");--hd-sky:linear-gradient(180deg,#F5F8EE 0,#FAF7EA 55%,#F3EAD2 100%);--bunga:url("../assets/img/hidup/h52.webp");--bunga2:url("../assets/img/hidup/h25.webp");--tone:#FAF7EA;--main:#3D4530;--main-rgb:61,69,48;--accent:#A8903F;--accent-rgb:168,144,63;--accent-soft:#D8CDA9;--accent-wash:#F1EDE0;--paper:#FCFBF8;--paper-2:#F6F4EC;--mist:#F6F4EC;--deep:#22261A}
+[data-theme="sakura-gugur"]{--plate:url("../assets/img/hidup/plate-sakura-gugur.webp");--hd-sky:linear-gradient(180deg,#FFF8FA 0,#FDEBF0 50%,#F9DCE5 100%);--bunga:url("../assets/img/hidup/h77.webp");--bunga2:url("../assets/img/hidup/h79.webp");--tone:#FDEBF0;--main:#5B2B3F;--main-rgb:91,43,63;--accent:#D75E86;--accent-rgb:215,94,134;--accent-soft:#EDB7C9;--accent-wash:#F9E5EC;--paper:#FEF9FB;--paper-2:#FBEFF3;--mist:#FBEFF3;--deep:#321823}
+[data-theme="fuji-semi"]{--plate:url("../assets/img/hidup/plate-fuji-semi.webp");--hd-sky:linear-gradient(180deg,#CFE6F8 0,#EAF4FC 46%,#FDF1F4 100%);--bunga:url("../assets/img/hidup/h77.webp");--bunga2:url("../assets/img/hidup/h88.webp");--tone:#EAF4FC;--main:#2C4560;--main-rgb:44,69,96;--accent:#D8628A;--accent-rgb:216,98,138;--accent-soft:#EDB8CA;--accent-wash:#F9E6EC;--paper:#FEFAFB;--paper-2:#FBEFF3;--mist:#FBEFF3;--deep:#182635}
+[data-theme="ladang-poppy"]{--plate:url("../assets/img/hidup/plate-ladang-poppy.webp");--hd-sky:linear-gradient(180deg,#DDEEF9 0,#F3F8F4 50%,#FCF6E2 100%);--bunga:url("../assets/img/hidup/h240.webp");--bunga2:url("../assets/img/hidup/h251.webp");--tone:#F3F8F4;--main:#34432C;--main-rgb:52,67,44;--accent:#C8442F;--accent-rgb:200,68,47;--accent-soft:#E6ABA1;--accent-wash:#F6E1DE;--paper:#FDF8F8;--paper-2:#FAECEA;--mist:#FAECEA;--deep:#1D2518}
+[data-theme="padang-aster"]{--plate:url("../assets/img/hidup/plate-padang-aster.webp");--hd-sky:linear-gradient(180deg,#EEF6E2 0,#FAFAE9 55%,#FFF3CC 100%);--bunga:url("../assets/img/hidup/h163.webp");--bunga2:url("../assets/img/hidup/h176.webp");--tone:#FAFAE9;--main:#3B4628;--main-rgb:59,70,40;--accent:#C79A1F;--accent-rgb:199,154,31;--accent-soft:#E6D29A;--accent-wash:#F6EFDB;--paper:#FDFBF7;--paper-2:#F9F5E9;--mist:#F9F5E9;--deep:#202616}
+[data-theme="kebun-rahasia"]{--plate:url("../assets/img/hidup/plate-kebun-rahasia.webp");--hd-sky:linear-gradient(180deg,#E3EEDC 0,#F1F5E6 55%,#F8F4DF 100%);--bunga:url("../assets/img/hidup/h204.webp");--bunga2:url("../assets/img/hidup/h213.webp");--tone:#F1F5E6;--main:#27402B;--main-rgb:39,64,43;--accent:#5E8A46;--accent-rgb:94,138,70;--accent-soft:#B7CAAC;--accent-wash:#E5ECE1;--paper:#F9FBF9;--paper-2:#EFF3EC;--mist:#EFF3EC;--deep:#152318}
+[data-theme="wisteria-ungu"]{--plate:url("../assets/img/hidup/plate-wisteria-ungu.webp");--hd-sky:linear-gradient(180deg,#F1EAFB 0,#F8F3FE 52%,#FBEFF6 100%);--bunga:url("../assets/img/hidup/h69.webp");--bunga2:url("../assets/img/hidup/h62.webp");--tone:#F8F3FE;--main:#3F2D5E;--main-rgb:63,45,94;--accent:#8B5FC2;--accent-rgb:139,95,194;--accent-soft:#CBB7E4;--accent-wash:#ECE5F5;--paper:#FBF9FD;--paper-2:#F3EFF9;--mist:#F3EFF9;--deep:#231934}
+[data-theme="gapura-mawar"]{--plate:url("../assets/img/hidup/plate-gapura-mawar.webp");--hd-sky:linear-gradient(180deg,#FBF4EA 0,#FCEFE6 55%,#F7DFD6 100%);--bunga:url("../assets/img/hidup/h274v.webp");--bunga2:url("../assets/img/hidup/h278.webp");--tone:#FCEFE6;--main:#553228;--main-rgb:85,50,40;--accent:#C96F6A;--accent-rgb:201,111,106;--accent-soft:#E7BEBC;--accent-wash:#F6E8E7;--paper:#FDFAFA;--paper-2:#FAF1F0;--mist:#FAF1F0;--deep:#2F1C16}
+[data-theme="rimba-tropis"]{--plate:url("../assets/img/hidup/plate-rimba-tropis.webp");--hd-sky:linear-gradient(180deg,#DDEEDD 0,#EEF6E6 52%,#F8F5DC 100%);--bunga:url("../assets/img/hidup/h226.webp");--bunga2:url("../assets/img/hidup/h236.webp");--tone:#EEF6E6;--main:#1E3F2B;--main-rgb:30,63,43;--accent:#D6593E;--accent-rgb:214,89,62;--accent-soft:#EDB4A8;--accent-wash:#F8E4E0;--paper:#FEF9F8;--paper-2:#FBEEEC;--mist:#FBEEEC;--deep:#102318}
+[data-theme="kembang-sepatu"]{--plate:url("../assets/img/hidup/plate-kembang-sepatu.webp");--hd-sky:linear-gradient(180deg,#FFF4EA 0,#FFE8DA 52%,#FFD4C2 100%);--bunga:url("../assets/img/hidup/h23.webp");--bunga2:url("../assets/img/hidup/h65.webp");--tone:#FFE8DA;--main:#5C2E22;--main-rgb:92,46,34;--accent:#E0603F;--accent-rgb:224,96,63;--accent-soft:#F1B7A9;--accent-wash:#FAE6E0;--paper:#FEF9F8;--paper-2:#FCEFEC;--mist:#FCEFEC;--deep:#331913}
+[data-theme="emas-malam"]{--plate:url("../assets/img/hidup/plate-emas-malam.webp");--hd-sky:linear-gradient(180deg,#0C1322 0,#141D33 55%,#1E2742 100%);--bunga:url("../assets/img/hidup/h289.webp");--bunga2:url("../assets/img/hidup/h292v.webp");--tone:#141D33;--main:#1A2540;--main-rgb:26,37,64;--accent:#C9A24B;--accent-rgb:201,162,75;--accent-soft:#E7D5AE;--accent-wash:#F6F0E2;--paper:#FDFCF9;--paper-2:#FAF6ED;--mist:#FAF6ED;--deep:#0E1423}
+[data-theme="kolibri-emas"]{--plate:url("../assets/img/hidup/plate-kolibri-emas.webp");--hd-sky:linear-gradient(180deg,#FCF8EE 0,#F8F0DC 55%,#F1E3C2 100%);--bunga:url("../assets/img/hidup/h290v.webp");--bunga2:url("../assets/img/hidup/h294v.webp");--tone:#F8F0DC;--main:#4A3A1C;--main-rgb:74,58,28;--accent:#B8902F;--accent-rgb:184,144,47;--accent-soft:#DFCDA1;--accent-wash:#F4EDDE;--paper:#FDFBF8;--paper-2:#F8F4EA;--mist:#F8F4EA;--deep:#29200F}
+[data-theme="merak-zamrud"]{--plate:url("../assets/img/hidup/plate-merak-zamrud.webp");--hd-sky:linear-gradient(180deg,#0B2622 0,#0F3530 55%,#15443C 100%);--bunga:url("../assets/img/hidup/h291v.webp");--bunga2:url("../assets/img/hidup/h302h.webp");--tone:#0F3530;--main:#123A33;--main-rgb:18,58,51;--accent:#C9A24B;--accent-rgb:201,162,75;--accent-soft:#E7D5AE;--accent-wash:#F6F0E2;--paper:#FDFCF9;--paper-2:#FAF6ED;--mist:#FAF6ED;--deep:#0A201C}
+[data-theme="herbarium"]{--plate:url("../assets/img/hidup/plate-herbarium.webp");--hd-sky:linear-gradient(180deg,#F6F0E1 0,#F1E8D4 55%,#EADDC2 100%);--bunga:url("../assets/img/hidup/h163.webp");--bunga2:url("../assets/img/hidup/h176.webp");--tone:#F1E8D4;--main:#4B3C28;--main-rgb:75,60,40;--accent:#9C7A46;--accent-rgb:156,122,70;--accent-soft:#D2C3AC;--accent-wash:#EFEAE1;--paper:#FCFAF9;--paper-2:#F5F2EC;--mist:#F5F2EC;--deep:#292116}
+[data-theme="bunga-tekan"]{--plate:url("../assets/img/hidup/plate-bunga-tekan.webp");--hd-sky:linear-gradient(180deg,#FCF9F1 0,#F8F1E3 55%,#F3E7D2 100%);--bunga:url("../assets/img/hidup/h178.webp");--bunga2:url("../assets/img/hidup/h179.webp");--tone:#F8F1E3;--main:#4A3B33;--main-rgb:74,59,51;--accent:#C5566B;--accent-rgb:197,86,107;--accent-soft:#E5B3BC;--accent-wash:#F6E4E7;--paper:#FDF9FA;--paper-2:#F9EEF0;--mist:#F9EEF0;--deep:#29201C}
+[data-theme="puncak-pagi"]{--plate:url("../assets/img/hidup/plate-puncak-pagi.webp");--hd-sky:linear-gradient(180deg,#BFDDF4 0,#E2F0FA 45%,#FFF4DC 100%);--tone:#E2F0FA;--main:#27405A;--main-rgb:39,64,90;--accent:#C98A2B;--accent-rgb:201,138,43;--accent-soft:#E7CAA0;--accent-wash:#F6ECDD;--paper:#FDFBF8;--paper-2:#FAF3EA;--mist:#FAF3EA;--deep:#152332}
+[data-theme="desa-alpen"]{--plate:url("../assets/img/hidup/plate-desa-alpen.webp");--hd-sky:linear-gradient(180deg,#A9C9E6 0,#CFE1F1 50%,#EEF4F9 100%);--tone:#CFE1F1;--main:#263F57;--main-rgb:38,63,87;--accent:#B5563C;--accent-rgb:181,86,60;--accent-soft:#DEB3A7;--accent-wash:#F3E4E0;--paper:#FCF9F8;--paper-2:#F8EEEC;--mist:#F8EEEC;--deep:#152330}
+[data-theme="jelajah-berdua"]{--plate:url("../assets/img/hidup/plate-jelajah-berdua.webp");--hd-sky:linear-gradient(180deg,#CDE7F2 0,#EEF6F1 50%,#FBF1D8 100%);--tone:#EEF6F1;--main:#28424B;--main-rgb:40,66,75;--accent:#D8732E;--accent-rgb:216,115,46;--accent-soft:#EDC0A1;--accent-wash:#F9E9DE;--paper:#FEFAF8;--paper-2:#FBF1EA;--mist:#FBF1EA;--deep:#162429}
+[data-theme="pastel-semi"]{--plate:url("../assets/img/hidup/plate-pastel-semi.webp");--hd-sky:linear-gradient(180deg,#FDF7F4 0,#F8F2F8 50%,#EEF3FB 100%);--bunga:url("../assets/img/hidup/h43.webp");--bunga2:url("../assets/img/hidup/h249.webp");--tone:#F8F2F8;--main:#4A3F5C;--main-rgb:74,63,92;--accent:#D2749A;--accent-rgb:210,116,154;--accent-soft:#EBC0D2;--accent-wash:#F8E9EF;--paper:#FDFAFB;--paper-2:#FAF1F5;--mist:#FAF1F5;--deep:#292333}
+[data-theme="peoni-merona"]{--plate:url("../assets/img/hidup/plate-peoni-merona.webp");--hd-sky:linear-gradient(180deg,#FEF5F2 0,#FCE7E2 52%,#F7D2CC 100%);--bunga:url("../assets/img/hidup/h34.webp");--bunga2:url("../assets/img/hidup/h30.webp");--tone:#FCE7E2;--main:#5B2E33;--main-rgb:91,46,51;--accent:#D26676;--accent-rgb:210,102,118;--accent-soft:#EBBAC1;--accent-wash:#F8E7E9;--paper:#FDFAFA;--paper-2:#FAF0F1;--mist:#FAF0F1;--deep:#32191C}
+[data-theme="hortensia-salju"]{--plate:url("../assets/img/hidup/plate-hortensia-salju.webp");--hd-sky:linear-gradient(180deg,#EAF2E6 0,#F5F8F0 52%,#FBF8EC 100%);--bunga:url("../assets/img/hidup/h276.webp");--bunga2:url("../assets/img/hidup/h213.webp");--tone:#F5F8F0;--main:#2F4433;--main-rgb:47,68,51;--accent:#6E9457;--accent-rgb:110,148,87;--accent-soft:#BECFB3;--accent-wash:#E8EEE4;--paper:#FAFBF9;--paper-2:#F0F4EE;--mist:#F0F4EE;--deep:#1A251C}
+[data-theme="jingga-senja"]{--plate:url("../assets/img/hidup/plate-jingga-senja.webp");--hd-sky:linear-gradient(180deg,#FFEED8 0,#FFD9B6 52%,#F8B99C 100%);--bunga:url("../assets/img/hidup/h63.webp");--bunga2:url("../assets/img/hidup/h206.webp");--tone:#FFD9B6;--main:#5A2D17;--main-rgb:90,45,23;--accent:#D9661F;--accent-rgb:217,102,31;--accent-soft:#EEBA9A;--accent-wash:#F9E7DB;--paper:#FEFAF7;--paper-2:#FBF0E9;--mist:#FBF0E9;--deep:#32190D}
+[data-theme="krokus-ungu"]{--plate:url("../assets/img/hidup/plate-krokus-ungu.webp");--hd-sky:linear-gradient(180deg,#EEE8FA 0,#F7F3FD 52%,#FBF3EE 100%);--bunga:url("../assets/img/hidup/h69.webp");--bunga2:url("../assets/img/hidup/h193.webp");--tone:#F7F3FD;--main:#3A2C5A;--main-rgb:58,44,90;--accent:#7C55C0;--accent-rgb:124,85,192;--accent-soft:#C4B2E3;--accent-wash:#EAE4F5;--paper:#FAF9FD;--paper-2:#F2EEF9;--mist:#F2EEF9;--deep:#201832}
+[data-theme="boho-pampas"]{--plate:url("../assets/img/hidup/plate-boho-pampas.webp");--hd-sky:linear-gradient(180deg,#F8EEE0 0,#F2E0CB 55%,#E8CDB2 100%);--bunga:url("../assets/img/hidup/h161.webp");--bunga2:url("../assets/img/hidup/h159.webp");--tone:#F2E0CB;--main:#553727;--main-rgb:85,55,39;--accent:#B8693F;--accent-rgb:184,105,63;--accent-soft:#DFBCA9;--accent-wash:#F4E7E0;--paper:#FDFAF8;--paper-2:#F8F0EC;--mist:#F8F0EC;--deep:#2F1E15}
+[data-theme="ladang-matahari"]{--plate:url("../assets/img/hidup/plate-ladang-matahari.webp");--hd-sky:linear-gradient(180deg,#FFF9E0 0,#FFF2C6 52%,#FFE49A 100%);--bunga:url("../assets/img/hidup/h187.webp");--bunga2:url("../assets/img/hidup/h192.webp");--tone:#FFF2C6;--main:#4E3A12;--main-rgb:78,58,18;--accent:#D99A12;--accent-rgb:217,154,18;--accent-soft:#EED294;--accent-wash:#F9EFD9;--paper:#FEFBF7;--paper-2:#FBF5E7;--mist:#FBF5E7;--deep:#2B200A}
+[data-theme="lili-marun"]{--plate:url("../assets/img/hidup/plate-lili-marun.webp");--hd-sky:linear-gradient(180deg,#22090F 0,#34111A 55%,#441823 100%);--bunga:url("../assets/img/hidup/h184.webp");--bunga2:url("../assets/img/hidup/h177.webp");--tone:#34111A;--main:#4A1620;--main-rgb:74,22,32;--accent:#C9A24B;--accent-rgb:201,162,75;--accent-soft:#E7D5AE;--accent-wash:#F6F0E2;--paper:#FDFCF9;--paper-2:#FAF6ED;--mist:#FAF6ED;--deep:#290C12}
+[data-theme="gerbera-ceria"]{--plate:url("../assets/img/hidup/plate-gerbera-ceria.webp");--hd-sky:linear-gradient(180deg,#FFF5F6 0,#FFE9EA 52%,#FFDCCF 100%);--bunga:url("../assets/img/hidup/h61.webp");--bunga2:url("../assets/img/hidup/h64.webp");--tone:#FFE9EA;--main:#5A2A36;--main-rgb:90,42,54;--accent:#E0527A;--accent-rgb:224,82,122;--accent-soft:#F1B1C3;--accent-wash:#FAE3EA;--paper:#FEF9FA;--paper-2:#FCEEF2;--mist:#FCEEF2;--deep:#32171E}
+[data-theme="pesta-topeng"]{--plate:url("../assets/img/hidup/plate-pesta-topeng.webp");--hd-sky:linear-gradient(180deg,#110D1B 0,#1B1430 55%,#271B42 100%);--bunga:url("../assets/img/hidup/h142r.webp");--bunga2:url("../assets/img/hidup/h301v.webp");--tone:#1B1430;--main:#231A3D;--main-rgb:35,26,61;--accent:#C9A24B;--accent-rgb:201,162,75;--accent-soft:#E7D5AE;--accent-wash:#F6F0E2;--paper:#FDFCF9;--paper-2:#FAF6ED;--mist:#FAF6ED;--deep:#130E22}
+[data-theme="sakura-malam"]{--plate:url("../assets/img/hidup/plate-sakura-malam.webp");--hd-sky:linear-gradient(180deg,#10162C 0,#1B2042 52%,#2E2750 100%);--bunga:url("../assets/img/hidup/h77.webp");--bunga2:url("../assets/img/hidup/h79.webp");--tone:#1B2042;--main:#1E2346;--main-rgb:30,35,70;--accent:#E27FA2;--accent-rgb:226,127,162;--accent-soft:#F2C5D5;--accent-wash:#FAEBF0;--paper:#FEFBFC;--paper-2:#FCF2F6;--mist:#FCF2F6;--deep:#101326}
+/* /gen:tema */

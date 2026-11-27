@@ -24,7 +24,7 @@ def T(p, tag='span', cls='', attrs=''):
 # ---------- figures numbers (developer mode: exact; owner, 23 Nov 2026) ----------
 # Later the owner will hide exact numbers behind words such as "ratusan"; change MODE to 'kira' and run again.
 MODE = 'pasti'
-N = {'tema': 122, 'dasar': 84, 'premium': 32, 'eksklusif': 6, 'contoh': 92, 'dunia': 8, 'demo': 3, 'huruf': 43, 'elemen': 38, 'bingkai': 12}
+N = {'tema': 152, 'dasar': 114, 'premium': 32, 'eksklusif': 6, 'contoh': 122, 'dunia': 8, 'demo': 3, 'huruf': 43, 'elemen': 38, 'bingkai': 12}
 def num(k, kira=('ratusan', 'hundreds')):
     return str(N[k]) if MODE == 'pasti' else kira
 

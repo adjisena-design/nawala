@@ -125,9 +125,42 @@
     'langit-ungu': ["Langit Ungu", "Violet Sky", 'light', 'waktu'],
     'padang': ["Padang Rumput", "Grassland", 'light', 'waktu'],
     'laut-subuh': ["Laut Subuh", "Sea at Dawn", 'light', 'waktu'],
-    'bintang-jatuh': ["Bintang Jatuh", "Shooting Stars", 'dark', 'waktu']
+    'bintang-jatuh': ["Bintang Jatuh", "Shooting Stars", 'dark', 'waktu'],
+    /* the living themes (27 Nov 2026, family hidup): scenery in moving layers, see hidup.js; written by tools/hidup.py */
+    /* gen:hidup */
+    "lili-merona": ["Lili Merona", "Blushing Lilies", "light", "hidup"],
+    "lili-gading": ["Lili Gading", "Ivory Lilies", "light", "hidup"],
+    "sakura-gugur": ["Sakura Berguguran", "Falling Cherry Blossom", "light", "hidup"],
+    "fuji-semi": ["Fuji Musim Semi", "Fuji in Spring", "light", "hidup"],
+    "ladang-poppy": ["Ladang Poppy", "Poppy Field", "light", "hidup"],
+    "padang-aster": ["Padang Aster", "Daisy Meadow", "light", "hidup"],
+    "kebun-rahasia": ["Kebun Rahasia", "Secret Garden", "light", "hidup"],
+    "wisteria-ungu": ["Wisteria Ungu", "Purple Wisteria", "light", "hidup"],
+    "gapura-mawar": ["Gapura Mawar", "Rose Arch", "light", "hidup"],
+    "rimba-tropis": ["Rimba Tropis", "Tropical Jungle", "light", "hidup"],
+    "kembang-sepatu": ["Kembang Sepatu", "Hibiscus", "light", "hidup"],
+    "emas-malam": ["Emas Malam", "Gold at Night", "dark", "hidup"],
+    "kolibri-emas": ["Kolibri Emas", "Golden Hummingbirds", "light", "hidup"],
+    "merak-zamrud": ["Merak Zamrud", "Emerald Peacock", "dark", "hidup"],
+    "herbarium": ["Herbarium", "Herbarium", "light", "hidup"],
+    "bunga-tekan": ["Bunga Tekan", "Pressed Flowers", "light", "hidup"],
+    "puncak-pagi": ["Puncak Pagi", "Morning Peaks", "light", "hidup"],
+    "desa-alpen": ["Desa Alpen", "Alpine Village", "light", "hidup"],
+    "jelajah-berdua": ["Jelajah Berdua", "Adventure for Two", "light", "hidup"],
+    "pastel-semi": ["Pastel Musim Semi", "Spring Pastels", "light", "hidup"],
+    "peoni-merona": ["Peoni Merona", "Blushing Peonies", "light", "hidup"],
+    "hortensia-salju": ["Hortensia Salju", "Snow Hydrangea", "light", "hidup"],
+    "jingga-senja": ["Jingga Senja", "Orange Dusk", "light", "hidup"],
+    "krokus-ungu": ["Krokus Ungu", "Violet Crocus", "light", "hidup"],
+    "boho-pampas": ["Boho Pampas", "Boho Pampas", "light", "hidup"],
+    "ladang-matahari": ["Ladang Matahari", "Sunflower Field", "light", "hidup"],
+    "lili-marun": ["Lili Marun", "Maroon Lily", "dark", "hidup"],
+    "gerbera-ceria": ["Gerbera Ceria", "Cheerful Gerbera", "light", "hidup"],
+    "pesta-topeng": ["Pesta Topeng", "Masquerade", "dark", "hidup"],
+    "sakura-malam": ["Sakura Malam", "Cherry Blossom Night", "dark", "hidup"],
+/* /gen:hidup */
   };
-  var GROUPS = [['foto', 'Foto', 'Photographs'], ['bunga', 'Bunga dan warna', 'Flowers and colour'], ['tempat', 'Tempat di Indonesia', 'Places in Indonesia'], ['budaya', 'Iman dan budaya', 'Faith and culture'], ['waktu', 'Musim dan waktu', 'Seasons and times of day']];
+  var GROUPS = [['foto', 'Foto', 'Photographs'], ['bunga', 'Bunga dan warna', 'Flowers and colour'], ['tempat', 'Tempat di Indonesia', 'Places in Indonesia'], ['budaya', 'Iman dan budaya', 'Faith and culture'], ['waktu', 'Musim dan waktu', 'Seasons and times of day'], ['hidup', 'Lukisan hidup', 'Living pictures']];
 
   var state = {
     lang: params.lang === 'en' ? 'en' : (params.lang === 'id' ? 'id' : (store('nawala-lang') === 'en' ? 'en' : 'id')),
@@ -524,8 +557,9 @@
     if (!THEMES[slug]) return;
     state.theme = slug;
     root.setAttribute('data-theme', slug); root.setAttribute('data-tone', THEMES[slug][2]);
-    root.setAttribute('data-art', THEMES[slug][3] ? 'lukis' : 'foto');
+    root.setAttribute('data-art', THEMES[slug][3] === 'hidup' ? 'hidup' : (THEMES[slug][3] ? 'lukis' : 'foto'));
     root.setAttribute('data-family', THEMES[slug][3] || 'foto');
+    if (window.NAWALA_HIDUP_ENGINE) NAWALA_HIDUP_ENGINE.set(slug);   /* the moving scenery of a living theme; clears it for any other */
     if (window.NAWALA_DESIGN) NAWALA_DESIGN.apply(NAWALA_DESIGN.current());   /* frames follow the family */
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', getComputedStyle(root).getPropertyValue('--main').trim() || '#16301F');

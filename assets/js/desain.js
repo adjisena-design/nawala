@@ -61,7 +61,7 @@ window.NAWALA_DESIGN = (function () {
     ['ganda', 'Cincin ganda', 'Double ring'], ['gerigi', 'Gerigi', 'Scalloped'], ['segi8', 'Segi delapan', 'Octagon'], ['wajik', 'Wajik', 'Diamond'], ['karangan', 'Karangan daun', 'Leaf wreath'],
     ['emas', 'Lengkung emas', 'Gilded arch'], ['perangko', 'Perangko', 'Stamp']];
   /* each family starts with its own frame, so themes do not all look alike */
-  var FAMILY_FRAME = { foto: 'oval', bunga: 'karangan', tempat: 'lengkung', budaya: 'emas', waktu: 'ganda' };
+  var FAMILY_FRAME = { foto: 'oval', bunga: 'karangan', tempat: 'lengkung', budaya: 'emas', waktu: 'ganda', hidup: 'karangan' };
   var OPENINGS = [['nawala', 'Nawala membawa surat', 'Nawala brings the letter'], ['monogram', 'Segel monogram', 'Monogram seal'], ['foto', 'Foto berdua', 'Your photo'], ['tema', 'Bunga tema', 'The theme\'s flowers']];
   var BLOCKS = ['sampul', 'salam', 'mempelai', 'cerita', 'acara', 'galeri', 'rsvp', 'ucapan', 'hadiah', 'penutup'];
 
