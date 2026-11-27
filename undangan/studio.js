@@ -75,13 +75,13 @@
       back.href = '../tema/'; back.target = '_top';
       $('#who').textContent = t('Laras & Bima, pasangan contoh', 'Laras & Bima, the sample couple');
       $('#demo').hidden = false; document.body.classList.add('has-demo');
-      send.textContent = t('Gunakan tema ini', 'Use this theme');
+      sendLabel();
       demoBar();
       return show('dasar.html?edit=2&tema=' + encodeURIComponent(tema));
     }
     if (AS === 'tim') {
       back.href = '../tim/#undangan';
-      send.textContent = t('Kembali ke pesanan', 'Back to the order'); send.href = '../tim/#undangan';
+      sendLabel(); send.href = '../tim/#undangan';
       $('#mode-hak').hidden = false;
       who = stored('nawala-tim');
       if (!who) return stop(t('Masuk dulu ke konsol tim', 'Log in to the team console first'), t('Studio dibuka dari pesanan di konsol tim.', 'The Studio opens from an order in the team console.'), '../tim/', t('Buka konsol tim', 'Open the team console'));
@@ -93,7 +93,7 @@
       }, offline);
     }
     back.href = '../ruang/#undangan';
-    send.textContent = t('Kirim untuk diperiksa', 'Send for a check');
+    sendLabel();
     who = stored('nawala-code');
     if (!who) return stop(t('Masuk dulu ke ruang pasangan', 'Open your room first'), t('Studio dibuka dari halaman undangan di ruang kalian.', 'The Studio opens from the invitation page in your room.'), '../ruang/', t('Buka ruang pasangan', 'Open your room'));
     Promise.all([DB.rpc('room_open', { p_code: who }), DB.rpc('site_themes', {})]).then(function (r) {
@@ -139,7 +139,7 @@
     try { keepY = page.scrollY || 0; } catch (e) { keepY = 0; }
     sel = null;
     if (!SAMPLE) preview();
-    if (src) pv.src = src; else page.location.reload();
+    if (SAMPLE) pv.src = 'dasar.html?edit=2&tema=' + encodeURIComponent(tema) + '&r=' + Date.now(); else if (src) pv.src = src; else page.location.reload();
   }
   /* the sample's own names live in this tab only */
   function words() {
@@ -211,7 +211,7 @@
       sel = s; scope = 'semua'; confirmReset = false;
       if (s && s.kind === 'item') { if (mode !== 'stiker') return setMode('stiker', true); }
       else if (s && mode !== 'sentuh') return setMode('sentuh', true);
-      if (s && !wide.matches) { $('#side').classList.remove('is-shut'); setTimeout(function () { var sr = $('#side').getBoundingClientRect(), pr = pv.getBoundingClientRect(); if (page.NAWALA_EDIT.lift) page.NAWALA_EDIT.lift(s, (sr.top - pr.top) / pr.height); }, 80); }
+      if (s && !wide.matches) { $('#side').classList.remove('is-shut'); setTimeout(function () { var pr = pv.getBoundingClientRect(); if (page.NAWALA_EDIT.lift) page.NAWALA_EDIT.lift(s, ($('#side').offsetTop - pr.top) / pr.height); }, 80); }
       panel();
     },
     value: function (s) { if (s.kind === 'item') { var it = itemBy(s.id); return it ? { x: it.x, y: it.y, w: it.w, r: it.r } : { x: 50, y: 50, w: 40, r: 0 }; } var p = photoOf(s.id); return { x: p.x, y: p.y, z: p.z }; },
@@ -256,7 +256,21 @@
     side.classList.remove('is-shut');
     setMode(m);
   });
-  $('#grip').addEventListener('click', function () { $('#side').classList.toggle('is-shut'); });
+  /* phones: the sheet follows a finger on its grip or heading; let go past a third and it closes (the mode bar opens it again) */
+  (function () {
+    var side = $('#side'), y0 = null, dy = 0, moved = false;
+    function down(e) { if (wide.matches) return; y0 = e.clientY; dy = 0; moved = false; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} }
+    function move(e) { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); if (dy > 4) { moved = true; side.classList.add('is-drag'); side.style.transform = 'translateY(' + dy + 'px)'; side.style.opacity = String(Math.max(.3, 1 - dy / 400)); } }
+    function up() { if (y0 === null) return; var shut = dy > Math.min(120, side.offsetHeight / 3); y0 = null; side.classList.remove('is-drag'); side.style.transform = ''; side.style.opacity = ''; if (shut) side.classList.add('is-shut'); }
+    [$('#grip'), $('.side__head')].forEach(function (el) { el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); });
+    $('#grip').addEventListener('click', function () { if (!moved) side.classList.add('is-shut'); });
+  })();
+  /* short words for the one main action on phones, so the bar keeps its title */
+  function sendLabel() {
+    var s = !wide.matches;
+    $('#send').textContent = SAMPLE ? (s ? t('Pakai tema', 'Use theme') : t('Gunakan tema ini', 'Use this theme')) : AS === 'tim' ? (s ? t('Pesanan', 'Order') : t('Kembali ke pesanan', 'Back to the order')) : (s ? t('Kirim', 'Send') : t('Kirim untuk diperiksa', 'Send for a check'));
+  }
+  if (wide.addEventListener) wide.addEventListener('change', sendLabel);
 
   /* ---------- Building blocks of the panel ---------- */
   var LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
@@ -475,6 +489,7 @@
     body.setAttribute('data-for', mode + '|' + (sel ? sel.kind + sel.id : ''));
     if (same) { body.scrollTop = top; $$('.scr[data-k]', body).forEach(function (s) { var v = keep[s.getAttribute('data-k')]; if (v) s.scrollLeft = v; }); }
     else {
+      [body, $('.side__head')].forEach(function (el) { el.classList.remove('is-new'); void el.offsetWidth; el.classList.add('is-new'); });
       body.scrollTop = 0;
       $$('.scr[data-k]', body).forEach(function (s) { var on = s.querySelector('[aria-pressed="true"]'); if (on) s.scrollLeft = Math.max(0, on.offsetLeft - s.offsetLeft - 40); });
     }

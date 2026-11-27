@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FFFDFB">
 <link rel="icon" href="../assets/img/icon-64.png">
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/jakarta.woff2" crossorigin>
-<link rel="stylesheet" href="studio.css?v=20261127a">
+<link rel="stylesheet" href="studio.css?v=20261127b">
 <link rel="stylesheet" href="../assets/css/kit.css">
 </head>
 <body class="is-loading">
@@ -48,10 +48,12 @@
     <div class="phone"><iframe id="pv" title="Pratinjau undangan"></iframe></div>
   </section>
 
-  <aside class="side glass" id="side">
+  <div class="dock glass" id="dock">
+  <aside class="side" id="side">
     <button type="button" class="side__grip" id="grip" aria-label="Buka atau tutup panel"></button>
     <div class="side__head"><h1 id="sh"></h1><p id="sm"></p></div>
     <div class="side__body" id="body"></div>
+  </aside>
     <nav class="modes" id="modes" aria-label="Cara mengubah">
       <button type="button" data-mode="sentuh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.500a1.500 1.500 0 0 1 3 0V11"/><path d="M12 10V8.500a1.500 1.500 0 0 1 3 0V11"/><path d="M15 10.500a1.500 1.500 0 0 1 3 0V15a6 6 0 0 1-6 6h-.500a6 6 0 0 1-5-2.700L4 14.500a1.500 1.500 0 0 1 2.500-1.600L9 15.500"/></svg><span data-en="Tap">Sentuh</span></button>
       <button type="button" data-mode="gaya"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.800 4.700L18.500 9.500l-4.700 1.800L12 16l-1.800-4.700L5.500 9.500l4.700-1.800z"/><path d="M18 15.500 18.800 18l2.200.800-2.200.800L18 22l-.800-2.400L15 18.800l2.200-.800z"/></svg><span data-en="Looks">Gaya</span></button>
@@ -59,7 +61,7 @@
       <button type="button" data-mode="pembuka"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9 6 9-6"/><rect x="3" y="6" width="18" height="13" rx="2"/></svg><span data-en="Opening">Pembuka</span></button>
       <button type="button" data-mode="hak" id="mode-hak" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-en="Rights">Hak</span></button>
     </nav>
-  </aside>
+  </div>
 </main>
 
 <div class="toast" id="toast" role="status"></div>
@@ -74,6 +76,6 @@
 <script src="../assets/js/console.js"></script>
 <script src="../assets/js/builder.js?v=20261122a"></script>
 <script src="../assets/js/desain.js?v=20261127a"></script>
-<script src="studio.js?v=20261127a"></script>
+<script src="studio.js?v=20261127b"></script>
 </body>
 </html>

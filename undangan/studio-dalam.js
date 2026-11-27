@@ -11,6 +11,7 @@
   var ED = window.parent && window.parent !== window && window.parent.NAWALA_STUDIO;
   if (!ED) return;
   var root = document.documentElement, sel = null, mode = 'sentuh';
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
   root.classList.add('is-studio'); root.setAttribute('data-st', mode);
   var GUARD = '.cover h1, .cover__date, .cover__to, #form, #count, .madeby';
   function guards() { Array.prototype.forEach.call(document.querySelectorAll(GUARD), function (el) { el.classList.add('st-guard'); }); }
@@ -72,13 +73,13 @@
     },
     scrollTo: function (s) {
       var el = typeof s === 'string' ? document.getElementById(s) : find(s);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: typeof s === 'string' ? 'start' : 'center' });
+      if (el) el.scrollIntoView({ behavior: calm, block: typeof s === 'string' ? 'start' : 'center' });
     },
     /* on a phone the panel covers the lower part of the preview: bring a chosen slot up into the clear part */
     lift: function (s, clear) {
       var el = find(s); if (!el) return;
       var r = el.getBoundingClientRect(), h = window.innerHeight * (clear || .4);
-      if (r.bottom > h - 10 || r.top < 6) window.scrollBy({ top: r.top - Math.max(14, (h - r.height) / 2), behavior: 'smooth' });
+      if (r.bottom > h - 10 || r.top < 6) window.scrollBy({ top: r.top - Math.max(14, (h - r.height) / 2), behavior: calm });
     },
     /* where the middle of the screen is, so a new sticker lands where the couple is looking */
     middle: function (frac) {
