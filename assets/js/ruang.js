@@ -454,6 +454,7 @@
     var rows = N.ALL.map(function (e) { var sl = N.slug(e), m = N.meta(sl) || {}; return { slug: sl, tier: e[0], kit: m.kit || (e[0] === 'dasar' ? sl : null) }; });
     var ed = $('#ord-design'); ed.hidden = !(o.theme && B.route(o.theme, rows).route === 'dasar');
     ed.href = '../undangan/sunting.html?as=ruang&u=' + encodeURIComponent(o.slug);
+    var stu = $('#ord-studio'); if (stu) { stu.hidden = ed.hidden; stu.href = '../undangan/studio.html?as=ruang&u=' + encodeURIComponent(o.slug); }
     $('#ord-submit').textContent = o.status === 'periksa' ? t('Kirim ulang untuk diperiksa', 'Send for a check again') : t('Kirim untuk diperiksa', 'Send for a check');
     if (!ordForm) ordForm = B.form($('#ord-form'), o.draft, { slug: o.slug, who: function () { return room.code; }, onChange: function (d) {
       o.draft = d;

@@ -1480,7 +1480,7 @@ main{overflow-x:clip}
 .demo__card > span:not(.garis){font-size:1.0625rem;line-height:1.45}
 .demo__card i{font-style:normal;font-weight:700;font-size:1.0625rem;color:#B8324A}
 @media (min-width:860px){
-  .demo__cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .demo__cards{grid-template-columns:repeat(4,minmax(0,1fr))}
   .demo__card{grid-template-columns:minmax(0,1fr);align-content:start;padding:1rem 1.1rem 1.2rem;row-gap:.4rem}
   .demo__card .garis{grid-row:auto;width:min(100%,220px);justify-self:center}
 }

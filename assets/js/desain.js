@@ -10,6 +10,10 @@
      photos {bride|groom|cover: {x, y, z, r, s, al}}   pan (0..100), zoom (1..3), turn (deg), size (.6..1.3), align l|c|r
      items  [{id, b, k, s, x, y, w, r, c, t, f, fs, z}]   added elements, pinned to a block (b), in % of that block
      at     ISO time of the last change (the console compares it with the publish time)
+   Since 27 Nov 2026 (the Studio, undangan/studio.html):
+     font.z  size of all writing in % (90..115; 100 is left out)
+     pal    ''|<colourway id>       the theme's own colours, or one of PALS (the picture stays, the paper and inks change)
+     hak    {<cap id>: true|false}  what this couple may change, where the team set it apart from their level (see CAPS)
    Everything that comes in is shaped again here, so a design can never carry a foreign picture or a script. */
 window.NAWALA_DESIGN = (function () {
   'use strict';
@@ -63,6 +67,67 @@ window.NAWALA_DESIGN = (function () {
   /* each family starts with its own frame, so themes do not all look alike */
   var FAMILY_FRAME = { foto: 'oval', bunga: 'karangan', tempat: 'lengkung', budaya: 'emas', waktu: 'ganda' };
   var OPENINGS = [['nawala', 'Nawala membawa surat', 'Nawala brings the letter'], ['monogram', 'Segel monogram', 'Monogram seal'], ['foto', 'Foto berdua', 'Your photo'], ['tema', 'Bunga tema', 'The theme\'s flowers']];
+  /* ---------- Colourways: main ink and accent; the lighter tones are mixed from them ---------- */
+  var PALS = [['sage', 'Sage', 'Sage', '#2F4034', '#6F8F72'], ['mawar', 'Mawar', 'Rose', '#5A2E3A', '#C27A8C'], ['langit', 'Langit', 'Sky', '#23364D', '#6E93B8'],
+    ['emas', 'Emas', 'Gold', '#4A3B1E', '#B8923F'], ['terakota', 'Terakota', 'Terracotta', '#4E2A1E', '#C2643F'], ['lila', 'Lila', 'Lilac', '#3B2F52', '#8C79B8'],
+    ['arang', 'Arang', 'Charcoal', '#2B2B2E', '#8A8A90'], ['marun', 'Marun', 'Maroon', '#4A1522', '#A8445A']];
+  function rgb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+  function mix(h, to, k) { var a = rgb(h), b = rgb(to); return '#' + a.map(function (v, i) { return ('0' + Math.round(v + (b[i] - v) * k).toString(16)).slice(-2); }).join(''); }
+  function palOf(id) {
+    for (var i = 0; i < PALS.length; i++) if (PALS[i][0] === id) {
+      var m = PALS[i][3], a = PALS[i][4];
+      return { main: m, accent: a, soft: mix(a, '#ffffff', .5), wash: mix(a, '#ffffff', .82), paper: mix(a, '#ffffff', .96), paper2: mix(a, '#ffffff', .9), deep: mix(m, '#000000', .35) };
+    }
+    return null;
+  }
+  /* ---------- Looks: whole designs set up by Nawala. One tap changes faces, boxes, frames and colours together ---------- */
+  var LOOKS = [
+    ['asli', 'Asli tema', 'As designed', {}],
+    ['klasik', 'Klasik', 'Classic', { font: { judul: 'playfair-display', teks: 'lora' }, box: { r: 28 }, frame: 'lengkung' }],
+    ['romantis', 'Romantis', 'Romantic', { font: { judul: 'great-vibes', teks: 'cormorant-garamond' }, box: { a: 88, r: 36 }, frame: 'oval', pal: 'mawar' }],
+    ['modern', 'Modern', 'Modern', { font: { judul: 'italiana', teks: 'jost' }, box: { a: 100, r: 8 }, frame: 'kotak', pal: 'arang' }],
+    ['megah', 'Megah', 'Grand', { font: { judul: 'cinzel', teks: 'eb-garamond' }, box: { r: 4 }, frame: 'emas', pal: 'emas' }],
+    ['surat', 'Surat tangan', 'Handwritten', { font: { judul: 'parisienne', teks: 'quicksand' }, box: { a: 80, r: 40 }, frame: 'bulat' }],
+    ['editorial', 'Editorial', 'Editorial', { font: { judul: 'bodoni-moda', teks: 'spectral' }, box: { r: 0 }, frame: 'perangko', pal: 'arang' }],
+    ['lembut', 'Lembut', 'Gentle', { font: { judul: 'sacramento', teks: 'nunito-sans' }, box: { a: 70, r: 32 }, frame: 'karangan', pal: 'sage' }],
+    ['nusantara', 'Nusantara', 'Nusantara', { font: { judul: 'marcellus', teks: 'crimson-pro' }, box: { r: 12 }, frame: 'segi8', pal: 'terakota' }],
+    ['bening', 'Bening', 'Sheer', { font: { judul: 'cormorant-upright', teks: 'raleway' }, box: { a: 45, r: 28 }, frame: 'ganda' }],
+    ['senja', 'Biru senja', 'Dusk blue', { font: { judul: 'prata', teks: 'lato' }, box: { r: 22 }, frame: 'lengkung', pal: 'langit' }],
+    ['kenangan', 'Kenangan', 'Keepsake', { font: { judul: 'pinyon-script', teks: 'cardo' }, box: { r: 6 }, frame: 'polaroid', pal: 'marun' }]
+  ];
+  /* a look replaces the faces, the boxes, the frames and the colourway; photos' crops, stickers, the opening and the
+     team's permissions stay as they are */
+  function wear(design, lookId) {
+    var D = norm(design), L = null;
+    for (var i = 0; i < LOOKS.length; i++) if (LOOKS[i][0] === lookId) L = LOOKS[i][3];
+    if (!L) return D;
+    D.font = { judul: (L.font || {}).judul || '', teks: (L.font || {}).teks || '' };
+    D.box = JSON.parse(JSON.stringify(L.box || {})); D.boxes = {};
+    D.frame = L.frame || ''; D.frames = {}; D.back = L.back || 'kertas'; D.pal = L.pal || '';
+    return norm(D);
+  }
+  function lookOf(design) {
+    var D = norm(design);
+    for (var i = 0; i < LOOKS.length; i++) {
+      var W = wear(D, LOOKS[i][0]);
+      if (JSON.stringify([W.font, W.box, W.boxes, W.frame, W.frames, W.back, W.pal]) === JSON.stringify([D.font, D.box, D.boxes, D.frame, D.frames, D.back, D.pal])) return LOOKS[i][0];
+    }
+    return '';
+  }
+  /* ---------- Permissions: what a couple may change. Each has the level of the order from which it is open (1 Dasar,
+     2 Menengah, 3 Maksimal); the team can open or close any of them for one order (design.hak). The team itself may
+     always change everything. id, name id, name en, level ---------- */
+  var CAPS = [['kata', 'Nama dan tanggal', 'Names and date', 1], ['foto', 'Mengganti dan menggeser foto', 'Replace and reposition photos', 1],
+    ['warna', 'Pilihan warna tema', 'Theme colourways', 1], ['gaya', 'Gaya sekali sentuh', 'One-tap looks', 2], ['huruf', 'Huruf', 'Fonts', 2],
+    ['bingkai', 'Bingkai foto', 'Photo frames', 2], ['pembuka', 'Pembuka dan Nawala', 'Opening and Nawala', 2], ['kotak', 'Kotak teks', 'Text boxes', 3],
+    ['stiker', 'Lapisan stiker', 'Sticker layer', 3], ['bebas', 'Warna bebas', 'Free colour picker', 3]];
+  function capBy(id) { for (var i = 0; i < CAPS.length; i++) if (CAPS[i][0] === id) return CAPS[i]; return null; }
+  function can(design, level, cap, team) {
+    if (team) return true;
+    var c = capBy(cap); if (!c) return false;
+    var h = design && design.hak || {};
+    return typeof h[cap] === 'boolean' ? h[cap] : (Number(level) || 2) >= c[3];
+  }
   var BLOCKS = ['sampul', 'salam', 'mempelai', 'cerita', 'acara', 'galeri', 'rsvp', 'ucapan', 'hadiah', 'penutup'];
 
   /* ---------- Shaping what comes in ---------- */
@@ -87,6 +152,10 @@ window.NAWALA_DESIGN = (function () {
     var o = { v: 1 };
     var f = d.font || {};
     o.font = { judul: fontOk(f.judul, 'judul') ? f.judul : '', teks: fontOk(f.teks, 'teks') ? f.teks : '' };
+    var fz = Math.round(num(f.z, 90, 115, 100)); if (fz !== 100) o.font.z = fz;
+    o.pal = one(PALS, d.pal, '');
+    o.hak = {};
+    if (d.hak && typeof d.hak === 'object') CAPS.forEach(function (c) { if (typeof d.hak[c[0]] === 'boolean') o.hak[c[0]] = d.hak[c[0]]; });
     o.box = box(d.box);
     o.boxes = {};
     if (d.boxes && typeof d.boxes === 'object') Object.keys(d.boxes).slice(0, 60).forEach(function (k) {
@@ -116,7 +185,7 @@ window.NAWALA_DESIGN = (function () {
     o.at = typeof d.at === 'string' ? d.at.slice(0, 40) : '';
     return o;
   }
-  function empty(d) { var n = norm(d); return JSON.stringify(n.font) === '{"judul":"","teks":""}' && !Object.keys(n.box).length && !Object.keys(n.boxes).length && n.nawala && n.opening === 'nawala' && !n.frame && !Object.keys(n.frames).length && n.back === 'kertas' && !Object.keys(n.photos).length && !n.items.length; }
+  function empty(d) { var n = norm(d); return JSON.stringify(n.font) === '{"judul":"","teks":""}' && !n.pal && !Object.keys(n.box).length && !Object.keys(n.boxes).length && n.nawala && n.opening === 'nawala' && !n.frame && !Object.keys(n.frames).length && n.back === 'kertas' && !Object.keys(n.photos).length && !n.items.length; }
 
   /* ---------- Putting a design on the page (only inside the invitation) ---------- */
   var base = (function () { var s = document.currentScript && document.currentScript.getAttribute('src'); return s ? s.replace(/js\/desain\.js.*$/, '') : '../assets/'; })();
@@ -228,9 +297,21 @@ window.NAWALA_DESIGN = (function () {
     });
     Array.prototype.forEach.call(document.querySelectorAll('.it'), function (el) { if (!keep[el.getAttribute('data-item')]) el.remove(); });
   }
+  var PALVARS = ['--main', '--main-rgb', '--accent', '--accent-rgb', '--accent-soft', '--accent-wash', '--paper', '--paper-2', '--mist', '--deep'];
+  function colours(root, id) {
+    var p = palOf(id);
+    PALVARS.forEach(function (k) { root.style.removeProperty(k); });
+    if (!p) return;
+    root.style.setProperty('--main', p.main); root.style.setProperty('--main-rgb', rgb(p.main).join(','));
+    root.style.setProperty('--accent', p.accent); root.style.setProperty('--accent-rgb', rgb(p.accent).join(','));
+    root.style.setProperty('--accent-soft', p.soft); root.style.setProperty('--accent-wash', p.wash);
+    root.style.setProperty('--paper', p.paper); root.style.setProperty('--paper-2', p.paper2); root.style.setProperty('--mist', p.paper2); root.style.setProperty('--deep', p.deep);
+  }
   var current = norm({});
   function apply(design) {
     var D = current = norm(design), root = document.documentElement;
+    colours(root, D.pal);
+    root.style.fontSize = D.font.z ? D.font.z + '%' : '';
     setVars(root, D.box);
     loadFont(D.font.judul); loadFont(D.font.teks);
     if (D.font.judul) root.style.setProperty('--display', face(D.font.judul)); else root.style.removeProperty('--display');
@@ -248,5 +329,6 @@ window.NAWALA_DESIGN = (function () {
     return D;
   }
   return { FONTS: FONTS, FONT_CATS: FONT_CATS, ELEMENTS: ELEMENTS, PAINTED: PAINTED, EL_CATS: EL_CATS, TEXTS: TEXTS, FRAMES: FRAMES, FAMILY_FRAME: FAMILY_FRAME, OPENINGS: OPENINGS, BLOCKS: BLOCKS,
+    PALS: PALS, palOf: palOf, LOOKS: LOOKS, wear: wear, lookOf: lookOf, CAPS: CAPS, can: can,
     norm: norm, empty: empty, apply: apply, fontById: fontById, fontOk: fontOk, elById: elById, loadFont: loadFont, face: face, base: function () { return base; }, current: function () { return current; } };
 })();

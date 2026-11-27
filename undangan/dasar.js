@@ -604,8 +604,10 @@
   /* the couple's design (fonts, boxes, frames, opening, Nawala, added elements): assets/js/desain.js */
   if (window.NAWALA_DESIGN) NAWALA_DESIGN.apply(D.design);
   /* the editor (sunting.html) shows this page in a frame with ?edit=1: no opening, no music, everything visible */
-  var editing = /[?&]edit=1(&|$)/.test(location.search);
-  window.NAWALA_PAGE = { replay: replay, inside: inside, setTheme: setTheme, setLevel: setLevel, editing: editing };
+  var editing = /[?&]edit=[12](&|$)/.test(location.search);   /* 2 = the Studio (studio.html) */
+  window.NAWALA_PAGE = { replay: replay, inside: inside, setTheme: setTheme, setLevel: setLevel, editing: editing,
+    /* the Studio changes a name in the couple file, then asks for the page's writing again */
+    refill: function () { $$('[data-f]').forEach(function (el) { var k = el.getAttribute('data-f'); if (k === 'guest' || k === 'date') return; var v = pick(k); if (v) say(el, v); }); } };
   if (editing) {
     root.classList.add('is-edit'); inside(); thrifty = true;
     $$('.rv').forEach(function (el) { el.classList.add('is-in'); });

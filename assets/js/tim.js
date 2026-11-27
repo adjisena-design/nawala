@@ -350,6 +350,7 @@
   /* a design the couple (or the team) changed since the last publish: it waits for the team's check */
   function designWaiting(o) { var dz = (o.draft || {}).design; return !!(dz && dz.at && (!o.published_at || dz.at > o.published_at)); }
   function editorLink(o) { return '../undangan/sunting.html?as=tim&u=' + encodeURIComponent(o.slug); }
+  function studioLink(o) { return '../undangan/studio.html?as=tim&u=' + encodeURIComponent(o.slug); }
   function seatLink(o) { return '../undangan/denah.html?as=tim&u=' + encodeURIComponent(o.slug); }
   function head(o) {
     var s = OSTAT[o.status], live = o.status === 'tayang';
@@ -358,7 +359,7 @@
       (live ? '<a class="link" target="_blank" rel="noopener" href="https://' + esc(addr(o)) + '">' + esc(addr(o)) + '</a>' : '<span class="muted">' + esc(addr(o)) + ' ' + t('(belum tayang)', '(not live yet)') + '</span>');
     var miss = B.missing(B.norm(o.draft)), r = B.route(o.theme, themeRows());
     var dasar = B.route(o.theme, themeRows()).route === 'dasar' && o.theme;
-    var designBits = '<button type="button" class="btn btn--line btn--sm" data-pm="' + esc(o.slug) + '">' + t('Persiapan', 'Plan') + '</button><a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + seatLink(o) + '">' + t('Denah & kursi', 'Floor plan & seats') + '</a>' + (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Sunting desain', 'Edit the design') + '</a>' : '') +
+    var designBits = '<button type="button" class="btn btn--line btn--sm" data-pm="' + esc(o.slug) + '">' + t('Persiapan', 'Plan') + '</button><a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + seatLink(o) + '">' + t('Denah & kursi', 'Floor plan & seats') + '</a>' + (dasar ? '<a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + studioLink(o) + '">' + t('Studio tema dan hak sunting', 'Theme studio and rights') + '</a><a class="btn btn--line btn--sm" target="_blank" rel="noopener" href="' + editorLink(o) + '">' + t('Editor lama', 'Old editor') + '</a>' : '') +
       (designWaiting(o) ? '<p class="small" style="width:100%"><span class="pill pill--pink">' + t('Desain baru menunggu persetujuan', 'New design waiting for approval') + '</span> ' +
         t('Periksa di Pratinjau, lalu terbitkan untuk menyetujuinya.', 'Check it in Preview, then publish to approve it.') + '</p>' : '');
     if (!sup()) {

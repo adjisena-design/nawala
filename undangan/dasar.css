@@ -530,3 +530,19 @@ html:not([data-art="lukis"]) .gflow i{background:var(--accent);-webkit-mask:url(
 #sheet-x{color:#16301F;border:2px solid transparent;background:linear-gradient(#FBF6EA,#FBF6EA) padding-box,conic-gradient(from var(--a),#F4A6C0,#F6C445,#D8436B,#F4A6C0) border-box;animation:kit-spin 5s linear infinite}
 @keyframes kit-spin{to{--a:360deg}}
 @media (prefers-reduced-motion:reduce){#sheet-x{animation:none}}
+
+/* ---------- Inside the Studio (?edit=2, studio.html): slots, the sticker layer and its guarded parts ---------- */
+.is-edit.is-studio .is-sel{outline:2.5px solid #E0527A;outline-offset:4px}
+.is-studio .is-selbox{outline:1.5px dashed rgba(224,82,122,.6);outline-offset:3px}
+.is-studio [data-f]:not([data-f="guest"]){cursor:pointer;border-radius:6px}
+.is-studio .madeby,.is-studio .duo,.is-studio .cover__to{cursor:pointer}
+@media (hover:hover){
+  .is-studio[data-st="sentuh"] [data-box]:hover,.is-studio[data-st="sentuh"] .fr:hover{outline:1.5px dashed rgba(224,82,122,.45);outline-offset:3px}
+  .is-studio[data-st="sentuh"] [data-f]:not([data-f="guest"]):hover{box-shadow:0 0 0 2px rgba(224,82,122,.35)}
+}
+.is-studio .fr.is-sel.is-photo{cursor:grab}
+.is-studio .fr.is-sel:not(.is-photo){touch-action:auto;cursor:pointer}
+.is-studio:not([data-st="stiker"]) .it.is-sel{touch-action:auto;cursor:pointer}
+.is-studio[data-st="stiker"] .it{outline:1.5px dashed rgba(224,82,122,.5);outline-offset:3px;cursor:grab}
+.is-studio[data-st="stiker"] .st-guard{box-shadow:0 0 0 2px rgba(224,82,122,.38);border-radius:10px}
+.is-studio .it.is-bad{outline:2.5px solid #D0392B!important;background:rgba(208,57,43,.14)}

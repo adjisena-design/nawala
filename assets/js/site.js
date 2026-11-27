@@ -782,9 +782,9 @@
       if (pops.themes && pops.themes.open && viewing < 0) build();
     });
 
-    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah'), tema: $('#pop-tema'), demo: $('#pop-demo'), persiapan: $('#pop-denah'), pilih: $('#pop-denah') };
+    var pops = { themes: $('#pop-themes'), login: $('#pop-login'), denah: $('#pop-denah'), tema: $('#pop-tema'), demo: $('#pop-demo'), persiapan: $('#pop-denah'), pilih: $('#pop-denah'), studio: $('#pop-denah') };
     /* the three live demos share one almost full-screen box: [page, title, title in English] */
-    var DEMOS = { denah: ['undangan/denah-demo.html', 'Demo denah dan kursi', 'Demo: floor plan and seats'], persiapan: ['ruang/?demo=persiapan', 'Demo persiapan pernikahan', 'Demo: the wedding plan'], pilih: ['ruang/?demo=tema', 'Demo memilih tema', 'Demo: choosing a theme'] };
+    var DEMOS = { denah: ['undangan/denah-demo.html', 'Demo denah dan kursi', 'Demo: floor plan and seats'], persiapan: ['ruang/?demo=persiapan', 'Demo persiapan pernikahan', 'Demo: the wedding plan'], pilih: ['ruang/?demo=tema', 'Demo memilih tema', 'Demo: choosing a theme'], studio: ['undangan/studio.html', 'Demo studio tema', 'Demo: the theme studio'] };
     /* ---------- The theme carousel (owner, 22 Nov 2026, 22:06, after the "Glassy Carousel" reel) ----------
        Every theme that has a working sample stands in a fan of glass cards: the front one lifted and lit, its
        neighbours turned away and dimmer. Drag, swipe, the wheel sideways, or the arrow keys turn it; it drifts on

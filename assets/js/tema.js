@@ -297,6 +297,7 @@
       : t('Untuk satu pasangan saja. Setelah kalian pilih, tema ini menjadi milik kalian dan tidak kami pakai lagi.', 'For one couple only. Once you choose it, it is yours and we never use it again.');
     var imj = $('#d-imj'); imj.hidden = !can;
     imj.href = can ? '../undangan/' + (th[0] === 'dasar' ? 'dasar.html' : '') + '?tema=' + encodeURIComponent(kitOf(th)) + '&to=Bapak+dan+Ibu+Santoso&imajinasi=buka' + (lang === 'en' ? '&lang=en' : '') : '#';
+    var stu = $('#d-studio'); if (stu) { stu.hidden = !(can && th[0] === 'dasar'); stu.href = can ? '../undangan/studio.html?tema=' + encodeURIComponent(kitOf(th)) : '#'; }
     var use = $('#d-use'); use.hidden = owned(th); use.href = '../?pilih=' + encodeURIComponent(sl) + '#kontak';
     $('#d-save').hidden = owned(th) || !SAVE; saveLabel(); tell('');
     if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', '');
