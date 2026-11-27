@@ -179,6 +179,13 @@
     "lili-biru": ["Lili Biru", "Blue Lilies", "light", "hidup"],
     "lili-kuning": ["Lili Kuning", "Yellow Lilies", "light", "hidup"],
     "peoni-putih": ["Peoni Putih", "White Peonies", "light", "hidup"],
+    "kawan-gunung": ["Kawan Gunung", "Mountain Friends", "light", "hidup"],
+    "rimba-raya": ["Rimba Raya", "Deep Jungle", "light", "hidup"],
+    "daun-hijau": ["Daun Hijau", "Greenery", "light", "hidup"],
+    "bingkai-persik": ["Bingkai Persik", "Peach Frame", "light", "hidup"],
+    "bingkai-malam": ["Bingkai Malam", "Night Frame", "dark", "hidup"],
+    "kartu-pos-fuji": ["Kartu Pos Fuji", "Postcard from Fuji", "light", "hidup"],
+    "aster-ceria": ["Aster Ceria", "Sunny Daisy", "light", "hidup"],
 /* /gen:hidup */
   };
   var GROUPS = [['foto', 'Foto', 'Photographs'], ['bunga', 'Bunga dan warna', 'Flowers and colour'], ['tempat', 'Tempat di Indonesia', 'Places in Indonesia'], ['budaya', 'Iman dan budaya', 'Faith and culture'], ['waktu', 'Musim dan waktu', 'Seasons and times of day'], ['hidup', 'Lukisan hidup', 'Living pictures']];

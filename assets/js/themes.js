@@ -34,7 +34,7 @@ window.NAWALA = (function () {
   /* Four tiers. Dasar: one scene, a gentle camera move. Premium: the camera travels into the scene.
      Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   var TIERS = {
-    dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai foto. 12 foto, 72 lukisan, dan 51 lukisan hidup yang bergerak.', 'The familiar scroll invitation: one picture, readable cards and photo frames. 12 photographs, 72 paintings and 51 living pictures that move.'],
+    dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai foto. 12 foto, 72 lukisan, dan 58 lukisan hidup yang bergerak.', 'The familiar scroll invitation: one picture, readable cards and photo frames. 12 photographs, 72 paintings and 58 living pictures that move.'],
     premium: ['Premium', 'Premium', 'Kamera membawa tamu masuk ke dalam adegan pembuka. Tujuh keluarga, 32 tema.', 'The camera carries your guest into the opening scene. Seven families, 32 themes.'],
     eksklusif: ['Eksklusif', 'Exclusive', 'Enam dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Six worlds. Each belongs to one couple only: once chosen, we never use it again.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
@@ -177,7 +177,14 @@ window.NAWALA = (function () {
     ["Lili Lembayung", "Violet Lilies", "Lili Merona dalam warna lembayung: lili ungu, daun eukaliptus, dan kelopak ungu yang jatuh.", "Blushing Lilies in violet: purple lilies, eucalyptus and violet petals falling.", "hidup", "lili-lembayung"],
     ["Lili Biru", "Blue Lilies", "Lili Merona dalam biru lembut: lili biru, daun eukaliptus, dan kelopak biru yang jatuh.", "Blushing Lilies in soft blue: blue lilies, eucalyptus and blue petals falling.", "hidup", "lili-biru"],
     ["Lili Kuning", "Yellow Lilies", "Lili Merona dalam kuning hangat: lili kuning, daun eukaliptus, dan kelopak kuning yang jatuh.", "Blushing Lilies in warm yellow: yellow lilies, eucalyptus and yellow petals falling.", "hidup", "lili-kuning"],
-    ["Peoni Putih", "White Peonies", "Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.", "Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.", "hidup", "peoni-putih"]
+    ["Peoni Putih", "White Peonies", "Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.", "Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.", "hidup", "peoni-putih"],
+    ["Kawan Gunung", "Mountain Friends", "Domba gunung, kambing, beruang hitam, dan keledai pembawa bekal di lereng berbatu; untuk undangan yang ceria.", "A ram, a goat, a black bear and a pack donkey on a rocky slope; for a playful invitation.", "hidup", "kawan-gunung"],
+    ["Rimba Raya", "Deep Jungle", "Gorila, ular hijau, dan kalkun di antara daun besar dan sulur; untuk undangan yang ceria.", "A gorilla, a green snake and a turkey among big leaves and lianas; for a playful invitation.", "hidup", "rimba-raya"],
+    ["Daun Hijau", "Greenery", "Hanya hijau: daun besar, ivy di sudut kartu, sulur kecil, dan bukit lumut di bawah.", "Green only: large leaves, ivy on the card corners, small vines and a mossy hill below.", "hidup", "daun-hijau"],
+    ["Bingkai Persik", "Peach Frame", "Bingkai emas tipis yang tetap di tempat, bunga persik dan ranunculus, dan kelopak yang jatuh.", "A fine gold frame that stays in place, peach blossom and ranunculus, and falling petals.", "hidup", "bingkai-persik"],
+    ["Bingkai Malam", "Night Frame", "Bingkai emas tipis di atas biru malam, mawar emas, dan kilau emas yang melayang.", "A fine gold frame on night blue, a gold rose and drifting gold light.", "hidup", "bingkai-malam"],
+    ["Kartu Pos Fuji", "Postcard from Fuji", "Lukisan Gunung Fuji seperti kartu pos, dengan ranting sakura yang keluar dari bingkainya.", "A painting of Mount Fuji like a postcard, with a cherry branch reaching out of its frame.", "hidup", "kartu-pos-fuji"],
+    ["Aster Ceria", "Sunny Daisy", "Aster kuning bergaya kartun, pohon bulat, kolam kecil, dan mobil kemping yang melintas; untuk undangan yang ceria.", "A cartoon yellow daisy, a round tree, a small pond and a camper van passing by; for a playful invitation.", "hidup", "aster-ceria"]
 /* /gen:hidup */
   ];
   var EXCLUSIVE = [

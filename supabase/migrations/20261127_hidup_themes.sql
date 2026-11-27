@@ -1,4 +1,4 @@
--- 51 living Dasar themes (27 Nov 2026), built from the cut-outs in the owner's art directory: family "hidup".
+-- 58 living Dasar themes (27 Nov 2026), built from the cut-outs in the owner's art directory: family "hidup".
 -- Scenery in layers that shift with the scroll, falling or rising particles, swaying corners. Every one has a working
 -- sample (kit = its own slug in undangan/dasar.html). Written by tools/hidup.py. Safe to run twice.
 
@@ -59,7 +59,14 @@ insert into public.themes (slug, tier, family, name_id, name_en, desc_id, desc_e
 ('lili-lembayung', 'dasar', 'hidup', 'Lili Lembayung', 'Violet Lilies', 'Lili Merona dalam warna lembayung: lili ungu, daun eukaliptus, dan kelopak ungu yang jatuh.', 'Blushing Lilies in violet: purple lilies, eucalyptus and violet petals falling.', 'lili-lembayung', 3470),
 ('lili-biru', 'dasar', 'hidup', 'Lili Biru', 'Blue Lilies', 'Lili Merona dalam biru lembut: lili biru, daun eukaliptus, dan kelopak biru yang jatuh.', 'Blushing Lilies in soft blue: blue lilies, eucalyptus and blue petals falling.', 'lili-biru', 3480),
 ('lili-kuning', 'dasar', 'hidup', 'Lili Kuning', 'Yellow Lilies', 'Lili Merona dalam kuning hangat: lili kuning, daun eukaliptus, dan kelopak kuning yang jatuh.', 'Blushing Lilies in warm yellow: yellow lilies, eucalyptus and yellow petals falling.', 'lili-kuning', 3490),
-('peoni-putih', 'dasar', 'hidup', 'Peoni Putih', 'White Peonies', 'Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.', 'Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.', 'peoni-putih', 3500)
+('peoni-putih', 'dasar', 'hidup', 'Peoni Putih', 'White Peonies', 'Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.', 'Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.', 'peoni-putih', 3500),
+('kawan-gunung', 'dasar', 'hidup', 'Kawan Gunung', 'Mountain Friends', 'Domba gunung, kambing, beruang hitam, dan keledai pembawa bekal di lereng berbatu; untuk undangan yang ceria.', 'A ram, a goat, a black bear and a pack donkey on a rocky slope; for a playful invitation.', 'kawan-gunung', 3510),
+('rimba-raya', 'dasar', 'hidup', 'Rimba Raya', 'Deep Jungle', 'Gorila, ular hijau, dan kalkun di antara daun besar dan sulur; untuk undangan yang ceria.', 'A gorilla, a green snake and a turkey among big leaves and lianas; for a playful invitation.', 'rimba-raya', 3520),
+('daun-hijau', 'dasar', 'hidup', 'Daun Hijau', 'Greenery', 'Hanya hijau: daun besar, ivy di sudut kartu, sulur kecil, dan bukit lumut di bawah.', 'Green only: large leaves, ivy on the card corners, small vines and a mossy hill below.', 'daun-hijau', 3530),
+('bingkai-persik', 'dasar', 'hidup', 'Bingkai Persik', 'Peach Frame', 'Bingkai emas tipis yang tetap di tempat, bunga persik dan ranunculus, dan kelopak yang jatuh.', 'A fine gold frame that stays in place, peach blossom and ranunculus, and falling petals.', 'bingkai-persik', 3540),
+('bingkai-malam', 'dasar', 'hidup', 'Bingkai Malam', 'Night Frame', 'Bingkai emas tipis di atas biru malam, mawar emas, dan kilau emas yang melayang.', 'A fine gold frame on night blue, a gold rose and drifting gold light.', 'bingkai-malam', 3550),
+('kartu-pos-fuji', 'dasar', 'hidup', 'Kartu Pos Fuji', 'Postcard from Fuji', 'Lukisan Gunung Fuji seperti kartu pos, dengan ranting sakura yang keluar dari bingkainya.', 'A painting of Mount Fuji like a postcard, with a cherry branch reaching out of its frame.', 'kartu-pos-fuji', 3560),
+('aster-ceria', 'dasar', 'hidup', 'Aster Ceria', 'Sunny Daisy', 'Aster kuning bergaya kartun, pohon bulat, kolam kecil, dan mobil kemping yang melintas; untuk undangan yang ceria.', 'A cartoon yellow daisy, a round tree, a small pond and a camper van passing by; for a playful invitation.', 'aster-ceria', 3570)
 on conflict (slug) do update set tier = excluded.tier, family = excluded.family, name_id = excluded.name_id, name_en = excluded.name_en,
   desc_id = excluded.desc_id, desc_en = excluded.desc_en, kit = excluded.kit, sort = excluded.sort;
 

@@ -414,3 +414,8 @@ The owner's girlfriend made 304 cut-outs for Nawala (hand-made and AI-made; "NAW
 - 42 of the 303 pictures are still unused (duplicates, faces, shrine pieces, a few lilies and small vines).
 - `20261127_hidup_themes.sql` now holds all 51 rows (an upsert, safe to run again). Run again by Claude through the owner's Chrome on 27 Nov 2026, 22:50: `site_themes` gave 173 themes, 135 Dasar, 51 `hidup` (D-085 to D-135).
 - Checked in a test browser at 390x844, three scroll positions each. Not on a real phone.
+
+### Third batch of living themes (owner, 27 Nov 2026, 22:51: "do more with the remaining arts")
+- Seven more, so the family has 58, Dasar 142, the site 180 themes (150 with a sample): kawan-gunung and rimba-raya (the remaining animals), daun-hijau (greenery only), bingkai-persik and bingkai-malam (the other two gold frame sets, fixed), kartu-pos-fuji (the rectangular Fuji painting as a postcard), aster-ceria (the cartoon daisy).
+- Still unused, on purpose: faces (86, 92, 94), shrine pieces (84, 87, 91, 96, 97, 99, 106), the octopus (103) and six duplicates (10, 126, 210, 259, 284, 285). The directory is used up; more variety needs new art (the Sheet "Nawala artwork list" has a tab "Draw next").
+- `20261127_hidup_themes.sql` holds all 58 rows.
