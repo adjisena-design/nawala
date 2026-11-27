@@ -9,7 +9,7 @@
 # Run from the repository root. Add a theme: one entry in THEMES below, then the three commands.
 #
 # A piece is written 'n' (file n.png), with letters after it: v = flipped top to bottom, h = mirrored,
-# r = turned upside down, pK = part K of a sheet of loose pieces (petals, confetti), cut apart by its gaps.
+# r = turned upside down, cu / cb / cy / cw = pink petals recoloured violet, blue, yellow, white, pK = part K of a sheet of loose pieces (petals, confetti), cut apart by its gaps.
 import sys, os, re, json, colorsys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -379,6 +379,244 @@ THEMES = {
     corner=('77', '79'),
     gaps=[gap(pc('71', 58, 50, 50), h=62), gap(pc('105', 80, 50, 50), h=40), gap(pc('72', 70, 50, 50), h=58), gap(pc('98', 44, 50, 50), h=64)],
     fx=fx('fall', SAKURA, n=16, s=(10, 22), d=(8, 15))),
+# ---- second batch (27 Nov 2026, night): unused pictures, new pairings, night versions, colour versions ----
+'lili-stargazer': dict(
+    name=('Lili Stargazer', 'Stargazer Lilies'),
+    desc=('Lili stargazer berbintik dalam merah muda tua, dengan kelopak yang jatuh perlahan.', 'Speckled stargazer lilies in deep pink, with petals falling slowly.'),
+    tone='light', tags=['merahmuda', 'lili', 'stargazer', 'kelopak'],
+    sky='linear-gradient(180deg,#FFF3F6 0,#FBDFE8 52%,#F3C3D4 100%)', main='#5A1F3A', accent='#C8386E',
+    top=[top('286', 46, -6, up=10, right=True, a=2)],
+    foot=[foot('46', 60, -10, down=20), foot('3', 64, -10, down=24, right=True)],
+    hero=[pc('3', 74, 50, 68)],
+    corner=('9', '48'),
+    gaps=[gap(pc('57', 52, 50, 50)), gap(pc('46', 54, 50, 50)), gap(pc('9', 42, 28, 50), pc('13', 44, 72, 52)), gap(pc('48', 44, 50, 50), h=62)],
+    fx=fx('fall', PETAL, n=11, s=(16, 30))),
+'lili-cat-air': dict(
+    name=('Lili Cat Air', 'Watercolour Lilies'),
+    desc=('Lili merah muda bersapuan cat air di atas padang bunga pastel.', 'Pink lilies in soft watercolour over a pastel flower meadow.'),
+    tone='light', tags=['catair', 'merahmuda', 'lili', 'lembut'],
+    sky='linear-gradient(180deg,#FFFAF7 0,#FDEFEF 52%,#F8E1E6 100%)', main='#5B3340', accent='#D46A8C',
+    top=[top('209', 96, 2, up=4, a=2.2)],
+    foot=[foot('242', 110, -5, down=20)],
+    hero=[pc('44', 62, 50, 68)],
+    corner=('6', '18'),
+    gaps=[gap(pc('15', 56, 50, 50)), gap(pc('14', 44, 28, 50), pc('27', 44, 72, 52)), gap(pc('8', 54, 50, 50)), gap(pc('29', 42, 28, 50), pc('36', 46, 72, 50))],
+    fx=fx('fall', PETAL, n=10, s=(14, 28))),
+'bingkai-emas': dict(
+    name=('Bingkai Emas', 'Gold Frame'),
+    desc=('Bingkai emas tipis yang tetap di tempat saat digulir, lili putih, dan kilau emas yang melayang.', 'A fine gold frame that stays in place as you scroll, a white lily and drifting gold light.'),
+    tone='light', tags=['emas', 'gading', 'bingkai', 'formal'],
+    sky='linear-gradient(180deg,#FFFDF7 0,#FBF5E6 55%,#F5EAD0 100%)', main='#46381E', accent='#B08A2E',
+    far=[far('297', 94, 50, 50, d=0)],
+    hero=[pc('16', 52, 50, 68)],
+    corner=('295', '298'),
+    gaps=[gap(pc('296', 80, 50, 50), h=20), gap(pc('205', 44, 50, 50)), gap(pc('141', 50, 50, 50)), gap(pc('303', 36, 50, 50))],
+    fx=fx('float', n=12, s=(5, 10), d=(7, 13), o=(.5, .95), dot='#C9A24B')),
+'segel-pita': dict(
+    name=('Segel Pita', 'Ribbon Seal'),
+    desc=('Segel lilin merah muda berpita di sampul, mawar kecil di sudut kartu, dan peony yang mekar.', 'A pink wax seal with a bow on the cover, small roses on the card corners and peonies in bloom.'),
+    tone='light', tags=['merahmuda', 'segel', 'mawar', 'manis'],
+    sky='linear-gradient(180deg,#FFF7F5 0,#FBE9E6 52%,#F3D3D0 100%)', main='#5A3338', accent='#C97886',
+    top=[top('235', 60, -8, up=10), top('234', 60, -8, up=10, right=True)],
+    foot=[foot('21', 92, 4, down=24)],
+    hero=[pc('32', 44, 50, 70)],
+    corner=('194', '196h'),
+    gaps=[gap(pc('41', 46, 50, 50)), gap(pc('33', 50, 50, 50)), gap(pc('32', 34, 50, 50)), gap(pc('45', 52, 50, 50))],
+    fx=fx('fall', PETAL, n=9, s=(14, 26))),
+'sahabat-rimba': dict(
+    name=('Sahabat Rimba', 'Forest Friends'),
+    desc=('Rusa, beruang, serigala, dan berang-berang di hutan pinus; untuk undangan yang ceria.', 'A moose, a bear, a wolf and a beaver in a pine forest; for a playful invitation.'),
+    tone='light', tags=['ilustrasi', 'hijau', 'hewan', 'ceria'],
+    sky='linear-gradient(180deg,#CFE8F3 0,#E9F4EA 50%,#F6F3D6 100%)', main='#2B4630', accent='#B4672E',
+    far=[far('109', 26, 90, 8, d=-.12, move='turn', t=150), far('136', 130, 46, 62, d=.12)],
+    foot=[foot('112', 118, -9, down=24, d=.5)],
+    hero=[pc('121', 40, 50, 74)],
+    corner=None,
+    gaps=[gap(pc('120', 50, 50, 50), h=46), gap(pc('124', 36, 30, 52), pc('128', 26, 72, 54), h=40), gap(pc('129', 44, 50, 50), h=58), gap(pc('122', 52, 50, 50), h=58)],
+    fx=fx('fall', DAUN, n=7, s=(18, 30), d=(11, 18)),
+    fly=[fly('128', 60, 70, 24, dy=0)]),
+'amarilis': dict(
+    name=('Amarilis', 'Amaryllis'),
+    desc=('Amarilis merah bergaris putih dan alstroemeria, di atas padang bunga kecil.', 'Red and white striped amaryllis and alstroemeria over a meadow of small flowers.'),
+    tone='light', tags=['merah', 'amarilis', 'berani', 'kelopak'],
+    sky='linear-gradient(180deg,#FFF8F4 0,#FDEDE8 52%,#F7D9D2 100%)', main='#5A2222', accent='#C43A3A',
+    top=[top('213', 30, 2, up=10, a=2.6, t=6), top('213', 26, 2, up=16, right=True, flip=True, a=3, t=7)],
+    foot=[foot('263', 110, -5, down=14)],
+    hero=[pc('67', 64, 50, 70)],
+    corner=('67', '189'),
+    gaps=[gap(pc('60', 34, 50, 50), h=70), gap(pc('28', 48, 50, 50)), gap(pc('67', 54, 50, 50), h=44), gap(pc('57', 50, 50, 50))],
+    fx=fx('fall', PETAL, n=9, s=(14, 26))),
+'kala-lili': dict(
+    name=('Kala Lili', 'Calla Lily'),
+    desc=('Kala lili putih yang ramping, daun hijau di atas, dan bunga putih yang tenang.', 'Slender white calla lilies, green leaves above and calm white flowers.'),
+    tone='light', tags=['putih', 'hijau', 'kalalili', 'minimalis'],
+    sky='linear-gradient(180deg,#F1F6EE 0,#F8FAF3 52%,#FBF9EE 100%)', main='#30422F', accent='#7A9A5E',
+    top=[top('271', 108, -4, up=30)],
+    foot=[foot('254', 110, -5, down=22)],
+    hero=[pc('76', 40, 50, 70)],
+    corner=('188', '162'),
+    gaps=[gap(pc('258', 42, 50, 50)), gap(pc('248', 44, 50, 50)), gap(pc('76', 34, 50, 50), h=72), gap(pc('205', 44, 50, 50))],
+    fx=fx('rise', n=11, s=(5, 10), d=(11, 18), o=(.5, 1), dot='#FFFFFF')),
+'kupu-apel': dict(
+    name=('Kupu-Kupu Bunga Apel', 'Butterfly on Apple Blossom'),
+    desc=('Kupu-kupu jingga di atas karangan bunga apel, dengan kelopak merah muda yang jatuh.', 'An orange butterfly on a wreath of apple blossom, with pink petals falling.'),
+    tone='light', tags=['merahmuda', 'kupukupu', 'bungaapel', 'musimsemi'],
+    sky='linear-gradient(180deg,#F6FAEF 0,#FDF3F1 52%,#FBE3E6 100%)', main='#4E3A2E', accent='#D9763A',
+    top=[top('274v', 58, -6, up=4), top('274v', 54, -6, up=8, right=True, flip=True)],
+    foot=[foot('267', 110, -5, down=14)],
+    hero=[pc('264', 58, 50, 70)],
+    corner=('248', '20'),
+    gaps=[gap(pc('264', 48, 50, 50)), gap(pc('19', 42, 28, 50), pc('248', 42, 72, 52)), gap(pc('21', 60, 50, 50), h=44), gap(pc('20', 46, 50, 50))],
+    fx=fx('fall', PETAL, n=9, s=(14, 26))),
+'semak-biru': dict(
+    name=('Semak Biru', 'Blue Blossom'),
+    desc=('Semak bunga biru, hortensia dan pansy biru, di bawah tirai daun.', 'A bush of blue blossom, blue hydrangea and pansies under a curtain of leaves.'),
+    tone='light', tags=['biru', 'hortensia', 'sejuk', 'taman'],
+    sky='linear-gradient(180deg,#E6F0FA 0,#F1F6FB 52%,#F6F4EC 100%)', main='#24405C', accent='#3F82C0',
+    top=[top('237', 108, -4, up=40)],
+    foot=[foot('247', 110, -5, down=20)],
+    hero=[pc('275', 62, 50, 70)],
+    corner=('174', '195'),
+    gaps=[gap(pc('180', 42, 50, 50)), gap(pc('174', 38, 28, 50), pc('193', 40, 72, 50)), gap(pc('275', 54, 50, 50), h=44), gap(pc('195', 42, 50, 50))],
+    fx=fx('float', n=11, s=(5, 10), d=(8, 14), o=(.6, 1), dot='#FFFFFF')),
+'taman-sakura': dict(
+    name=('Taman Sakura', 'Cherry Garden'),
+    desc=('Pohon merah muda seperti kapas, awan kelopak, dan gunung di kejauhan dalam lingkaran cat air.', 'A pink cotton-candy tree, a cloud of petals and a far mountain in a watercolour circle.'),
+    tone='light', tags=['catair', 'merahmuda', 'sakura', 'pohon'],
+    sky='linear-gradient(180deg,#FDF6FA 0,#FBE8F0 52%,#F5D5E3 100%)', main='#5A2C45', accent='#D95B8E',
+    far=[far('102', 56, 80, 62, d=.12, move='sway', a=1.2)],
+    top=[top('83', 74, -6, up=6, right=True)],
+    foot=[foot('73', 110, -5, down=10)],
+    hero=[pc('95', 56, 46, 70)],
+    corner=('77', '88'),
+    gaps=[gap(pc('89', 60, 50, 50)), gap(pc('101', 40, 50, 50), h=44), gap(pc('102', 40, 50, 50), h=62), gap(pc('90', 36, 50, 50))],
+    fx=fx('fall', SAKURA, n=15, s=(10, 20), d=(8, 15))),
+'macan-emas': dict(
+    name=('Macan Emas', 'Golden Leopard'),
+    desc=('Macan tutul emas di atas hitam pekat, tirai emas, dan serpihan emas yang jatuh.', 'A gold leopard on deep black, a gold curtain and falling flecks of gold.'),
+    tone='dark', tags=['emas', 'hitam', 'macan', 'berani'],
+    sky='linear-gradient(180deg,#0D0B08 0,#17130C 55%,#221B10 100%)', main='#231C10', accent='#C9A24B',
+    far=[far('148', 84, 50, 56, d=.14, move='turn', t=150, o=.3)],
+    top=[top('283', 108, -4, up=48, a=1.2, t=9)],
+    foot=[foot('288', 64, 18, down=12, a=.6)],
+    hero=[pc('147', 60, 50, 70)],
+    corner=('295', '298'),
+    gaps=[gap(pc('147', 50, 50, 50)), gap(pc('154', 34, 50, 50)), gap(pc('141', 52, 50, 50)), gap(pc('296', 82, 50, 50), h=20)],
+    fx=fx('fall', EMAS, n=13, s=(8, 18), d=(8, 15)),
+    fly=[fly('158', 80, 36, 24)]),
+'lili-emas': dict(
+    name=('Lili Emas', 'Lilies and Gold'),
+    desc=('Lili putih dengan ukiran emas di atas dan bawah, di atas kertas gading.', 'White lilies with carved gold above and below, on ivory paper.'),
+    tone='light', tags=['emas', 'putih', 'lili', 'klasik'],
+    sky='linear-gradient(180deg,#FFFCF4 0,#FAF3E2 55%,#F2E6C8 100%)', main='#4A3C20', accent='#B8902F',
+    top=[top('288', 72, 14, up=18, a=.6)],
+    foot=[foot('293', 60, 20, down=8, a=.6)],
+    hero=[pc('52', 60, 50, 68)],
+    corner=('301v', '302h'),
+    gaps=[gap(pc('56', 58, 50, 50)), gap(pc('296', 80, 50, 50), h=20), gap(pc('25', 50, 50, 50)), gap(pc('49', 50, 50, 50))],
+    fx=fx('float', n=12, s=(5, 10), d=(7, 13), o=(.5, .95), dot='#C9A24B')),
+'tropis-emas': dict(
+    name=('Tropis Emas', 'Tropical Gold'),
+    desc=('Monstera dan palem di malam hijau tua, dengan kolibri emas yang terbang melintas.', 'Monstera and palm in a deep green night, with gold hummingbirds flying across.'),
+    tone='dark', tags=['emas', 'hijau', 'tropis', 'malam'],
+    sky='linear-gradient(180deg,#081A14 0,#0C261C 55%,#123325 100%)', main='#10301F', accent='#C9A24B',
+    far=[far('216', 70, 94, 52, d=.22, move='sway', a=2.4, o=.8), far('223', 66, 8, 64, d=.14, move='sway', a=1.8, o=.7)],
+    top=[top('227', 84, -16, up=18, a=2.6)],
+    foot=[foot('225', 74, -12, down=12), foot('231', 60, -10, down=10, right=True)],
+    hero=[pc('151', 56, 50, 72)],
+    corner=('236', '217'),
+    gaps=[gap(pc('222', 46, 50, 50)), gap(pc('158', 40, 50, 50)), gap(pc('221', 56, 50, 50), h=62), gap(pc('150', 30, 50, 50), h=62)],
+    fx=fx('fall', EMAS, n=12, s=(8, 18), d=(8, 15)),
+    fly=[fly('156', 70, 38, 20), fly('157', 56, 60, 26, flip=True)]),
+'wisteria-gapura': dict(
+    name=('Gapura Wisteria', 'Wisteria Arch'),
+    desc=('Gapura mawar di bawah wisteria ungu yang menjuntai, dengan kelopak ungu yang melayang.', 'The rose arch under hanging purple wisteria, with violet petals drifting.'),
+    tone='light', tags=['ungu', 'wisteria', 'gapura', 'romantis'],
+    sky='linear-gradient(180deg,#F3ECFB 0,#FAF3F8 52%,#FBEBE6 100%)', main='#43305C', accent='#9366C4',
+    top=[top('281', 110, -5, up=8)],
+    foot=[foot('265', 110, -5, down=20)],
+    hero=[pc('273', 84, 50, 68, sp=-.25)],
+    corner=('270', '62'),
+    gaps=[gap(pc('287', 48, 50, 50), h=62), gap(pc('269', 44, 50, 50), h=64), gap(pc('280', 38, 50, 50), h=58), gap(pc('278', 66, 50, 50))],
+    fx=fx('fall', UNGU, n=12, s=(10, 20), d=(9, 16))),
+'herbarium-malam': dict(
+    name=('Herbarium Malam', 'Herbarium by Night'),
+    desc=('Bunga kering di atas biru arang, dengan titik cahaya hangat yang melayang.', 'Dried flowers on charcoal blue, with warm specks of light drifting.'),
+    tone='dark', tags=['bungakering', 'malam', 'arang', 'hangat'],
+    sky='linear-gradient(180deg,#14171D 0,#1B2029 55%,#242A35 100%)', main='#222835', accent='#D2A566',
+    far=[far('159', 36, 18, 60, d=.2, move='sway', a=2), far('181', 38, 84, 54, d=.1, move='sway', a=1.6)],
+    foot=[foot('164', 26, 2, down=4, a=2.4), foot('167', 22, 26, down=4, a=3, t=6), foot('161', 26, 2, down=4, right=True, a=2.6), foot('160', 40, 22, down=6, right=True, a=2, t=9)],
+    hero=[pc('190', 64, 50, 68)],
+    corner=('163', '176'),
+    gaps=[gap(pc('166', 50, 50, 50)), gap(pc('173', 36, 28, 50), pc('179', 38, 72, 50)), gap(pc('183', 32, 30, 50), pc('182', 26, 70, 50)), gap(pc('165', 46, 50, 50), h=62)],
+    fx=fx('float', n=13, s=(5, 10), d=(8, 14), o=(.5, .95), dot='#F0C98A')),
+'padang-malam': dict(
+    name=('Padang Malam', 'Meadow at Night'),
+    desc=('Padang bunga liar di bawah langit malam biru, dengan kunang-kunang yang naik perlahan.', 'A wildflower meadow under a blue night sky, with fireflies rising slowly.'),
+    tone='dark', tags=['malam', 'biru', 'padang', 'kunangkunang'],
+    sky='linear-gradient(180deg,#0C1530 0,#152247 55%,#22305A 100%)', main='#18254A', accent='#E3B94F',
+    top=[top('199', 104, -2, up=14)],
+    foot=[foot('244', 110, -5, down=22)],
+    hero=[pc('251', 56, 50, 68)],
+    corner=('240', '249'),
+    gaps=[gap(pc('247', 84, 50, 50), h=62), gap(pc('266', 62, 50, 50), h=62), gap(pc('260', 80, 50, 50), h=58), gap(pc('246', 86, 50, 50), h=60)],
+    fx=fx('rise', n=16, s=(5, 11), d=(10, 18), o=(.6, 1), dot='#F6DC6E')),
+'kebun-malam': dict(
+    name=('Kebun Malam', 'Garden at Night'),
+    desc=('Tirai sulur dan hortensia putih di malam hijau tua, diterangi kunang-kunang.', 'A curtain of vines and white hydrangea in a deep green night, lit by fireflies.'),
+    tone='dark', tags=['malam', 'hijau', 'sulur', 'kunangkunang'],
+    sky='linear-gradient(180deg,#07140F 0,#0D2018 55%,#142C21 100%)', main='#112A1D', accent='#C8D46A',
+    far=[far('200', 112, 50, 50, d=.1, move='breathe', o=.5)],
+    top=[top('198', 108, -4, up=20)],
+    foot=[foot('233', 110, -5, down=28)],
+    hero=[pc('203', 46, 50, 72)],
+    corner=('204', '213'),
+    gaps=[gap(pc('279', 92, 50, 50), h=52), gap(pc('205', 44, 50, 50)), gap(pc('202', 60, 50, 50), h=64), gap(pc('203', 40, 50, 50))],
+    fx=fx('rise', n=16, s=(5, 11), d=(10, 18), o=(.6, 1), dot='#F2E27A')),
+'lili-lembayung': dict(
+    name=('Lili Lembayung', 'Violet Lilies'),
+    desc=('Lili Merona dalam warna lembayung: lili ungu, daun eukaliptus, dan kelopak ungu yang jatuh.', 'Blushing Lilies in violet: purple lilies, eucalyptus and violet petals falling.'),
+    tone='light', tags=['catair', 'ungu', 'lili', 'kelopak'],
+    sky='linear-gradient(180deg,#F8F4FE 0,#EFE8FB 52%,#E2D7F6 100%)', main='#3D2E5E', accent='#8A62C8',
+    top=[top('235', 64, -6, up=8), top('234', 64, -6, up=8, right=True)],
+    foot=[foot('39cu', 112, -6, down=34)],
+    hero=[pc('4cu', 78, 50, 66)],
+    corner=('5cu', '7cu'),
+    gaps=[gap(pc('31cu', 56, 50, 50)), gap(pc('37cu', 46, 24, 52), pc('38', 62, 70, 50)), gap(pc('17cu', 54, 50, 50)), gap(pc('11cu', 44, 26, 50), pc('12cu', 46, 74, 52))],
+    fx=fx('fall', ['47cu', '47hcu'], n=11, s=(16, 30))),
+'lili-biru': dict(
+    name=('Lili Biru', 'Blue Lilies'),
+    desc=('Lili Merona dalam biru lembut: lili biru, daun eukaliptus, dan kelopak biru yang jatuh.', 'Blushing Lilies in soft blue: blue lilies, eucalyptus and blue petals falling.'),
+    tone='light', tags=['catair', 'biru', 'lili', 'kelopak'],
+    sky='linear-gradient(180deg,#F3F8FE 0,#E6F0FB 52%,#D3E3F6 100%)', main='#27405E', accent='#4E86C8',
+    top=[top('235', 64, -6, up=8), top('234', 64, -6, up=8, right=True)],
+    foot=[foot('39cb', 112, -6, down=34)],
+    hero=[pc('4cb', 78, 50, 66)],
+    corner=('5cb', '7cb'),
+    gaps=[gap(pc('31cb', 56, 50, 50)), gap(pc('37cb', 46, 24, 52), pc('38', 62, 70, 50)), gap(pc('17cb', 54, 50, 50)), gap(pc('11cb', 44, 26, 50), pc('12cb', 46, 74, 52))],
+    fx=fx('fall', ['47cb', '47hcb'], n=11, s=(16, 30))),
+'lili-kuning': dict(
+    name=('Lili Kuning', 'Yellow Lilies'),
+    desc=('Lili Merona dalam kuning hangat: lili kuning, daun eukaliptus, dan kelopak kuning yang jatuh.', 'Blushing Lilies in warm yellow: yellow lilies, eucalyptus and yellow petals falling.'),
+    tone='light', tags=['catair', 'kuning', 'lili', 'kelopak'],
+    sky='linear-gradient(180deg,#FFFDF2 0,#FDF6DA 52%,#F8E9B4 100%)', main='#4E3C14', accent='#C9981E',
+    top=[top('235', 64, -6, up=8), top('234', 64, -6, up=8, right=True)],
+    foot=[foot('39cy', 112, -6, down=34)],
+    hero=[pc('4cy', 78, 50, 66)],
+    corner=('5cy', '7cy'),
+    gaps=[gap(pc('31cy', 56, 50, 50)), gap(pc('37cy', 46, 24, 52), pc('49', 50, 70, 50)), gap(pc('17cy', 54, 50, 50)), gap(pc('11cy', 44, 26, 50), pc('12cy', 46, 74, 52))],
+    fx=fx('fall', ['47cy', '47hcy'], n=11, s=(16, 30))),
+'peoni-putih': dict(
+    name=('Peoni Putih', 'White Peonies'),
+    desc=('Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.', 'Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.'),
+    tone='light', tags=['catair', 'putih', 'peony', 'klasik'],
+    sky='linear-gradient(180deg,#E2EADB 0,#D5E0CC 52%,#C4D3BA 100%)', main='#3C4634', accent='#869A66',
+    top=[top('234', 66, -6, up=8, right=True), top('235', 60, -8, up=10)],
+    foot=[foot('21cw', 96, 2, down=24), foot('34cw', 44, -10, down=22, right=True)],
+    hero=[pc('40cw', 60, 50, 68)],
+    corner=('34cw', '30'),
+    gaps=[gap(pc('33cw', 52, 50, 50)), gap(pc('45', 54, 50, 50)), gap(pc('19cw', 42, 28, 50), pc('41cw', 42, 72, 52)), gap(pc('20cw', 50, 50, 50))],
+    fx=fx('fall', ['47cw', '47hcw'], n=11, s=(16, 30))),
 }
 
 FAMILY = ('hidup', 'Lukisan hidup', 'Living pictures',
@@ -412,8 +650,8 @@ def cut(src, key):
     from PIL import Image
     import numpy as np
     Image.MAX_IMAGE_PIXELS = None
-    m = re.match(r'^(\d+)(?:p(\d+))?([vhr]*)$', key)
-    n, part, ops = int(m.group(1)), m.group(2), m.group(3)
+    m = re.match(r'^(\d+)(?:p(\d+))?([vhr]*)(?:c([ubyw]))?$', key)
+    n, part, ops, col = int(m.group(1)), m.group(2), m.group(3), m.group(4)
     im = Image.open(os.path.join(src, '%d.png' % n)).convert('RGBA')
     a = np.array(im)[..., 3]
     if part is not None:
@@ -433,6 +671,21 @@ def cut(src, key):
     if 'v' in ops: im = im.transpose(Image.FLIP_TOP_BOTTOM)
     if 'h' in ops: im = im.transpose(Image.FLIP_LEFT_RIGHT)
     if 'r' in ops: im = im.transpose(Image.ROTATE_180)
+    if col:
+        # recolour only what is pink or red (petals); greens, yellows and browns keep their own colour
+        al = im.getchannel('A')
+        hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.int32)
+        h, sa, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+        pink = ((h >= 200) | (h <= 18)) & (sa > 18)
+        if col == 'w':
+            sa = np.where(pink, sa * .1, sa); v = np.where(pink, v + (255 - v) * .4, v)
+        else:
+            T = {'u': 191, 'b': 152, 'y': 33}[col]
+            h = np.where(pink, (h - 240 + T) % 256, h)
+            if col == 'y': v = np.where(pink, v + (255 - v) * .25, v)
+            if col == 'b': sa = np.where(pink, sa * .85, sa)
+        out = Image.fromarray(np.stack([h, sa, v], -1).clip(0, 255).astype('uint8'), 'HSV').convert('RGB')
+        im = Image.merge('RGBA', (*out.split(), al))
     return im
 
 def assets(src):

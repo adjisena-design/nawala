@@ -34,7 +34,7 @@ window.NAWALA = (function () {
   /* Four tiers. Dasar: one scene, a gentle camera move. Premium: the camera travels into the scene.
      Eksklusif: sold to one couple only, then marked as owned. Kustom: built from the couple's own inspiration. */
   var TIERS = {
-    dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai foto. 12 foto, 72 lukisan, dan 30 lukisan hidup yang bergerak.', 'The familiar scroll invitation: one picture, readable cards and photo frames. 12 photographs, 72 paintings and 30 living pictures that move.'],
+    dasar: ['Dasar', 'Basic', 'Undangan gulir yang akrab: satu gambar, kartu yang mudah dibaca, dan bingkai foto. 12 foto, 72 lukisan, dan 51 lukisan hidup yang bergerak.', 'The familiar scroll invitation: one picture, readable cards and photo frames. 12 photographs, 72 paintings and 51 living pictures that move.'],
     premium: ['Premium', 'Premium', 'Kamera membawa tamu masuk ke dalam adegan pembuka. Tujuh keluarga, 32 tema.', 'The camera carries your guest into the opening scene. Seven families, 32 themes.'],
     eksklusif: ['Eksklusif', 'Exclusive', 'Enam dunia. Masing-masing hanya untuk satu pasangan: setelah dipilih, tema itu tidak kami pakai lagi.', 'Six worlds. Each belongs to one couple only: once chosen, we never use it again.'],
     kustom: ['Kustom', 'Custom', 'Dibuat dari nol dari inspirasi kalian sendiri.', 'Built from scratch from your own inspiration.']
@@ -156,7 +156,28 @@ window.NAWALA = (function () {
     ["Lili Marun", "Maroon Lily", "Lili merah gelap dan mawar tekan di atas marun pekat, dengan tirai dan serpihan emas.", "Dark red lilies and pressed roses on deep maroon, with a curtain and flecks of gold.", "hidup", "lili-marun"],
     ["Gerbera Ceria", "Cheerful Gerbera", "Gerbera besar yang berputar pelan di sudut layar, dahlia, kosmos, dan kelopak merah muda.", "Large gerberas turning slowly at the edges, dahlia, cosmos and pink petals.", "hidup", "gerbera-ceria"],
     ["Pesta Topeng", "Masquerade", "Topeng emas, permata, dan kolibri hitam emas di malam ungu tua bertabur emas.", "A gold mask, a jewel and a black and gold hummingbird in a deep violet night of gold dust.", "hidup", "pesta-topeng"],
-    ["Sakura Malam", "Cherry Blossom Night", "Sakura di langit malam biru tua, lampion yang bergoyang, dan kelopak yang berguguran.", "Cherry blossom against a deep blue night, a swaying lantern and falling petals.", "hidup", "sakura-malam"]
+    ["Sakura Malam", "Cherry Blossom Night", "Sakura di langit malam biru tua, lampion yang bergoyang, dan kelopak yang berguguran.", "Cherry blossom against a deep blue night, a swaying lantern and falling petals.", "hidup", "sakura-malam"],
+    ["Lili Stargazer", "Stargazer Lilies", "Lili stargazer berbintik dalam merah muda tua, dengan kelopak yang jatuh perlahan.", "Speckled stargazer lilies in deep pink, with petals falling slowly.", "hidup", "lili-stargazer"],
+    ["Lili Cat Air", "Watercolour Lilies", "Lili merah muda bersapuan cat air di atas padang bunga pastel.", "Pink lilies in soft watercolour over a pastel flower meadow.", "hidup", "lili-cat-air"],
+    ["Bingkai Emas", "Gold Frame", "Bingkai emas tipis yang tetap di tempat saat digulir, lili putih, dan kilau emas yang melayang.", "A fine gold frame that stays in place as you scroll, a white lily and drifting gold light.", "hidup", "bingkai-emas"],
+    ["Segel Pita", "Ribbon Seal", "Segel lilin merah muda berpita di sampul, mawar kecil di sudut kartu, dan peony yang mekar.", "A pink wax seal with a bow on the cover, small roses on the card corners and peonies in bloom.", "hidup", "segel-pita"],
+    ["Sahabat Rimba", "Forest Friends", "Rusa, beruang, serigala, dan berang-berang di hutan pinus; untuk undangan yang ceria.", "A moose, a bear, a wolf and a beaver in a pine forest; for a playful invitation.", "hidup", "sahabat-rimba"],
+    ["Amarilis", "Amaryllis", "Amarilis merah bergaris putih dan alstroemeria, di atas padang bunga kecil.", "Red and white striped amaryllis and alstroemeria over a meadow of small flowers.", "hidup", "amarilis"],
+    ["Kala Lili", "Calla Lily", "Kala lili putih yang ramping, daun hijau di atas, dan bunga putih yang tenang.", "Slender white calla lilies, green leaves above and calm white flowers.", "hidup", "kala-lili"],
+    ["Kupu-Kupu Bunga Apel", "Butterfly on Apple Blossom", "Kupu-kupu jingga di atas karangan bunga apel, dengan kelopak merah muda yang jatuh.", "An orange butterfly on a wreath of apple blossom, with pink petals falling.", "hidup", "kupu-apel"],
+    ["Semak Biru", "Blue Blossom", "Semak bunga biru, hortensia dan pansy biru, di bawah tirai daun.", "A bush of blue blossom, blue hydrangea and pansies under a curtain of leaves.", "hidup", "semak-biru"],
+    ["Taman Sakura", "Cherry Garden", "Pohon merah muda seperti kapas, awan kelopak, dan gunung di kejauhan dalam lingkaran cat air.", "A pink cotton-candy tree, a cloud of petals and a far mountain in a watercolour circle.", "hidup", "taman-sakura"],
+    ["Macan Emas", "Golden Leopard", "Macan tutul emas di atas hitam pekat, tirai emas, dan serpihan emas yang jatuh.", "A gold leopard on deep black, a gold curtain and falling flecks of gold.", "hidup", "macan-emas"],
+    ["Lili Emas", "Lilies and Gold", "Lili putih dengan ukiran emas di atas dan bawah, di atas kertas gading.", "White lilies with carved gold above and below, on ivory paper.", "hidup", "lili-emas"],
+    ["Tropis Emas", "Tropical Gold", "Monstera dan palem di malam hijau tua, dengan kolibri emas yang terbang melintas.", "Monstera and palm in a deep green night, with gold hummingbirds flying across.", "hidup", "tropis-emas"],
+    ["Gapura Wisteria", "Wisteria Arch", "Gapura mawar di bawah wisteria ungu yang menjuntai, dengan kelopak ungu yang melayang.", "The rose arch under hanging purple wisteria, with violet petals drifting.", "hidup", "wisteria-gapura"],
+    ["Herbarium Malam", "Herbarium by Night", "Bunga kering di atas biru arang, dengan titik cahaya hangat yang melayang.", "Dried flowers on charcoal blue, with warm specks of light drifting.", "hidup", "herbarium-malam"],
+    ["Padang Malam", "Meadow at Night", "Padang bunga liar di bawah langit malam biru, dengan kunang-kunang yang naik perlahan.", "A wildflower meadow under a blue night sky, with fireflies rising slowly.", "hidup", "padang-malam"],
+    ["Kebun Malam", "Garden at Night", "Tirai sulur dan hortensia putih di malam hijau tua, diterangi kunang-kunang.", "A curtain of vines and white hydrangea in a deep green night, lit by fireflies.", "hidup", "kebun-malam"],
+    ["Lili Lembayung", "Violet Lilies", "Lili Merona dalam warna lembayung: lili ungu, daun eukaliptus, dan kelopak ungu yang jatuh.", "Blushing Lilies in violet: purple lilies, eucalyptus and violet petals falling.", "hidup", "lili-lembayung"],
+    ["Lili Biru", "Blue Lilies", "Lili Merona dalam biru lembut: lili biru, daun eukaliptus, dan kelopak biru yang jatuh.", "Blushing Lilies in soft blue: blue lilies, eucalyptus and blue petals falling.", "hidup", "lili-biru"],
+    ["Lili Kuning", "Yellow Lilies", "Lili Merona dalam kuning hangat: lili kuning, daun eukaliptus, dan kelopak kuning yang jatuh.", "Blushing Lilies in warm yellow: yellow lilies, eucalyptus and yellow petals falling.", "hidup", "lili-kuning"],
+    ["Peoni Putih", "White Peonies", "Peoni Merona dalam putih: peony putih, eukaliptus di atas, dan kelopak putih yang jatuh.", "Blushing Peonies in white: white peonies, eucalyptus above and white petals falling.", "hidup", "peoni-putih"]
 /* /gen:hidup */
   ];
   var EXCLUSIVE = [
