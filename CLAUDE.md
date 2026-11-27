@@ -411,6 +411,6 @@ The owner's girlfriend made 304 cut-outs for Nawala (hand-made and AI-made; "NAW
 ### Second batch of living themes (owner, 27 Nov 2026, 22:36: "default, go make it; animals can be used too")
 - 21 more, so the family has 51 and Dasar 135 (173 themes in all, 143 with a sample). From pictures the first batch left unused: lili-stargazer, lili-cat-air, bingkai-emas (a thin gold frame that stays fixed, depth 0), segel-pita (the wax seal on the cover), sahabat-rimba (the flat animals; meant for playful invitations), amarilis, kala-lili, kupu-apel, semak-biru, taman-sakura, macan-emas. New pairings and night versions: lili-emas, tropis-emas, wisteria-gapura, herbarium-malam, padang-malam, kebun-malam. Colour versions of Lili Merona and Peoni Merona: lili-lembayung, lili-biru, lili-kuning, peoni-putih.
 - Recolouring is a letter pair on a piece in `tools/hidup.py` (`cu` violet, `cb` blue, `cy` yellow, `cw` white, e.g. `4cu`): only pink and red pixels change hue, so leaves, buds and stamens keep their colour. White needs a tinted sky behind it (peoni-putih sits on sage).
-- 87 of the 303 pictures are still unused (duplicates, faces, shrine pieces, a few lilies and small vines).
-- `20261127_hidup_themes.sql` now holds all 51 rows (an upsert, safe to run again).
+- 42 of the 303 pictures are still unused (duplicates, faces, shrine pieces, a few lilies and small vines).
+- `20261127_hidup_themes.sql` now holds all 51 rows (an upsert, safe to run again). Run again by Claude through the owner's Chrome on 27 Nov 2026, 22:50: `site_themes` gave 173 themes, 135 Dasar, 51 `hidup` (D-085 to D-135).
 - Checked in a test browser at 390x844, three scroll positions each. Not on a real phone.
