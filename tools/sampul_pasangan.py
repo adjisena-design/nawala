@@ -1,7 +1,7 @@
 # Puts the matched sample couple on the cover of every theme that has a working sample (owner, 28 Nov 2026).
 # Run from the repository root: python3 tools/sampul_pasangan.py [slug ...]
 # - Which couple and attire: the same match() as the samples (undangan/pasangan.js, asked through node).
-# - The clean cover is read from git (commit BASE, the last one before couples were added), so running this twice
+# - The clean cover is read from git (commit BASE, the last one on main before couples were put on covers), so running this twice
 #   never stacks a couple on a couple. A cover that is not in BASE (a theme added later) is taken from the working
 #   file the first time and kept as assets/img/sampul-asli/<file>; bake a new theme's covers BEFORE running this.
 # - Writes cover-<slug>.webp, -t, -m and -s. The grey -g file (the drifting gallery) stays without a couple.
@@ -9,7 +9,7 @@
 import os, re, sys, io, json, subprocess
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, 'assets/img'); BASE = 'f5206c0'; KEEP = os.path.join(IMG, 'sampul-asli')
+IMG = os.path.join(ROOT, 'assets/img'); BASE = '071f7fa'; KEEP = os.path.join(IMG, 'sampul-asli')
 def slugs():
     s = open(os.path.join(ROOT, 'undangan/index.html')).read(); i = s.index('var KITS = {')
     d = open(os.path.join(ROOT, 'undangan/dasar.js')).read(); j = d.index('var THEMES = {'); k = d.index('\n  };', j)
