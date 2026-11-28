@@ -337,7 +337,7 @@
 
   /* ---------- The couple's own photos (live invitations), in Nawala's place ---------- */
   var PH = D.photos || {};
-  function okPhoto(u) { return typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u)
+  function okPhoto(u) { return (D.sample === true && !!window.NAWALA_PASANGAN && NAWALA_PASANGAN.ok(u)) || typeof u === 'string' && /^https:\/\/erwddnobnagpglkpvdfm\.supabase\.co\/storage\/v1\/object\/public\/media\/inv\/[a-z0-9\/-]+\.(webp|jpg)$/.test(u)
     /* the Imagination Room's own photos, kept on this device (imajinasi.js): only on samples */
     || (window.NAWALA_IMAJINASI === true && D.sample === true && typeof u === 'string' && /^data:image\/(jpeg|webp|png);base64,/.test(u)); }
   function photo(u, cls) { var im = new Image(); im.className = cls; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = u; return im; }

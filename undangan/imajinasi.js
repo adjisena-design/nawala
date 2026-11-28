@@ -6,13 +6,29 @@
      the couple file (NAWALA_INVITE) and NAWALA_IMAJINASI tells the engines to accept these local pictures.
    - Then a "Ruang Imajinasi" button joins the top tools. "Terapkan" reloads the page with the set; "Unduh gambar" makes
      a picture of the cover with Nawala's watermark, after the single door (pintu.js) has taken the visitor's details once.
-   - ?imajinasi=buka opens the room at once (from tema/'s sheet). */
+   - ?imajinasi=buka opens the room at once (from tema/'s sheet).
+   - Sample couples (owner, 28 Nov 2026; pasangan.js): while the visitor has put in nothing of their own, the sample opens
+     with one of the two sample couples in the attire that suits the theme. The room's first row, "Coba pasangan contoh",
+     lets them pick another couple or attire ("nawala-pasangan" in sessionStorage), which then follows them to every
+     sample in the tab. ?still=1 (the bake of a theme's own picture) shows no couple. */
 (function () {
   'use strict';
   var D = window.NAWALA_INVITE, KEY = 'nawala-imajinasi';
   if (!D || !D.sample || window.NAWALA_LIVE || /[?&](u|preview)=/.test(location.search)) return;
   var set = null;
   try { set = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { set = null; }
+
+  /* ---------- the sample couple, when the visitor has put in nothing of their own ---------- */
+  var PS = window.NAWALA_PASANGAN, DASAR0 = /dasar\.html$/.test(location.pathname), pair = null, picked = null;
+  function slugNow() {
+    var q = ''; try { q = (new URLSearchParams(location.search).get('tema') || '').toLowerCase(); } catch (e) {}
+    return q || (DASAR0 ? (D.dasarTheme || 'putih-klasik') : (D.theme || 'umum'));
+  }
+  if (PS && !/[?&]still=1(&|$)/.test(location.search)) {
+    try { picked = sessionStorage.getItem(PS.KEY); } catch (e) { picked = null; }
+    if (!PS.sets[picked]) picked = null;
+    if (!set) { pair = picked || PS.match(slugNow()); if (!PS.fill(D, pair)) pair = null; }
+  }
 
   /* ---------- merge, before the engine reads the couple file ---------- */
   function okData(u) { return typeof u === 'string' && /^data:image\/(jpeg|webp|png);base64,[A-Za-z0-9+\/=]+$/.test(u); }
@@ -75,6 +91,16 @@
     '.imj__foot .imj__btn{flex:1 1 auto}' +
     '.imj__note{margin:0;font-size:17px;color:rgba(58,48,53,.7)}' +
     '.imj__busy{opacity:.6;pointer-events:none}' +
+    '.imj__who{margin:.7rem 0 .35rem;font-weight:700}' +
+    '.imj__duos{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}' +
+    '.imj__duo{display:grid;gap:.3rem;padding:0 0 .4rem;border:0;border-radius:14px;overflow:hidden;background:#fff;color:inherit;font:inherit;font-size:17px;line-height:1.2;font-weight:650;cursor:pointer;' +
+      'box-shadow:inset 0 0 0 1.5px rgba(58,48,53,.12);transition:translate .2s}' +
+    '.imj__duo img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:50% 30%;background:#F3E3E9}' +
+    '.imj__duo span{padding:0 .3rem;overflow-wrap:anywhere}' +
+    '.imj__duo:hover{translate:0 -2px}.imj__duo:active{translate:0 1px}' +
+    '.imj__duo[aria-pressed=true]{box-shadow:0 0 0 2px #fff,0 0 0 4px #D8436B}' +
+    '@media (max-width:420px){.imj__duos{grid-template-columns:repeat(2,1fr)}.imj__duo img{aspect-ratio:4/3;object-position:50% 22%}}' +
+    '@media (prefers-reduced-motion:reduce){.imj__duo{transition:none}}' +
     '.tool--imj{display:inline-flex;align-items:center;gap:.4rem;background:#8E2F52!important;color:#FFFDFB!important}.tool--imj svg{width:18px;height:18px}' +
     '@media (prefers-reduced-motion:reduce){.imj__btn{transition:none}}';
 
@@ -118,13 +144,37 @@
       '<div class="imj__gal">' + [0, 1, 2, 3, 4, 5].map(function (k) { return '<i style="' + bg(gal[k]) + '"></i>'; }).join('') + '</div>' +
       '<div class="imj__acts"><button type="button" class="imj__btn" data-pick="gallery">' + (gal.length ? t('Ganti galeri', 'Change the gallery') : t('Pilih foto', 'Choose photos')) + '</button>' +
       (gal.length ? '<button type="button" class="imj__btn imj__btn--quiet" data-drop="gallery">' + t('Kosongkan', 'Clear') + '</button>' : '') + '</div></div></div>';
-    return '<p class="imj__lead">' + t('Lihat tema ini dengan foto, nama, dan tanggal kalian sendiri. Foto tetap di perangkat ini dan tidak dikirim ke mana pun; tema lain yang kalian buka di tab ini ikut memakainya.',
+    return couples() + '<p class="imj__lead">' + t('Lihat tema ini dengan foto, nama, dan tanggal kalian sendiri. Foto tetap di perangkat ini dan tidak dikirim ke mana pun; tema lain yang kalian buka di tab ini ikut memakainya.',
         'See this theme with your own photos, names and date. The photos stay on this device and are not sent anywhere; other themes you open in this tab use them too.') + '</p>' +
       '<div class="imj__two"><label>' + t('Nama wanita', "Bride's name") + '<input type="text" maxlength="24" data-imj="bride" value="' + esc(draft.bride || '') + '" placeholder="' + esc(set && set.bride ? '' : 'Laras') + '"></label>' +
       '<label>' + t('Nama pria', "Groom's name") + '<input type="text" maxlength="24" data-imj="groom" value="' + esc(draft.groom || '') + '" placeholder="Bima"></label></div>' +
       '<label>' + t('Tanggal pernikahan', 'Wedding date') + '<input type="date" data-imj="date" value="' + esc(draft.date || '') + '"></label>' +
       slots + galHtml +
       '<p class="imj__note">' + t('Foto dikecilkan otomatis agar tetap ringan. Tutup tab ini untuk menghapus semuanya.', 'Photos are made smaller to stay light. Close this tab to remove them all.') + '</p>';
+  }
+  function couples() {
+    if (!PS) return '';
+    var rows = ['a', 'b'].map(function (c) {
+      var tiles = PS.order.filter(function (k) { return PS.sets[k][0] === c; }).map(function (k) {
+        var s = PS.sets[k], on = pair === k;
+        return '<button type="button" class="imj__duo" data-duo="' + k + '" aria-pressed="' + on + '">' +
+          '<img src="' + PS.tile(k) + '" alt="" loading="lazy" decoding="async" width="200" height="356">' +
+          '<span>' + esc(t(s[2], s[3])) + '</span></button>';
+      }).join('');
+      return '<p class="imj__who">' + esc(PS.couples[c].names) + '</p><div class="imj__duos">' + tiles + '</div>';
+    }).join('');
+    return '<div class="imj__slot imj__pair" style="grid-template-columns:1fr"><div><b>' + t('Coba pasangan contoh', 'Try a sample couple') + '</b>' +
+      '<p class="imj__note">' + t('Ketuk satu busana untuk melihat tema ini bersama mereka.', 'Tap an attire to see this theme with them.') + '</p>' + rows +
+      (picked ? '<div class="imj__acts"><button type="button" class="imj__btn imj__btn--quiet" data-duo="auto">' + t('Ikuti busana yang cocok dengan tema', 'Follow the attire that suits the theme') + '</button></div>' : '') +
+      '</div></div>';
+  }
+  function duo(k) {
+    try {
+      if (k === 'auto') sessionStorage.removeItem(PS.KEY); else sessionStorage.setItem(PS.KEY, k);
+      sessionStorage.removeItem(KEY);   /* a sample couple replaces the visitor's own set */
+    } catch (e) {}
+    var q = location.search.replace(/([?&])imajinasi=[^&]*&?/, '$1').replace(/[?&]$/, '');
+    location.replace(location.pathname + q + location.hash);
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
@@ -136,6 +186,7 @@
     d.body.appendChild(dlg);
     dlg.addEventListener('click', function (e) {
       if (e.target === dlg || e.target.closest('[data-x]')) return dlg.close();
+      var du = e.target.closest('[data-duo]'); if (du && PS) return duo(du.getAttribute('data-duo'));
       var p = e.target.closest('[data-pick]'), dr = e.target.closest('[data-drop]');
       if (p) {
         var k = p.getAttribute('data-pick');
@@ -244,6 +295,17 @@
       new MutationObserver(relabel).observe(d.documentElement, { attributes: true, attributeFilter: ['lang'] });
     }
     if (/[?&]imajinasi=buka(&|$)/.test(location.search)) setTimeout(open, 600);
+    /* Dasar's review sheet changes the theme without a reload: when the attire that suits the new theme is another
+       one (and the visitor has not picked a couple themselves), open that theme afresh so couple and theme agree */
+    if (PS && pair && !picked && DASAR0) {
+      new MutationObserver(function () {
+        var now = d.documentElement.getAttribute('data-theme');
+        if (!now || PS.match(now) === pair) return;
+        var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+        q.set('tema', now); q.delete('imajinasi');
+        location.replace(location.pathname + '?' + q.toString() + location.hash);
+      }).observe(d.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', start); else start();
 })();

@@ -564,3 +564,12 @@ dialog::backdrop{background:rgba(8,18,12,.8)}
 #sheet-x{color:#16301F;border:2px solid transparent;background:linear-gradient(#FBF6EA,#FBF6EA) padding-box,conic-gradient(from var(--a),#F4A6C0,#F6C445,#D8436B,#F4A6C0) border-box;animation:kit-spin 5s linear infinite}
 @keyframes kit-spin{to{--a:360deg}}
 @media (prefers-reduced-motion:reduce){#sheet-x{animation:none}}
+
+/* Photographs of the couple (live invitations and the sample couples, 28 Nov 2026) in Nawala's place: an arched
+   portrait on each person's step, a lying picture on the closing step, gallery frames filled. Nothing moves. */
+.person > img.portrait{width:auto;height:clamp(170px,34vh,300px);aspect-ratio:3/4;object-fit:cover;object-position:50% 16%;border-radius:999px 999px 20px 20px;
+  box-shadow:0 0 0 3px rgba(255,255,255,.88),0 22px 34px -18px rgba(0,0,0,.6);filter:none;animation:none}
+.duo--photo{margin-bottom:-1.1rem}
+.duo.duo--photo img.portrait--wide{width:min(88%,340px);height:auto;aspect-ratio:16/10;margin:0;object-fit:cover;object-position:var(--side-pos,50% 40%);border-radius:20px;
+  box-shadow:0 0 0 3px rgba(255,255,255,.88),0 22px 34px -18px rgba(0,0,0,.6);filter:none;animation:none}
+.shot--photo img.ph{inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;filter:none}
