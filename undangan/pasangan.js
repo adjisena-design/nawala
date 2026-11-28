@@ -62,6 +62,9 @@
 
   /* the Premium walk shows the cover photo as a lying picture on its closing step; Dasar as a standing one on the cover */
   var WALK = !/dasar\.html$/.test(location.pathname);
+  /* living themes whose cover is itself a drawn bride and groom: no photograph on the cover there (it would sit on them) */
+  var DRAWN = /^(joglo-jawa|pengantin-jawa|pengantin-putih|pengantin-andalas|akad-melati|pasangan-ceria|nusantara-berpasangan|pengantin-klasik)$/;
+  function drawn(slug) { return DRAWN.test(String(slug || '')); }
   function photos(key, wide) {
     var s = SETS[key]; if (!s) return null;
     var p = BASE + s[1] + '-';
@@ -74,7 +77,7 @@
     };
   }
   /* puts a couple into the sample couple file (names, parents, the gift names, photos) */
-  function fill(D, key) {
+  function fill(D, key, slug) {
     var s = SETS[key]; if (!s || !D || D.sample !== true) return false;
     var c = COUPLES[s[0]];
     if (c.bride) {
@@ -88,6 +91,7 @@
     }
     var wide = false; try { wide = window.matchMedia('(min-width:900px)').matches; } catch (e) {}
     D.photos = Object.assign({}, D.photos || {}, photos(key, wide));
+    if (!WALK && drawn(slug)) delete D.photos.cover;
     /* the wide picture has the couple at one third; keep them in view beside the invitation (samping.js) */
     document.documentElement.style.setProperty('--side-pos', /^(a1|a3|b1|b3)$/.test(key) ? '86% 40%' : '14% 40%');
     return true;
@@ -96,7 +100,7 @@
 
   window.NAWALA_PASANGAN = {
     KEY: 'nawala-pasangan', sets: SETS, order: ORDER, couples: COUPLES,
-    match: match, fill: fill, ok: ok,
+    match: match, fill: fill, ok: ok, drawn: drawn,
     tile: function (key) { var s = SETS[key]; return BASE + s[1] + '-' + s[5] + '-t.webp'; }
   };
 })();

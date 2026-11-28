@@ -27,7 +27,7 @@
   if (PS && !/[?&]still=1(&|$)/.test(location.search)) {
     try { picked = sessionStorage.getItem(PS.KEY); } catch (e) { picked = null; }
     if (!PS.sets[picked]) picked = null;
-    if (!set) { pair = picked || PS.match(slugNow()); if (!PS.fill(D, pair)) pair = null; }
+    if (!set) { pair = picked || PS.match(slugNow()); if (!PS.fill(D, pair, slugNow())) pair = null; }
   }
 
   /* ---------- merge, before the engine reads the couple file ---------- */
@@ -297,10 +297,13 @@
     if (/[?&]imajinasi=buka(&|$)/.test(location.search)) setTimeout(open, 600);
     /* Dasar's review sheet changes the theme without a reload: when the attire that suits the new theme is another
        one (and the visitor has not picked a couple themselves), open that theme afresh so couple and theme agree */
-    if (PS && pair && !picked && DASAR0) {
+    if (PS && pair && DASAR0) {
+      var was = slugNow();
       new MutationObserver(function () {
         var now = d.documentElement.getAttribute('data-theme');
-        if (!now || PS.match(now) === pair) return;
+        if (!now || now === was) return;
+        /* same attire and the same kind of cover (drawn couple or not): nothing to change */
+        if ((picked || PS.match(now) === pair) && PS.drawn(now) === PS.drawn(was)) { was = now; return; }
         var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
         q.set('tema', now); q.delete('imajinasi');
         location.replace(location.pathname + '?' + q.toString() + location.hash);

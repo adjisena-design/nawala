@@ -4,19 +4,20 @@
 # - The clean cover is read from git (commit BASE, the last one on main before couples were put on covers), so running this twice
 #   never stacks a couple on a couple. A cover that is not in BASE (a theme added later) is taken from the working
 #   file the first time and kept as assets/img/sampul-asli/<file>; bake a new theme's covers BEFORE running this.
+# - A living theme whose cover is a drawn bride and groom (drawn() in pasangan.js) keeps its clean cover.
 # - Writes cover-<slug>.webp, -t, -m and -s. The grey -g file (the drifting gallery) stays without a couple.
 # - The twelve photographic Dasar themes use assets/img/latar-<slug>.webp as their backdrop, not the cover.
 import os, re, sys, io, json, subprocess
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, 'assets/img'); BASE = '071f7fa'; KEEP = os.path.join(IMG, 'sampul-asli')
+IMG = os.path.join(ROOT, 'assets/img'); BASE = 'd9c7b5f'; KEEP = os.path.join(IMG, 'sampul-asli')
 def slugs():
     s = open(os.path.join(ROOT, 'undangan/index.html')).read(); i = s.index('var KITS = {')
     d = open(os.path.join(ROOT, 'undangan/dasar.js')).read(); j = d.index('var THEMES = {'); k = d.index('\n  };', j)
     return re.findall(r"^\s{4}'([a-z0-9-]+)': \{", s[i:i + 15000], re.M) + re.findall(r"['\"]?([a-z0-9-]+)['\"]?\s*:\s*\[", d[j:k])
 def matches(names):
     js = ("global.window={};global.location={pathname:'/undangan/dasar.html'};global.document={documentElement:{style:{setProperty(){}}}};"
-          "require(%s);const P=window.NAWALA_PASANGAN;const o={};for(const s of %s){const k=P.match(s);o[s]=[P.sets[k][1],P.sets[k][5]]}console.log(JSON.stringify(o))"
+          "require(%s);const P=window.NAWALA_PASANGAN;const o={};for(const s of %s){const k=P.match(s);o[s]=[P.sets[k][1],P.sets[k][5],P.drawn(s)]}console.log(JSON.stringify(o))"
           % (json.dumps(os.path.join(ROOT, 'undangan/pasangan.js')), json.dumps(names)))
     return json.loads(subprocess.check_output(['node', '-e', js]))
 def clean(name):
@@ -52,13 +53,13 @@ def main():
     want = sys.argv[1:]; names = [s for s in slugs() if (not want or s in want) and os.path.exists(os.path.join(IMG, f'cover-{s}.webp'))]
     M = matches(names); n = 0
     for s in names:
-        setp, shot = M[s]
+        setp, shot, drawn = M[s]
         src = os.path.join(IMG, 'pasangan', f'{setp}-{shot}-l.webp')
         photo = Image.open(src).convert('RGB')
         for suf, q, tone in (('', 82, False), ('-t', 80, True), ('-m', 78, True), ('-s', 74, True)):
             name = f'cover-{s}{suf}.webp'
             if not os.path.exists(os.path.join(IMG, name)): continue
-            put(clean(name), photo, tone).save(os.path.join(IMG, name), 'WEBP', quality=q, method=6)
+            (clean(name) if drawn else put(clean(name), photo, tone)).save(os.path.join(IMG, name), 'WEBP', quality=q, method=6)
         n += 1
     print(n, 'themes')
 main()
