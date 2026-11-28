@@ -780,9 +780,9 @@ THEMES = {
     sky='linear-gradient(180deg,#0A2230 0,#0F3242 55%,#17475A 100%)', main='#0F2E3D', accent='#D6A84A',
     far=[far('d166', 120, 50, 40, d=.04, o=.14)],
     top=[top('c153', 62, 0, up=0, a=2.2, t=6), top('c136', 44, 2, up=0, right=True, a=2.6, t=7)],
-    hero=[pc('c155m', 44, 50, 72)],
+    hero=[pc('c155', 44, 50, 72)],
     corner=None,
-    gaps=[gap(pc('c148m', 70, 50, 50), h=70), gap(pc('d174', 30, 50, 50), h=34), gap(pc('c143', 54, 50, 50), h=62), gap(pc('d165', 30, 50, 50), h=34)],
+    gaps=[gap(pc('c148', 70, 50, 50), h=70), gap(pc('d174', 30, 50, 50), h=34), gap(pc('c143', 54, 50, 50), h=62), gap(pc('d165', 30, 50, 50), h=34)],
     fx=fx('float', n=14, s=(5, 10), d=(7, 13), o=(.5, .95), dot='#F2CE7A')),
 'pesta-kebun': dict(
     name=('Pesta Kebun', 'Garden Party'),
@@ -1428,8 +1428,9 @@ def all_keys():
 def cut(src, key):
     """Open piece `key`: trimmed to what is drawn, turned as its letters say.
     A key may start with b, c or d: the picture comes from art directory 2, 3 or 4 (shrunk copies in PACK/<letter>/n.webp).
-    Directory 3 has white backgrounds: the white around the drawing is cut away; the letter m after the number
-    instead turns white into transparency everywhere (for glows and lights)."""
+    Directory 3 came with white backgrounds first and transparent ones later (28 Nov 2026, 16:34); a picture without
+    transparency still gets the white around the drawing cut away, or, with the letter m, white turned into
+    transparency everywhere."""
     from PIL import Image, ImageFilter
     import numpy as np
     from scipy import ndimage
@@ -1447,7 +1448,7 @@ def cut(src, key):
         bg = ndimage.binary_dilation(bg, iterations=2)
         al = Image.fromarray(np.where(bg, 0, 255).astype('uint8')).filter(ImageFilter.GaussianBlur(1.1))
         im = im.convert('RGB'); im.putalpha(al)
-    elif 'm' in ops:
+    elif 'm' in ops and 'A' not in im.getbands():
         c = np.array(im.convert('RGB')).astype(np.float32) / 255
         al = 1 - c.min(-1)
         al = np.clip(al * 1.35, 0, 1)
